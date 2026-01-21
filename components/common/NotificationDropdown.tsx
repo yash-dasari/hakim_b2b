@@ -1,5 +1,6 @@
 import React from 'react';
 import { FaBell, FaInfoCircle, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
+import { useTranslations } from 'next-intl';
 
 export interface NotificationItem {
     id: string;
@@ -21,6 +22,7 @@ import { useRouter } from 'next/router';
 
 export default function NotificationDropdown({ notifications, isOpen, onClose, onClearAll }: NotificationDropdownProps) {
     const router = useRouter();
+    const t = useTranslations('common');
 
     if (!isOpen) return null;
 
@@ -63,7 +65,7 @@ export default function NotificationDropdown({ notifications, isOpen, onClose, o
                         onClick={onClearAll}
                         className="text-xs text-[#64748B] hover:text-red-500 transition-colors font-medium"
                     >
-                        Clear all
+                        {t('notifications.clearAll')}
                     </button>
                 )}
             </div>

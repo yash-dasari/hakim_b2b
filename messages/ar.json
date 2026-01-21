@@ -1,0 +1,1196 @@
+{
+  "common": {
+    "language": {
+      "label": "اللغة",
+      "english": "English",
+      "arabic": "العربية",
+      "kurdish": "کوردی"
+    },
+    "actions": {
+      "back": "رجوع",
+      "close": "إغلاق",
+      "cancel": "إلغاء",
+      "save": "حفظ",
+      "submit": "إرسال",
+      "ok": "حسنًا"
+    },
+    "notifications": {
+      "title": "الإشعارات",
+      "clearAll": "مسح الكل",
+      "empty": "لا توجد إشعارات بعد"
+    }
+  },
+  "adminLayout": {
+    "loading": "جارٍ التحميل...",
+    "notifications": "الإشعارات",
+    "welcomeBack": "مرحبًا بعودتك،",
+    "logout": "تسجيل الخروج",
+    "adminLabel": "مشرف",
+    "brand": {
+      "forBusiness": "للأعمال"
+    },
+    "menu": {
+      "dashboard": {
+        "title": "لوحة التحكم",
+        "description": "نظرة عامة ومؤشرات الأداء"
+      },
+      "services": {
+        "title": "الخدمات",
+        "description": "طلبات الخدمة"
+      },
+      "vehicles": {
+        "title": "المركبات",
+        "description": "إدارة الأسطول"
+      },
+      "account": {
+        "title": "الحساب",
+        "description": "تفاصيل النشاط"
+      },
+      "finance": {
+        "title": "المالية",
+        "description": "المدفوعات والفواتير"
+      }
+    }
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "subtitle": "إدارة مركباتك وطلبات الخدمة",
+    "actions": {
+      "addCars": "إضافة سيارات",
+      "createRequest": "إنشاء طلب",
+      "arrivedAtServiceCenter": "وصلت إلى مركز الخدمة",
+      "viewQuotation": "عرض العرض السعري",
+      "viewEstimatedPrice": "عرض السعر التقديري",
+      "viewBodyCheck": "عرض فحص الهيكل",
+      "accept": "قبول",
+      "reject": "رفض",
+      "submitQuote": "إرسال العرض",
+      "editQuote": "تعديل العرض",
+      "photos": "صور",
+      "collect": "تحصيل",
+      "approvePhotos": "اعتماد الصور",
+      "rejectPhotos": "رفض الصور"
+    },
+    "stats": {
+      "totalCars": "إجمالي السيارات",
+      "activeRequests": "الطلبات النشطة",
+      "completedRequests": "الطلبات المكتملة"
+    },
+    "activeRequests": {
+      "title": "الطلبات النشطة",
+      "searchPlaceholder": "ابحث في الطلبات..."
+    },
+    "filters": {
+      "allStatuses": "كل الحالات",
+      "assigned": "مسندة",
+      "accepted": "مقبولة",
+      "bodyChecking": "فحص الهيكل",
+      "fixing": "قيد الإصلاح",
+      "completed": "مكتملة"
+    },
+    "table": {
+      "bookingId": "رقم الحجز",
+      "plateNumber": "رقم اللوحة",
+      "vehicle": "المركبة",
+      "serviceType": "نوع الخدمة",
+      "category": "الفئة",
+      "serviceCost": "تكلفة الخدمة",
+      "status": "الحالة",
+      "time": "الوقت",
+      "actions": "الإجراءات",
+      "empty": "لا توجد طلبات.",
+      "pending": "قيد الانتظار",
+      "na": "غير متوفر"
+    },
+    "alerts": {
+      "error": {
+        "title": "خطأ",
+        "noBookingContext": "لم يتم العثور على سياق الحجز",
+        "approvePhotosFailed": "فشل اعتماد الصور",
+        "rejectPhotosFailed": "فشل رفض الصور",
+        "fetchQuotationDetails": "تعذر جلب تفاصيل العرض",
+        "loadQuotation": "فشل تحميل العرض",
+        "fetchBodyCheckPhotos": "فشل جلب صور فحص الهيكل",
+        "notifyServiceCenterFailed": "فشل إخطار مركز الخدمة.",
+        "confirm": "حسنًا"
+      },
+      "warning": {
+        "title": "تحذير",
+        "noPhotosToApprove": "لا توجد صور لاعتمادها"
+      },
+      "success": {
+        "title": "نجاح!",
+        "bodyCheckApproved": "تم اعتماد صور فحص الهيكل",
+        "serviceCenterNotified": "تم إخطار مركز الخدمة بوصولك.",
+        "photosSubmitted": "تم إرسال {count} صورة بنجاح."
+      },
+      "rejected": {
+        "title": "تم الرفض!",
+        "quotationSuccess": "تم رفض العرض بنجاح.",
+        "failed": "فشل الرفض",
+        "quotationFailed": "فشل رفض العرض",
+        "bodyCheckPhotos": "تم رفض صور فحص الهيكل"
+      },
+      "approveQuotation": {
+        "title": "اعتماد العرض؟",
+        "text": "هل أنت متأكد من اعتماد هذا العرض؟",
+        "confirm": "نعم، اعتمد"
+      },
+      "approved": {
+        "title": "تم الاعتماد!",
+        "quotationSuccess": "تم اعتماد العرض بنجاح.",
+        "failed": "فشل الاعتماد",
+        "quotationFailed": "فشل اعتماد العرض"
+      },
+      "info": {
+        "title": "معلومة",
+        "noQuotation": "لا يوجد عرض لهذا الحجز"
+      },
+      "acceptRequest": {
+        "title": "قبول الطلب؟",
+        "text": "هل تريد قبول الطلب رقم #{id}؟",
+        "confirm": "نعم، قبول"
+      },
+      "accepted": {
+        "title": "تم القبول!",
+        "text": "تم قبول الطلب رقم #{id}."
+      },
+      "draftSaved": {
+        "title": "تم حفظ المسودة!",
+        "text": "تم حفظ مسودة العرض."
+      },
+      "quotationSent": {
+        "title": "تم إرسال العرض!",
+        "text": "تم إرسال العرض إلى العميل."
+      },
+      "processing": {
+        "title": "جارٍ المعالجة...",
+        "notifying": "جارٍ إخطار مركز الخدمة..."
+      },
+      "paymentRecorded": {
+        "title": "تم تسجيل الدفع!",
+        "text": "تم تسجيل الدفع بنجاح."
+      },
+      "rejectBodyCheck": {
+        "title": "رفض صور فحص الهيكل",
+        "reasonLabel": "سبب الرفض",
+        "reasonPlaceholder": "أدخل سبب الرفض...",
+        "reasonRequired": "يجب كتابة سبب!"
+      }
+    },
+    "modals": {
+      "bodyCheckTitle": "فحص الهيكل - {vehicle}",
+      "vehicleFallback": "المركبة"
+    }
+  },
+  "servicesCreate": {
+    "title": "طلب خدمة",
+    "subtitle": "قدّم طلب خدمة جديد لمركباتك",
+    "fallback": {
+      "na": "غير متوفر"
+    },
+    "serviceDetails": {
+      "title": "تفاصيل الخدمة",
+      "selectCategory": "اختر الفئة",
+      "selectService": "اختر الخدمة",
+      "chooseCategory": "اختر فئة",
+      "chooseService": "اختر خدمة",
+      "loading": "جارٍ التحميل...",
+      "scheduleType": "نوع الجدولة",
+      "preferredDate": "التاريخ المفضل",
+      "preferredTime": "الوقت المفضل",
+      "am": "ص",
+      "pm": "م",
+      "serviceProvider": "مزود الخدمة",
+      "chooseProvider": "اختر مزودًا"
+    },
+    "map": {
+      "pickupSelected": "تم تحديد موقع الاستلام",
+      "pinPickup": "حدد موقع الاستلام",
+      "pinLocation": "حدد الموقع للعثور على أقرب مركز",
+      "permissionDenied": {
+        "title": "تم رفض الإذن",
+        "message": "لا يمكننا تحديد موقعك لأن الإذن مرفوض.",
+        "hint": "يرجى السماح بالوصول للموقع في إعدادات المتصفح ثم حاول مجددًا.",
+        "retry": "إعادة المحاولة"
+      },
+      "selectedPickup": "عنوان الاستلام المحدد:",
+      "dropoffSelected": "تم تحديد موقع التسليم",
+      "pinDropoff": "حدد موقع التسليم",
+      "selectedDropoff": "عنوان التسليم المحدد:"
+    },
+    "location": {
+      "detecting": "جارٍ تحديد موقعك...",
+      "detected": "تم تحديد الموقع",
+      "addressFailed": "فشل الحصول على تفاصيل العنوان",
+      "accessDenied": "تم رفض الوصول للموقع",
+      "destinationCenter": "مركز الوجهة",
+      "serviceCenter": "موقع مركز الخدمة",
+      "searchingNearby": "جارٍ البحث في القرب...",
+      "noCenters": "لا توجد مراكز متاحة",
+      "selectOnMap": "اختر من الخريطة",
+      "chooseLocation": "اختر موقعًا",
+      "center": "مركز",
+      "nearbyCenter": "مركز قريب"
+    },
+    "vehicles": {
+      "title": "اختر مركبة",
+      "available": "{count} مركبة متاحة",
+      "searchPlaceholder": "ابحث حسب الماركة أو الطراز أو رقم اللوحة...",
+      "table": {
+        "makeModelYear": "الماركة/الطراز/السنة",
+        "plateNumber": "رقم اللوحة",
+        "lastService": "آخر تاريخ/وقت خدمة",
+        "note": "ملاحظة"
+      },
+      "notePlaceholder": "أضف ملاحظة..."
+    },
+    "errors": {
+      "loadVehicles": "فشل تحميل المركبات",
+      "noServiceCenters": "لم يتم العثور على مراكز خدمة قريبة.",
+      "nearbyCentersFailed": "فشل العثور على مراكز قريبة",
+      "categoriesFailed": "فشل تحميل فئات الخدمة",
+      "servicesFailed": "فشل تحميل الخدمات",
+      "companyMissing": "بيانات الشركة مفقودة",
+      "selectVehicle": "يرجى اختيار مركبة واحدة على الأقل",
+      "selectServiceProvider": "يرجى اختيار خدمة ومزود",
+      "selectScheduleType": "يرجى اختيار نوع الجدولة",
+      "selectScheduleTime": "يرجى اختيار التاريخ والوقت للخدمة المجدولة",
+      "pickupLocation": "يرجى تحديد موقع الاستلام",
+      "dropoffLocation": "يرجى تحديد موقع التسليم",
+      "selectServiceCenter": "يرجى اختيار موقع مركز الخدمة",
+      "scheduleFuture": "يجب أن يكون وقت الجدولة بعد 30 دقيقة على الأقل"
+    },
+    "submission": {
+      "submitting": "جارٍ إرسال طلب الحجز...",
+      "success": "تم إنشاء الحجوزات بنجاح",
+      "failed": "فشل إنشاء الحجوزات",
+      "processing": "جارٍ المعالجة...",
+      "submit": "إرسال الطلب ({count})"
+    }
+  },
+  "servicesRequests": {
+    "title": "طلبات الخدمة",
+    "actions": {
+      "requestService": "طلب خدمة",
+      "waitingQuotation": "بانتظار العرض...",
+      "arrivedAtServiceCenter": "وصلت إلى مركز الخدمة",
+      "viewQuotation": "عرض العرض",
+      "viewEstimatedPrice": "عرض السعر التقديري",
+      "viewBodyCheck": "عرض فحص الهيكل",
+      "accept": "قبول",
+      "reject": "رفض",
+      "submitQuotation": "إرسال العرض",
+      "submitPhotos": "إرسال الصور",
+      "editQuotation": "تعديل العرض",
+      "collectPayment": "تحصيل الدفعة",
+      "approvePhotos": "اعتماد الصور",
+      "rejectPhotos": "رفض الصور",
+      "approveQuotation": "اعتماد العرض",
+      "rejectQuotation": "رفض العرض"
+    },
+    "stats": {
+      "totalRequests": "إجمالي الطلبات",
+      "activeServices": "الخدمات النشطة",
+      "completed": "مكتملة"
+    },
+    "filters": {
+      "searchPlaceholder": "ابحث برقم الحجز أو المركبة أو اللوحة...",
+      "allStatuses": "كل الحالات",
+      "assigned": "مسندة",
+      "accepted": "مقبولة",
+      "bodyChecking": "فحص الهيكل",
+      "awaitingApproval": "بانتظار الموافقة",
+      "fixing": "قيد الإصلاح",
+      "pendingPayment": "بانتظار الدفع",
+      "completed": "مكتملة",
+      "allCategories": "كل الفئات"
+    },
+    "table": {
+      "bookingId": "رقم الحجز",
+      "customer": "العميل",
+      "vehicle": "المركبة",
+      "service": "الخدمة",
+      "status": "الحالة",
+      "scheduled": "الموعد",
+      "payment": "الدفع",
+      "actions": "الإجراءات",
+      "empty": "لا توجد طلبات.",
+      "plateLabel": "اللوحة:"
+    },
+    "pagination": {
+      "showing": "عرض {start} إلى {end} من أصل {total} طلب"
+    },
+    "modals": {
+      "bodyCheckTitle": "فحص الهيكل - {vehicle}",
+      "vehicleFallback": "المركبة"
+    },
+    "alerts": {
+      "error": {
+        "title": "خطأ",
+        "noBookingContext": "لم يتم العثور على سياق الحجز",
+        "approvePhotosFailed": "فشل اعتماد الصور",
+        "rejectPhotosFailed": "فشل رفض الصور",
+        "fetchQuotationDetails": "تعذر جلب تفاصيل العرض",
+        "loadQuotation": "فشل تحميل العرض",
+        "notifyServiceCenterFailed": "فشل إخطار مركز الخدمة.",
+        "confirm": "حسنًا",
+        "fetchBodyCheckPhotos": "فشل جلب صور فحص الهيكل"
+      },
+      "warning": {
+        "title": "تحذير",
+        "noPhotosToApprove": "لا توجد صور لاعتمادها"
+      },
+      "success": {
+        "title": "نجاح!",
+        "bodyCheckApproved": "تم اعتماد صور فحص الهيكل",
+        "serviceCenterNotified": "تم إخطار مركز الخدمة بوصولك.",
+        "photosSubmitted": "تم إرسال {count} صورة بنجاح."
+      },
+      "rejected": {
+        "title": "تم الرفض!",
+        "quotationSuccess": "تم رفض العرض بنجاح.",
+        "failed": "فشل الرفض",
+        "quotationFailed": "فشل رفض العرض",
+        "bodyCheckPhotos": "تم رفض صور فحص الهيكل"
+      },
+      "approveQuotation": {
+        "title": "اعتماد العرض؟",
+        "text": "هل أنت متأكد من اعتماد هذا العرض؟",
+        "confirm": "نعم، اعتمد",
+        "cancel": "إلغاء"
+      },
+      "approved": {
+        "title": "تم الاعتماد!",
+        "quotationSuccess": "تم اعتماد العرض بنجاح.",
+        "failed": "فشل الاعتماد",
+        "quotationFailed": "فشل اعتماد العرض"
+      },
+      "info": {
+        "title": "معلومة",
+        "noQuotation": "لا يوجد عرض لهذا الحجز"
+      },
+      "acceptRequest": {
+        "title": "قبول الطلب؟",
+        "text": "هل تريد قبول الطلب رقم #{id}؟",
+        "confirm": "نعم، قبول",
+        "cancel": "إلغاء"
+      },
+      "accepted": {
+        "title": "تم القبول!",
+        "text": "تم قبول الطلب رقم #{id} بنجاح."
+      },
+      "paymentRecorded": {
+        "title": "تم تسجيل الدفع!",
+        "text": "تم تسجيل دفع الطلب رقم #{id} بنجاح."
+      },
+      "draftSaved": {
+        "title": "تم حفظ المسودة!",
+        "text": "تم حفظ مسودة العرض للطلب رقم #{id}."
+      },
+      "quotationSent": {
+        "title": "تم إرسال العرض!",
+        "text": "تم إرسال العرض للطلب رقم #{id} إلى العميل."
+      },
+      "processing": {
+        "title": "جارٍ المعالجة...",
+        "notifying": "جارٍ إخطار مركز الخدمة..."
+      },
+      "photoReview": {
+        "approveTitle": "اعتماد الصور؟",
+        "rejectTitle": "رفض الصور؟",
+        "approveText": "هل أنت متأكد من اعتماد صور فحص الهيكل؟",
+        "rejectText": "هل أنت متأكد من رفض هذه الصور؟",
+        "approveConfirm": "نعم، اعتمد",
+        "rejectConfirm": "نعم، ارفض",
+        "approved": "تم اعتماد الصور بنجاح.",
+        "rejected": "تم رفض الصور بنجاح.",
+        "failed": "فشل معالجة مراجعة الصور"
+      },
+      "rejectBodyCheck": {
+        "title": "رفض صور فحص الهيكل",
+        "reasonLabel": "سبب الرفض",
+        "reasonPlaceholder": "أدخل سبب الرفض...",
+        "reasonRequired": "يجب كتابة سبب!"
+      }
+    }
+  },
+  "account": {
+    "title": "إعدادات الحساب",
+    "subtitle": {
+      "editing": "إدارة معلومات وإعدادات حساب نشاطك التجاري",
+      "viewing": "عرض وإدارة معلومات حساب نشاطك التجاري"
+    },
+    "company": {
+      "title": "معلومات الشركة",
+      "edit": "تعديل المعلومات",
+      "fields": {
+        "name": "اسم الشركة",
+        "tradeLicense": "رقم الرخصة التجارية",
+        "address": "العنوان الحالي",
+        "city": "المدينة"
+      },
+      "notSet": "غير محدد",
+      "cityValue": "{city}، الإمارات العربية المتحدة",
+      "tradeDocument": {
+        "title": "وثيقة الرخصة التجارية",
+        "current": "تم رفع الوثيقة الحالية",
+        "empty": "لم يتم رفع وثيقة",
+        "emptyTitle": "لا توجد وثيقة",
+        "upload": "رفع الوثيقة",
+        "change": "تغيير الوثيقة",
+        "download": "تنزيل الرخصة"
+      }
+    },
+    "contact": {
+      "title": "جهة الاتصال الأساسية",
+      "edit": "تعديل جهة الاتصال",
+      "fields": {
+        "fullName": "الاسم الكامل",
+        "jobTitle": "المسمى الوظيفي",
+        "email": "البريد الإلكتروني",
+        "phone": "رقم الهاتف"
+      }
+    },
+    "password": {
+      "change": "تغيير كلمة المرور",
+      "modalTitle": "تغيير كلمة المرور",
+      "newLabel": "كلمة مرور جديدة",
+      "newPlaceholder": "أدخل كلمة المرور الجديدة",
+      "confirmLabel": "تأكيد كلمة المرور",
+      "confirmPlaceholder": "أعد إدخال كلمة المرور",
+      "requirements": {
+        "title": "متطلبات كلمة المرور:",
+        "upper": "حرف كبير واحد على الأقل",
+        "number": "رقم واحد على الأقل",
+        "special": "رمز خاص واحد على الأقل",
+        "length": "6 أحرف على الأقل"
+      },
+      "errors": {
+        "requirements": "كلمة المرور لا تستوفي جميع المتطلبات",
+        "mismatch": "كلمتا المرور غير متطابقتين",
+        "changeFailed": "فشل تغيير كلمة المرور"
+      },
+      "success": "تم تغيير كلمة المرور بنجاح"
+    },
+    "details": {
+      "title": "تفاصيل الحساب",
+      "statusLabel": "حالة الحساب",
+      "statusActive": "نشط",
+      "statusInactive": "غير نشط",
+      "memberSince": "عضو منذ",
+      "lastUpdated": "آخر تحديث",
+      "emptyDate": "-"
+    },
+    "actions": {
+      "cancelChanges": "إلغاء التغييرات",
+      "saving": "جارٍ الحفظ...",
+      "saveChanges": "حفظ التغييرات"
+    },
+    "errors": {
+      "loadFailed": "فشل تحميل معلومات الحساب",
+      "updateFailed": "فشل تحديث المعلومات"
+    },
+    "success": {
+      "updated": "تم تحديث معلومات الحساب بنجاح"
+    }
+  },
+  "modals": {
+    "addCar": {
+      "title": "إضافة سيارات",
+      "brand": "HAKIM للأعمال",
+      "subtitle": "اختر الطريقة التي تريد بها إضافة السيارات إلى أسطولك:",
+      "single": {
+        "title": "إضافة سيارة واحدة",
+        "description": "أضف سيارة واحدة في كل مرة مع معلومات تفصيلية مثل الماركة والطراز والسنة والمواصفات."
+      },
+      "bulk": {
+        "title": "رفع جماعي للسيارات",
+        "description": "ارفع عدة سيارات دفعة واحدة باستخدام ملف CSV. مثالي لإضافة أعداد كبيرة بسرعة."
+      },
+      "continue": "متابعة"
+    },
+    "payment": {
+      "brand": "HAKIM للأعمال",
+      "title": "اختر طريقة الدفع",
+      "subtitle": "اختر طريقة الدفع المفضلة لديك",
+      "helper": "اختر خيارًا واحدًا أدناه لمتابعة الدفع",
+      "methods": {
+        "fib": "بنك العراق الأول - تحويل فوري",
+        "fastPay": "دفع رقمي سريع وآمن",
+        "cash": "الدفع نقدًا عند التسليم أو الاستلام"
+      },
+      "note": {
+        "label": "ملاحظة:",
+        "text": "ستتم معالجة الدفع بأمان. ستتلقى تأكيدًا عند اكتمال العملية."
+      },
+      "processing": "جارٍ المعالجة...",
+      "continue": "متابعة"
+    },
+    "quotation": {
+      "title": "عرض سعر",
+      "subtitle": "تقدير خدمة احترافي",
+      "status": {
+        "approved": "معتمد"
+      },
+      "info": {
+        "quotationId": "رقم العرض",
+        "dateIssued": "تاريخ الإصدار",
+        "validUntil": "صالح حتى"
+      },
+      "fallback": {
+        "na": "غير متوفر"
+      },
+      "fees": {
+        "title": "تفاصيل الرسوم",
+        "serviceItem": "عنصر خدمة {index}",
+        "quantity": "الكمية: {count}",
+        "discount": "(-{currency} {amount} خصم)",
+        "addOn": "إضافة",
+        "replacementPart": "قطعة بديلة",
+        "qty": "الكمية: {count}",
+        "service": "خدمة",
+        "serviceCharges": "رسوم الخدمة",
+        "transportation": "النقل",
+        "transportationFees": "رسوم الاستلام والتوصيل"
+      },
+      "total": {
+        "title": "المبلغ الإجمالي"
+      },
+      "warranty": {
+        "title": "تفاصيل الضمان",
+        "standard": "ضمان قياسي",
+        "description": "تأتي هذه الخدمة مع تغطية الضمان المحددة. رضاك وأداء مركبتك مضمونان."
+      },
+      "actions": {
+        "acceptPayNow": "قبول والدفع الآن",
+        "acceptPayLater": "قبول والدفع لاحقًا",
+        "reject": "رفض"
+      },
+      "disclaimer": "بقبولك لهذا العرض، فإنك توافق على الشروط والأحكام. سيتم معالجة الدفع بأمان عبر بوابة الدفع."
+    },
+    "confirmReceipt": {
+      "brand": "HAKIM",
+      "brandSuffix": "للأعمال",
+      "title": "تأكيد استلام السيارة",
+      "message": "هل أنت متأكد أنك استلمت السيارة؟",
+      "warning": "لا يمكن التراجع عن هذا الإجراء بعد التأكيد.",
+      "vehicle": {
+        "placeholderTitle": "تويوتا كامري 2023",
+        "placeholderLicense": "ABC-1234",
+        "placeholderBooking": "#HB-789456",
+        "license": "اللوحة: {value}",
+        "bookingId": "رقم الحجز: {value}"
+      },
+      "notice": {
+        "title": "تنبيه مهم",
+        "message": "يرجى التأكد من فحص المركبة جيدًا قبل تأكيد الاستلام."
+      },
+      "actions": {
+        "confirm": "تأكيد الاستلام"
+      }
+    },
+    "vehicleDetails": {
+      "sections": {
+        "vehicleInfo": "معلومات المركبة",
+        "serviceStatus": "حالة الخدمة"
+      },
+      "fields": {
+        "licensePlate": "رقم اللوحة",
+        "vin": "رقم VIN",
+        "mileage": "المسافة المقطوعة",
+        "currentStatus": "الحالة الحالية",
+        "lastServiceDate": "آخر تاريخ خدمة",
+        "systemId": "معرّف النظام",
+        "idLabel": "المعرّف"
+      },
+      "values": {
+        "mileage": "{value} كم"
+      },
+      "statuses": {
+        "ongoing": "خدمة جارية",
+        "active": "نشط"
+      },
+      "fallback": {
+        "na": "غير متوفر"
+      }
+    },
+    "collectPayment": {
+      "title": "تحصيل الدفعة",
+      "serviceFallback": "خدمة",
+      "customerLabel": "العميل: {name}",
+      "customerUnknown": "غير معروف",
+      "breakdown": {
+        "serviceFee": "رسوم الخدمة",
+        "parts": "قطع ومواد",
+        "inspection": "فحص",
+        "total": "المبلغ الإجمالي"
+      },
+      "confirmation": {
+        "title": "تأكيد الدفع",
+        "message": "يرجى تأكيد استلام الدفعة من العميل قبل المتابعة."
+      },
+      "actions": {
+        "received": "تم استلام الدفع"
+      }
+    },
+    "photoGallery": {
+      "defaultTitle": "صور فحص الهيكل",
+      "photosLabel": "صور",
+      "subtitle": "مراجعة صور حالة المركبة",
+      "loading": "جارٍ تحميل الصور...",
+      "empty": "لا توجد صور",
+      "photoAlt": "فحص الهيكل {index}",
+      "actions": {
+        "reject": "رفض الصور",
+        "approve": "اعتماد الصور"
+      },
+      "lightbox": {
+        "openOriginal": "فتح الأصل",
+        "fullViewAlt": "عرض كامل {index}",
+        "thumbnailAlt": "مصغّرة"
+      }
+    },
+    "rejectService": {
+      "title": "رفض طلب الخدمة",
+      "subtitle": "يرجى اختيار سبب لرفض هذا الطلب. لا يمكن التراجع عن هذا الإجراء.",
+      "reasonLabel": "سبب الرفض",
+      "placeholder": "اختر سببًا...",
+      "reasons": {
+        "technician": "الفني غير متاح",
+        "location": "الموقع خارج نطاق الخدمة",
+        "duplicate": "طلب مكرر",
+        "incomplete": "معلومات غير مكتملة",
+        "other": "أخرى"
+      },
+      "confirm": "تأكيد الرفض"
+    },
+    "submitPhotos": {
+      "title": "إرسال الصور",
+      "subtitle": "رفع الصور",
+      "dragTitle": "اسحب الصور وأفلتها هنا",
+      "or": "أو",
+      "browse": "اضغط للتصفح",
+      "fromDevice": "من جهازك",
+      "supported": "الأنواع المدعومة: JPG, PNG, GIF • الحد الأقصى 10MB لكل ملف",
+      "fileCount": "{count, plural, one {تم اختيار ملف واحد} other {تم اختيار # ملفات}}",
+      "submit": "إرسال {count, plural, one {# صورة} other {# صور}}"
+    },
+    "quotationBuilder": {
+      "title": "منشئ العرض",
+      "header": "الحجز #{id} · {category} · {plate}",
+      "serviceFallback": "خدمة",
+      "fallback": {
+        "na": "غير متوفر"
+      },
+      "alerts": {
+        "saved": "تم حفظ العرض بنجاح!",
+        "sent": "تم إرسال العرض للعميل!"
+      },
+      "services": {
+        "title": "الخدمات",
+        "add": "إضافة خدمة",
+        "select": "اختر خدمة",
+        "columns": {
+          "service": "الخدمة",
+          "qty": "الكمية",
+          "price": "السعر",
+          "discount": "الخصم",
+          "cost": "التكلفة",
+          "warranty": "الضمان",
+          "total": "الإجمالي"
+        }
+      },
+      "parts": {
+        "title": "القطع والمكوّنات",
+        "add": "إضافة قطعة",
+        "namePlaceholder": "اسم القطعة",
+        "columns": {
+          "part": "القطعة",
+          "qty": "الكمية",
+          "price": "السعر",
+          "discount": "الخصم",
+          "cost": "التكلفة",
+          "warranty": "الضمان",
+          "total": "الإجمالي"
+        }
+      },
+      "warranty": {
+        "none": "بدون ضمان",
+        "oneMonth": "شهر واحد",
+        "threeMonths": "3 أشهر",
+        "sixMonths": "6 أشهر",
+        "oneYear": "سنة واحدة"
+      },
+      "summary": {
+        "title": "ملخص العرض",
+        "servicesSubtotal": "إجمالي الخدمات",
+        "partsSubtotal": "إجمالي القطع",
+        "inspectionFees": "رسوم الفحص",
+        "subtotal": "الإجمالي الفرعي",
+        "total": "المبلغ الإجمالي"
+      },
+      "actions": {
+        "title": "إجراءات العرض",
+        "validUntil": "صالح حتى",
+        "internalNotes": "ملاحظات داخلية",
+        "internalNotesPlaceholder": "أضف ملاحظات داخلية...",
+        "send": "إرسال العرض للعميل",
+        "saveDraft": "حفظ كمسودة"
+      }
+    },
+    "serviceRequestDetail": {
+      "title": "طلب خدمة #{id}",
+      "createdLabel": "تم الإنشاء:",
+      "serviceFallback": "خدمة",
+      "status": {
+        "current": "الحالة الحالية",
+        "inProgress": "قيد التنفيذ"
+      },
+      "quoteStatus": {
+        "label": "حالة العرض",
+        "pending": "قيد الانتظار"
+      },
+      "scheduled": {
+        "label": "تاريخ/وقت الجدولة"
+      },
+      "vehicle": {
+        "title": "معلومات المركبة",
+        "makeModel": "الماركة والطراز",
+        "vin": "رقم VIN",
+        "plate": "رقم اللوحة",
+        "mileage": "المسافة المقطوعة",
+        "color": "اللون",
+        "engine": "المحرك",
+        "mileageValue": "{value} ميل"
+      },
+      "service": {
+        "title": "تفاصيل الخدمة",
+        "type": "نوع الخدمة",
+        "destination": "الوجهة",
+        "requestedDate": "تاريخ/وقت الطلب",
+        "distance": "المسافة",
+        "autoServiceCenter": "مركز خدمة السيارات",
+        "distanceValue": "{value} ميل"
+      },
+      "cost": {
+        "title": "تفاصيل التكلفة",
+        "baseTow": "سحب أساسي",
+        "addOns": "إضافات",
+        "transportation": "رسوم النقل",
+        "inspection": "رسوم الفحص",
+        "total": "المبلغ الإجمالي"
+      }
+    }
+  },
+  "vehicles": {
+    "title": "المركبات",
+    "subtitle": "إدارة مركبات أسطولك والخدمات",
+    "actions": {
+      "requestService": "طلب خدمة",
+      "addCar": "إضافة سيارة"
+    },
+    "stats": {
+      "numberOfCars": "عدد السيارات",
+      "activeServices": "عدد الخدمات النشطة",
+      "scheduledThisWeek": "{count} مجدولة هذا الأسبوع"
+    },
+    "fleet": {
+      "title": "أسطول المركبات",
+      "searchPlaceholder": "ابحث عن مركبات..."
+    },
+    "filters": {
+      "allStatus": "كل الحالات",
+      "ongoing": "جاري"
+    },
+    "table": {
+      "vehicleId": "معرّف المركبة",
+      "makeModelYear": "الماركة/الطراز/السنة",
+      "plateNumber": "رقم اللوحة",
+      "vinNumber": "رقم VIN",
+      "lastServiceDate": "آخر تاريخ خدمة",
+      "action": "الإجراء",
+      "empty": "لا توجد مركبات."
+    },
+    "status": {
+      "ongoing": "جاري"
+    },
+    "pagination": {
+      "showing": "عرض {start} إلى {end} من أصل {total} مركبة",
+      "previous": "السابق",
+      "next": "التالي"
+    },
+    "alerts": {
+      "delete": {
+        "title": "هل أنت متأكد؟",
+        "text": "لن تتمكن من التراجع!",
+        "confirm": "نعم، احذف"
+      },
+      "deleted": {
+        "title": "تم الحذف!",
+        "text": "تم حذف المركبة.",
+        "failed": "فشل الحذف"
+      },
+      "error": {
+        "title": "خطأ!",
+        "deleteFailed": "فشل حذف المركبة."
+      }
+    },
+    "fallback": {
+      "unknown": "غير معروف",
+      "na": "غير متوفر"
+    }
+  },
+  "addVehicle": {
+    "title": "إضافة مركبة جديدة",
+    "subtitle": "أضف مركبة إلى أسطولك",
+    "stepper": {
+      "details": "تفاصيل المركبة",
+      "complete": "اكتمال"
+    },
+    "sections": {
+      "vehicleInfo": {
+        "title": "معلومات المركبة",
+        "subtitle": "يرجى إدخال تفاصيل المركبة التي تريد إضافتها إلى أسطولك."
+      }
+    },
+    "fields": {
+      "make": "ماركة المركبة",
+      "model": "طراز المركبة",
+      "year": "سنة المركبة",
+      "mileage": "المسافة المقطوعة (كم)",
+      "color": "لون المركبة",
+      "licensePlate": "لوحة الترخيص",
+      "vin": "رقم VIN"
+    },
+    "placeholders": {
+      "loadingBrands": "جارٍ تحميل الماركات...",
+      "selectMake": "اختر الماركة",
+      "loadingModels": "جارٍ تحميل الطرازات...",
+      "selectModel": "اختر الطراز",
+      "selectMakeFirst": "اختر الماركة أولاً",
+      "enterModel": "أدخل الطراز",
+      "selectYear": "اختر السنة",
+      "mileage": "مثال: 5000",
+      "color": "مثال: أبيض، فضي، أسود",
+      "vin": "أدخل VIN مكون من 17 خانة (اختياري)"
+    },
+    "units": {
+      "km": "كم"
+    },
+    "plate": {
+      "newFormat": "تنسيق جديد",
+      "oldFormat": "تنسيق قديم",
+      "code": "رمز",
+      "letter": "حرف",
+      "number": "رقم"
+    },
+    "actions": {
+      "uploadImage": "ارفع {label}",
+      "imagePreview": "معاينة {label}",
+      "adding": "جارٍ الإضافة...",
+      "addVehicle": "إضافة مركبة"
+    },
+    "imageLabels": {
+      "front": "أمام",
+      "back": "خلف",
+      "left": "يسار",
+      "right": "يمين"
+    },
+    "validation": {
+      "makeRequired": "الماركة مطلوبة",
+      "modelRequired": "الطراز مطلوب",
+      "yearRequired": "السنة مطلوبة",
+      "colorRequired": "اللون مطلوب",
+      "plateRequired": "رقم اللوحة مطلوب",
+      "requiredFields": "يرجى تعبئة جميع الحقول المطلوبة"
+    },
+    "errors": {
+      "fileSize": "يجب أن يكون حجم صورة {direction} أقل من 5MB.",
+      "fileType": "نوع ملف صورة {direction} يجب أن يكون JPEG أو JPG أو PNG.",
+      "maxImages": "يمكنك رفع 4 صور كحد أقصى.",
+      "fileTooLarge": "الملف {fileName} كبير جدًا (حد أقصى 5MB). تم التخطي.",
+      "invalidImage": "الملف {fileName} ليس صورة صالحة. تم التخطي.",
+      "companyIdMissing": "معرّف الشركة غير موجود. يرجى تسجيل الدخول مجددًا.",
+      "createFailed": "فشل إنشاء المركبة",
+      "unknown": "خطأ غير معروف",
+      "duplicatePlate": "توجد مركبة بنفس رقم اللوحة.",
+      "createError": "خطأ أثناء إنشاء المركبة"
+    },
+    "success": {
+      "vehicleAdded": "تمت إضافة المركبة بنجاح"
+    },
+    "helpers": {
+      "vin": "رقم تعريف المركبة (17 خانة)"
+    },
+    "help": {
+      "title": "تحتاج مساعدة؟",
+      "vinInfo": "يمكن العثور على رقم VIN في تسجيل المركبة أو بطاقة التأمين أو على لوحة القيادة جهة السائق قرب الزجاج الأمامي.",
+      "imageInfo": "يرجى التأكد من رفع صور واضحة من الجهات الأربع."
+    }
+  },
+  "editVehicle": {
+    "title": "تعديل المركبة",
+    "subtitle": "تحديث تفاصيل المركبة",
+    "sections": {
+      "vehicleInfo": {
+        "title": "تعديل معلومات المركبة"
+      }
+    },
+    "fields": {
+      "make": "ماركة المركبة",
+      "model": "طراز المركبة",
+      "year": "سنة المركبة",
+      "mileage": "المسافة المقطوعة (كم)",
+      "color": "لون المركبة",
+      "licensePlate": "لوحة الترخيص",
+      "vin": "رقم VIN"
+    },
+    "placeholders": {
+      "loadingBrands": "جارٍ تحميل الماركات...",
+      "selectMake": "اختر الماركة",
+      "loadingModels": "جارٍ تحميل الطرازات...",
+      "selectModel": "اختر الطراز",
+      "selectMakeFirst": "اختر الماركة أولاً",
+      "enterModel": "أدخل الطراز",
+      "selectYear": "اختر السنة",
+      "mileage": "مثال: 5000",
+      "color": "مثال: أبيض، فضي",
+      "vin": "أدخل VIN مكون من 17 خانة (اختياري)"
+    },
+    "units": {
+      "km": "كم"
+    },
+    "plate": {
+      "newFormat": "تنسيق جديد",
+      "oldFormat": "تنسيق قديم"
+    },
+    "actions": {
+      "updating": "جارٍ التحديث...",
+      "updateVehicle": "تحديث المركبة"
+    },
+    "validation": {
+      "makeRequired": "الماركة مطلوبة",
+      "modelRequired": "الطراز مطلوب",
+      "yearRequired": "السنة مطلوبة",
+      "colorRequired": "اللون مطلوب",
+      "plateRequired": "رقم اللوحة مطلوب",
+      "requiredFields": "يرجى تعبئة جميع الحقول المطلوبة"
+    },
+    "errors": {
+      "vehicleIdMissing": "معرّف المركبة مفقود",
+      "updateFailed": "فشل تحديث المركبة",
+      "unknown": "خطأ غير معروف",
+      "updateError": "خطأ أثناء تحديث المركبة",
+      "autoSelectModel": "تعذر اختيار الطراز '{model}' تلقائيًا. يرجى الاختيار يدويًا."
+    },
+    "success": {
+      "vehicleUpdated": "تم تحديث المركبة بنجاح"
+    }
+  },
+  "finance": {
+    "title": "المالية",
+    "subtitle": "إدارة معاملاتك ومدفوعاتك",
+    "stats": {
+      "totalTransactions": "إجمالي المعاملات",
+      "totalOutstanding": "إجمالي المبلغ المستحق",
+      "month": "يناير",
+      "year": "2024",
+      "outstandingPerMonth": "المستحق شهريًا"
+    },
+    "history": {
+      "title": "سجل المعاملات",
+      "exportAll": "تصدير الكل"
+    },
+    "filters": {
+      "searchPlaceholder": "ابحث عن المعاملات...",
+      "allStatus": "كل الحالات",
+      "allMethods": "كل الطرق"
+    },
+    "table": {
+      "transactionId": "رقم المعاملة",
+      "date": "التاريخ",
+      "bookingId": "رقم الحجز",
+      "vehicleId": "معرّف المركبة",
+      "makeModelYear": "الماركة/الطراز/السنة",
+      "serviceType": "نوع الخدمة",
+      "serviceCost": "تكلفة الخدمة",
+      "paymentStatus": "حالة الدفع",
+      "paymentMethod": "طريقة الدفع",
+      "action": "الإجراء",
+      "invoice": "فاتورة"
+    },
+    "pagination": {
+      "showing": "عرض 1 إلى 5 من 1,247 نتيجة"
+    }
+  },
+  "login": {
+    "metaTitle": "تسجيل الدخول - حكيم للأعمال",
+    "metaDescription": "سجل الدخول إلى حساب حكيم للأعمال",
+    "brandTagline": "للأعمال",
+    "welcomeTitle": "مرحبًا بعودتك",
+    "welcomeSubtitle": "سجّل الدخول إلى حساب شركتك",
+    "emailLabel": "البريد الإلكتروني",
+    "emailPlaceholder": "أدخل بريدك الإلكتروني",
+    "passwordLabel": "كلمة المرور",
+    "passwordPlaceholder": "أدخل كلمة المرور",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "signIn": "تسجيل الدخول",
+    "signingIn": "جارٍ تسجيل الدخول...",
+    "noAccount": "ليس لديك حساب؟",
+    "createAccount": "إنشاء حساب",
+    "privacyPolicy": "سياسة الخصوصية",
+    "termsOfService": "شروط الخدمة",
+    "support": "الدعم",
+    "secureLogin": "تسجيل دخول آمن للأعمال بواسطة",
+    "validation": {
+      "emailRequired": "يرجى إدخال البريد الإلكتروني",
+      "emailInvalid": "يرجى إدخال بريد إلكتروني صحيح",
+      "passwordRequired": "يرجى إدخال كلمة المرور"
+    },
+    "errors": {
+      "unexpected": "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.",
+      "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة"
+    }
+  },
+  "register": {
+    "metaTitle": "التسجيل - حكيم للأعمال",
+    "metaDescription": "سجل نشاطك التجاري مع حكيم",
+    "brandTagline": "للأعمال",
+    "navHelp": "مساعدة",
+    "navCall": "اتصال",
+    "pageTitle": "سجّل نشاطك التجاري",
+    "pageSubtitle": "انضم إلى حكيم للأعمال وسهّل احتياجات شركتك للنقل. أكمل التسجيل في ثلاث خطوات بسيطة.",
+    "stepper": {
+      "company": "معلومات الشركة",
+      "contact": "جهة الاتصال",
+      "fleet": "معلومات الأسطول"
+    },
+    "section": {
+      "companyInfo": "معلومات الشركة والرخصة التجارية",
+      "contactPerson": "جهة الاتصال الأساسية",
+      "fleetInfo": "حجم الأسطول والنوع"
+    },
+    "infoBanner": "سيتم استخدام هذه البيانات لتسجيل الدخول إلى حساب شركتك",
+    "fields": {
+      "companyName": "اسم الشركة *",
+      "tradeLicenseNumber": "رقم الرخصة التجارية *",
+      "companyLocation": "موقع الشركة *",
+      "city": "المدينة *",
+      "companyAddress": "عنوان الشركة *",
+      "tradeLicenseDocument": "وثيقة الرخصة التجارية *",
+      "fullName": "الاسم الكامل *",
+      "jobTitle": "المسمى الوظيفي *",
+      "email": "البريد الإلكتروني *",
+      "emailHint": "(اسم المستخدم)",
+      "password": "كلمة المرور *",
+      "passwordHint": "(كلمة مرور الدخول)",
+      "phoneNumber": "رقم الهاتف *",
+      "fleetSize": "الحجم التقديري للأسطول *",
+      "vehicleType": "نوع المركبة الأساسي *"
+    },
+    "placeholders": {
+      "companyName": "أدخل اسم الشركة",
+      "tradeLicenseNumber": "أدخل رقم الرخصة",
+      "companyAddress": "أدخل عنوان الشركة بالكامل",
+      "fullName": "أدخل الاسم الكامل",
+      "jobTitle": "أدخل المسمى الوظيفي",
+      "email": "أدخل البريد الإلكتروني",
+      "password": "أنشئ كلمة مرور",
+      "phoneNumber": "أدخل رقم الهاتف",
+      "fleetSize": "أدخل حجم الأسطول",
+      "vehicleType": "اختر نوع المركبة",
+      "detectingCity": "جارٍ تحديد المدينة...",
+      "autoDetectedCity": "تم اكتشافها تلقائيًا من الموقع",
+      "locationSelected": "الموقع المحدد: {lat}، {lng}"
+    },
+    "vehicleTypes": {
+      "sedan": "سيدان",
+      "suv": "دفع رباعي",
+      "van": "فان",
+      "truck": "شاحنة",
+      "luxury": "فاخر"
+    },
+    "upload": {
+      "cta": "حمّل وثيقة الرخصة التجارية",
+      "helper": "ملفات PDF أو JPG أو PNG حتى 5MB",
+      "chooseFile": "اختر ملفًا"
+    },
+    "passwordCriteria": {
+      "length": "6 أحرف أو أكثر",
+      "upper": "حرف كبير",
+      "number": "رقم",
+      "special": "رمز خاص (!@#$%^&*)"
+    },
+    "actions": {
+      "back": "رجوع",
+      "register": "تسجيل",
+      "registering": "جارٍ التسجيل..."
+    },
+    "footer": {
+      "needHelp": "تحتاج مساعدة في التسجيل؟",
+      "callSupport": "اتصل بالدعم",
+      "emailUs": "راسلنا",
+      "liveChat": "دردشة مباشرة",
+      "copyright": "© 2024 حكيم للأعمال. جميع الحقوق محفوظة.",
+      "privacyPolicy": "سياسة الخصوصية",
+      "termsOfService": "شروط الخدمة",
+      "support": "الدعم"
+    },
+    "alerts": {
+      "unsupported": {
+        "title": "غير مدعوم",
+        "text": "المتصفح لا يدعم تحديد الموقع الجغرافي"
+      },
+      "permissionDenied": {
+        "title": "تم رفض الإذن",
+        "text": "لا يمكننا تحديد موقعك بسبب رفض الإذن.",
+        "hint": "يرجى النقر على أيقونة القفل/الإعدادات في شريط العنوان والسماح بالوصول للموقع ثم اضغط إعادة المحاولة.",
+        "retry": "إعادة المحاولة"
+      },
+      "missingInfo": {
+        "title": "معلومات ناقصة",
+        "text": "يرجى تعبئة جميع الحقول المطلوبة ورفع الرخصة التجارية."
+      },
+      "invalidEmail": {
+        "title": "بريد إلكتروني غير صالح",
+        "text": "يرجى إدخال بريد إلكتروني صحيح."
+      },
+      "weakPassword": {
+        "title": "كلمة مرور ضعيفة",
+        "text": "يرجى التأكد من استيفاء متطلبات كلمة المرور."
+      },
+      "registerSuccess": {
+        "title": "تم التسجيل بنجاح!",
+        "text": "تم تسجيل شركتك. يمكنك الآن تسجيل الدخول.",
+        "confirm": "اذهب لتسجيل الدخول"
+      },
+      "registerFailed": {
+        "title": "فشل التسجيل",
+        "fallback": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
+      }
+    }
+  },
+  "errors": {
+    "actions": {
+      "home": "الذهاب للصفحة الرئيسية",
+      "back": "رجوع"
+    },
+    "notFound": {
+      "title": "الصفحة غير موجودة",
+      "description": "الصفحة التي تبحث عنها غير موجودة أو تم نقلها.",
+      "help": "هل تحتاج مساعدة؟ تواصل مع فريق الدعم."
+    },
+    "serverError": {
+      "title": "خطأ في الخادم",
+      "description": "حدث خطأ من جانبنا. نعمل على إصلاح المشكلة.",
+      "help": "إذا استمرت المشكلة، يرجى التواصل مع الدعم."
+    },
+    "generic": {
+      "title": "حدث خطأ",
+      "withCode": "خطأ {statusCode}",
+      "description": "حدث خطأ ما. يرجى المحاولة لاحقًا.",
+      "notFound": "تعذر العثور على الصفحة المطلوبة."
+    }
+  }
+}

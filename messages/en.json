@@ -1,0 +1,1196 @@
+{
+  "common": {
+    "language": {
+      "label": "Language",
+      "english": "English",
+      "arabic": "العربية",
+      "kurdish": "کوردی"
+    },
+    "actions": {
+      "back": "Back",
+      "close": "Close",
+      "cancel": "Cancel",
+      "save": "Save",
+      "submit": "Submit",
+      "ok": "OK"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "clearAll": "Clear all",
+      "empty": "No notifications yet"
+    }
+  },
+  "adminLayout": {
+    "loading": "Loading...",
+    "notifications": "Notifications",
+    "welcomeBack": "Welcome back,",
+    "logout": "Logout",
+    "adminLabel": "Admin",
+    "brand": {
+      "forBusiness": "for Business"
+    },
+    "menu": {
+      "dashboard": {
+        "title": "Dashboard",
+        "description": "Overview & KPIs"
+      },
+      "services": {
+        "title": "Services",
+        "description": "Service Requests"
+      },
+      "vehicles": {
+        "title": "Vehicles",
+        "description": "Manage fleets"
+      },
+      "account": {
+        "title": "Account",
+        "description": "Business details"
+      },
+      "finance": {
+        "title": "Finance",
+        "description": "Payments & Invoices"
+      }
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Manage your vehicles and service requests",
+    "actions": {
+      "addCars": "Add Cars",
+      "createRequest": "Create Request",
+      "arrivedAtServiceCenter": "Arrived at Service Center",
+      "viewQuotation": "View Quotation",
+      "viewEstimatedPrice": "View Estimated Price",
+      "viewBodyCheck": "View Body Check",
+      "accept": "Accept",
+      "reject": "Reject",
+      "submitQuote": "Submit Quote",
+      "editQuote": "Edit Quote",
+      "photos": "Photos",
+      "collect": "Collect",
+      "approvePhotos": "Approve Photos",
+      "rejectPhotos": "Reject Photos"
+    },
+    "stats": {
+      "totalCars": "Total Cars",
+      "activeRequests": "Active Requests",
+      "completedRequests": "Completed Requests"
+    },
+    "activeRequests": {
+      "title": "Active Requests",
+      "searchPlaceholder": "Search requests..."
+    },
+    "filters": {
+      "allStatuses": "All Statuses",
+      "assigned": "Assigned",
+      "accepted": "Accepted",
+      "bodyChecking": "Body Checking",
+      "fixing": "Fixing",
+      "completed": "Completed"
+    },
+    "table": {
+      "bookingId": "Booking ID",
+      "plateNumber": "Plate Number",
+      "vehicle": "Vehicle",
+      "serviceType": "Service Type",
+      "category": "Category",
+      "serviceCost": "Service Cost",
+      "status": "Status",
+      "time": "Time",
+      "actions": "Actions",
+      "empty": "No requests found.",
+      "pending": "Pending",
+      "na": "N/A"
+    },
+    "alerts": {
+      "error": {
+        "title": "Error",
+        "noBookingContext": "No booking context found",
+        "approvePhotosFailed": "Failed to approve photos",
+        "rejectPhotosFailed": "Failed to reject photos",
+        "fetchQuotationDetails": "Could not fetch quotation details",
+        "loadQuotation": "Failed to load quotation",
+        "fetchBodyCheckPhotos": "Failed to fetch body check photos",
+        "notifyServiceCenterFailed": "Failed to notify service center.",
+        "confirm": "OK"
+      },
+      "warning": {
+        "title": "Warning",
+        "noPhotosToApprove": "No photos to approve"
+      },
+      "success": {
+        "title": "Success!",
+        "bodyCheckApproved": "Body check photos approved",
+        "serviceCenterNotified": "Service center has been notified of your arrival.",
+        "photosSubmitted": "{count} photos have been submitted successfully."
+      },
+      "rejected": {
+        "title": "Rejected!",
+        "quotationSuccess": "The quotation has been rejected successfully.",
+        "failed": "Failed to reject",
+        "quotationFailed": "Failed to reject the quotation",
+        "bodyCheckPhotos": "Body check photos rejected"
+      },
+      "approveQuotation": {
+        "title": "Approve Quotation?",
+        "text": "Are you sure you want to approve this quotation?",
+        "confirm": "Yes, Approve"
+      },
+      "approved": {
+        "title": "Approved!",
+        "quotationSuccess": "The quotation has been approved successfully.",
+        "failed": "Failed to approve",
+        "quotationFailed": "Failed to approve the quotation"
+      },
+      "info": {
+        "title": "Info",
+        "noQuotation": "No quotation found for this booking"
+      },
+      "acceptRequest": {
+        "title": "Accept Request?",
+        "text": "Are you sure you want to accept request #{id}?",
+        "confirm": "Yes, accept it!"
+      },
+      "accepted": {
+        "title": "Accepted!",
+        "text": "Request #{id} has been accepted."
+      },
+      "draftSaved": {
+        "title": "Draft Saved!",
+        "text": "Quotation draft saved."
+      },
+      "quotationSent": {
+        "title": "Quotation Sent!",
+        "text": "Quotation sent to customer."
+      },
+      "processing": {
+        "title": "Processing...",
+        "notifying": "Notifying service center..."
+      },
+      "paymentRecorded": {
+        "title": "Payment Recorded!",
+        "text": "Payment recorded successfully."
+      },
+      "rejectBodyCheck": {
+        "title": "Reject Body Check Photos",
+        "reasonLabel": "Rejection Reason",
+        "reasonPlaceholder": "Enter reason for rejection...",
+        "reasonRequired": "You need to write a reason!"
+      }
+    },
+    "modals": {
+      "bodyCheckTitle": "Body Check - {vehicle}",
+      "vehicleFallback": "Vehicle"
+    }
+  },
+  "servicesCreate": {
+    "title": "Service Request",
+    "subtitle": "Submit a new service request for your vehicles",
+    "fallback": {
+      "na": "N/A"
+    },
+    "serviceDetails": {
+      "title": "Service Details",
+      "selectCategory": "Select Category",
+      "selectService": "Select Service",
+      "chooseCategory": "Choose a category",
+      "chooseService": "Choose a service",
+      "loading": "Loading...",
+      "scheduleType": "Schedule Type",
+      "preferredDate": "Preferred Date",
+      "preferredTime": "Preferred Time",
+      "am": "AM",
+      "pm": "PM",
+      "serviceProvider": "Service Provider",
+      "chooseProvider": "Choose a provider"
+    },
+    "map": {
+      "pickupSelected": "Pickup Location Selected",
+      "pinPickup": "Pin your pickup location",
+      "pinLocation": "Pin location to find nearby centers",
+      "permissionDenied": {
+        "title": "Permission Denied",
+        "message": "We cannot detect your location because permission was denied.",
+        "hint": "Please allow location access in your browser settings and try again.",
+        "retry": "Retry Detection"
+      },
+      "selectedPickup": "Selected Pickup Address:",
+      "dropoffSelected": "Drop Off Location Selected",
+      "pinDropoff": "Pin your drop off location",
+      "selectedDropoff": "Selected Drop Off Address:"
+    },
+    "vehicles": {
+      "title": "Select Vehicle",
+      "available": "{count} vehicles available",
+      "searchPlaceholder": "Search by make, model, or plate number...",
+      "table": {
+        "makeModelYear": "Car Make/Model/Year",
+        "plateNumber": "Plate Number",
+        "lastService": "Last Service Date/Time",
+        "note": "Note"
+      },
+      "notePlaceholder": "Add a note..."
+    },
+    "errors": {
+      "loadVehicles": "Failed to load vehicles",
+      "noServiceCenters": "No service centers found nearby.",
+      "nearbyCentersFailed": "Failed to find nearby centers",
+      "categoriesFailed": "Failed to load service categories",
+      "servicesFailed": "Failed to load services",
+      "companyMissing": "Company information missing",
+      "selectVehicle": "Please select at least one vehicle",
+      "selectServiceProvider": "Please select a service and provider",
+      "selectScheduleType": "Please select a schedule type",
+      "selectScheduleTime": "Please select date and time for scheduled service",
+      "pickupLocation": "Please pin a pickup location",
+      "dropoffLocation": "Please pin a drop off location",
+      "selectServiceCenter": "Please select a service center location",
+      "scheduleFuture": "Scheduled time must be at least 30 minutes in the future"
+    },
+    "location": {
+      "detecting": "Detecting your location...",
+      "detected": "Location detected",
+      "addressFailed": "Failed to get address details",
+      "accessDenied": "Location access denied",
+      "destinationCenter": "Destination Center",
+      "serviceCenter": "Service Center Location",
+      "searchingNearby": "Searching nearby...",
+      "noCenters": "No centers available",
+      "selectOnMap": "Select on map",
+      "chooseLocation": "Choose a location",
+      "center": "Center",
+      "nearbyCenter": "Nearby Center"
+    },
+    "submission": {
+      "submitting": "Submitting booking request...",
+      "success": "Bookings created successfully",
+      "failed": "Failed to create bookings",
+      "processing": "Processing...",
+      "submit": "Submit Request ({count})"
+    }
+  },
+  "servicesRequests": {
+    "title": "Service Requests",
+    "actions": {
+      "requestService": "Request a Service",
+      "waitingQuotation": "Waiting for quotation...",
+      "arrivedAtServiceCenter": "Arrived at Service Center",
+      "viewQuotation": "View Quotation",
+      "viewEstimatedPrice": "View Estimated Price",
+      "viewBodyCheck": "View Body Check",
+      "accept": "Accept",
+      "reject": "Reject",
+      "submitQuotation": "Submit Quotation",
+      "submitPhotos": "Submit Photos",
+      "editQuotation": "Edit Quotation",
+      "collectPayment": "Collect Payment",
+      "approvePhotos": "Approve Photos",
+      "rejectPhotos": "Reject Photos",
+      "approveQuotation": "Approve Quotation",
+      "rejectQuotation": "Reject Quotation"
+    },
+    "stats": {
+      "totalRequests": "Total Requests",
+      "activeServices": "Active Services",
+      "completed": "Completed"
+    },
+    "filters": {
+      "searchPlaceholder": "Search by Booking ID, Customer, Vehicle, or Plate Number...",
+      "allStatuses": "All Statuses",
+      "assigned": "Assigned",
+      "accepted": "Accepted",
+      "bodyChecking": "Body Checking",
+      "awaitingApproval": "Awaiting Approval",
+      "fixing": "Fixing",
+      "pendingPayment": "Pending Payment",
+      "completed": "Completed",
+      "allCategories": "All Categories"
+    },
+    "table": {
+      "bookingId": "Booking ID",
+      "customer": "Customer",
+      "vehicle": "Vehicle",
+      "service": "Service",
+      "status": "Status",
+      "scheduled": "Scheduled",
+      "payment": "Payment",
+      "actions": "Actions",
+      "empty": "No requests found.",
+      "plateLabel": "Plate:"
+    },
+    "pagination": {
+      "showing": "Showing {start} to {end} of {total} requests"
+    },
+    "modals": {
+      "bodyCheckTitle": "Body Check - {vehicle}",
+      "vehicleFallback": "Vehicle"
+    },
+    "alerts": {
+      "error": {
+        "title": "Error",
+        "noBookingContext": "No booking context found",
+        "approvePhotosFailed": "Failed to approve photos",
+        "rejectPhotosFailed": "Failed to reject photos",
+        "fetchQuotationDetails": "Could not fetch quotation details",
+        "loadQuotation": "Failed to load quotation",
+        "notifyServiceCenterFailed": "Failed to notify service center.",
+        "confirm": "OK",
+        "fetchBodyCheckPhotos": "Failed to fetch body check photos"
+      },
+      "warning": {
+        "title": "Warning",
+        "noPhotosToApprove": "No photos to approve"
+      },
+      "success": {
+        "title": "Success!",
+        "bodyCheckApproved": "Body check photos approved",
+        "serviceCenterNotified": "Service center has been notified of your arrival.",
+        "photosSubmitted": "{count} photos have been submitted successfully."
+      },
+      "rejected": {
+        "title": "Rejected!",
+        "quotationSuccess": "The quotation has been rejected successfully.",
+        "failed": "Failed to reject",
+        "quotationFailed": "Failed to reject the quotation",
+        "bodyCheckPhotos": "Body check photos rejected"
+      },
+      "approveQuotation": {
+        "title": "Approve Quotation?",
+        "text": "Are you sure you want to approve this quotation?",
+        "confirm": "Yes, Approve",
+        "cancel": "Cancel"
+      },
+      "approved": {
+        "title": "Approved!",
+        "quotationSuccess": "The quotation has been approved successfully.",
+        "failed": "Failed to approve",
+        "quotationFailed": "Failed to approve the quotation"
+      },
+      "info": {
+        "title": "Info",
+        "noQuotation": "No quotation found for this booking"
+      },
+      "acceptRequest": {
+        "title": "Accept Request?",
+        "text": "Are you sure you want to accept request #{id}?",
+        "confirm": "Yes, accept it!",
+        "cancel": "Cancel"
+      },
+      "accepted": {
+        "title": "Accepted!",
+        "text": "Request #{id} has been accepted successfully."
+      },
+      "paymentRecorded": {
+        "title": "Payment Recorded!",
+        "text": "Payment for request #{id} has been recorded successfully."
+      },
+      "draftSaved": {
+        "title": "Draft Saved!",
+        "text": "Quotation draft for request #{id} has been saved."
+      },
+      "quotationSent": {
+        "title": "Quotation Sent!",
+        "text": "Quotation for request #{id} has been sent to the customer."
+      },
+      "processing": {
+        "title": "Processing...",
+        "notifying": "Notifying service center..."
+      },
+      "photoReview": {
+        "approveTitle": "Approve Photos?",
+        "rejectTitle": "Reject Photos?",
+        "approveText": "Are you sure you want to approve these body check photos?",
+        "rejectText": "Are you sure you want to reject these photos?",
+        "approveConfirm": "Yes, Approve",
+        "rejectConfirm": "Yes, Reject",
+        "approved": "Photos have been approved successfully.",
+        "rejected": "Photos have been rejected successfully.",
+        "failed": "Failed to process photo review"
+      },
+      "rejectBodyCheck": {
+        "title": "Reject Body Check Photos",
+        "reasonLabel": "Rejection Reason",
+        "reasonPlaceholder": "Enter reason for rejection...",
+        "reasonRequired": "You need to write a reason!"
+      }
+    }
+  },
+  "account": {
+    "title": "Account Settings",
+    "subtitle": {
+      "editing": "Manage your business account information and settings",
+      "viewing": "View and manage your business account information"
+    },
+    "company": {
+      "title": "Company Information",
+      "edit": "Edit Information",
+      "fields": {
+        "name": "Company Name",
+        "tradeLicense": "Trade License Number",
+        "address": "Current Address",
+        "city": "City"
+      },
+      "notSet": "Not set",
+      "cityValue": "{city}, United Arab Emirates",
+      "tradeDocument": {
+        "title": "Trade License Document",
+        "current": "Current Document Uploaded",
+        "empty": "No document uploaded",
+        "emptyTitle": "No Document",
+        "upload": "Upload Document",
+        "change": "Change Document",
+        "download": "Download License"
+      }
+    },
+    "contact": {
+      "title": "Primary Contact Person",
+      "edit": "Edit Contact",
+      "fields": {
+        "fullName": "Full Name",
+        "jobTitle": "Job Title",
+        "email": "Email Address",
+        "phone": "Phone Number"
+      }
+    },
+    "password": {
+      "change": "Change Password",
+      "modalTitle": "Change Password",
+      "newLabel": "New Password",
+      "newPlaceholder": "Enter new password",
+      "confirmLabel": "Confirm Password",
+      "confirmPlaceholder": "Confirm new password",
+      "requirements": {
+        "title": "Password Requirements:",
+        "upper": "At least one capital letter",
+        "number": "At least one number",
+        "special": "At least one special character",
+        "length": "Minimum 6 characters"
+      },
+      "errors": {
+        "requirements": "Password does not meet all requirements",
+        "mismatch": "Passwords do not match",
+        "changeFailed": "Failed to change password"
+      },
+      "success": "Password changed successfully"
+    },
+    "details": {
+      "title": "Account Details",
+      "statusLabel": "Account Status",
+      "statusActive": "Active",
+      "statusInactive": "Inactive",
+      "memberSince": "Member Since",
+      "lastUpdated": "Last Updated",
+      "emptyDate": "-"
+    },
+    "actions": {
+      "cancelChanges": "Cancel Changes",
+      "saving": "Saving...",
+      "saveChanges": "Save Changes"
+    },
+    "errors": {
+      "loadFailed": "Failed to load account information",
+      "updateFailed": "Failed to update information"
+    },
+    "success": {
+      "updated": "Account information updated successfully"
+    }
+  },
+  "modals": {
+    "addCar": {
+      "title": "Add Cars",
+      "brand": "HAKIM for Business",
+      "subtitle": "Choose how you would like to add cars to your fleet:",
+      "single": {
+        "title": "Add Single Car",
+        "description": "Add one car at a time with detailed information including make, model, year, and specifications."
+      },
+      "bulk": {
+        "title": "Bulk Upload Cars",
+        "description": "Upload multiple cars at once using a CSV file. Perfect for adding large numbers of vehicles quickly."
+      },
+      "continue": "Continue"
+    },
+    "payment": {
+      "brand": "HAKIM for Business",
+      "title": "Select Payment Method",
+      "subtitle": "Choose your preferred payment method",
+      "helper": "Select one option below to continue with your payment",
+      "methods": {
+        "fib": "First Iraqi Bank - Instant transfer",
+        "fastPay": "Quick and secure digital payment",
+        "cash": "Pay with cash on delivery or pickup"
+      },
+      "note": {
+        "label": "Note:",
+        "text": "Your payment will be processed securely. You will receive a confirmation once the transaction is complete."
+      },
+      "processing": "Processing...",
+      "continue": "Continue"
+    },
+    "quotation": {
+      "title": "Quotation",
+      "subtitle": "Professional Service Estimate",
+      "status": {
+        "approved": "Approved"
+      },
+      "info": {
+        "quotationId": "Quotation ID",
+        "dateIssued": "Date Issued",
+        "validUntil": "Valid Until"
+      },
+      "fallback": {
+        "na": "N/A"
+      },
+      "fees": {
+        "title": "Fees Breakdown",
+        "serviceItem": "Service Item {index}",
+        "quantity": "Quantity: {count}",
+        "discount": "(-{currency} {amount} Discount)",
+        "addOn": "Add-on",
+        "replacementPart": "Replacement Part",
+        "qty": "Qty: {count}",
+        "service": "Service",
+        "serviceCharges": "Service Charges",
+        "transportation": "Transportation",
+        "transportationFees": "Pickup and Delivery Fees"
+      },
+      "total": {
+        "title": "Total Amount"
+      },
+      "warranty": {
+        "title": "Warranty Details",
+        "standard": "Standard Warranty",
+        "description": "This service comes with the specified warranty coverage. Your satisfaction and vehicle performance are guaranteed."
+      },
+      "actions": {
+        "acceptPayNow": "Accept & Pay Now",
+        "acceptPayLater": "Accept & Pay Later",
+        "reject": "Reject"
+      },
+      "disclaimer": "By accepting this quotation, you agree to the terms and conditions of service. Payment will be processed securely through our payment gateway."
+    },
+    "confirmReceipt": {
+      "brand": "HAKIM",
+      "brandSuffix": "for Business",
+      "title": "Confirm Car Receipt",
+      "message": "Are you sure you want to confirm that you have received the car?",
+      "warning": "This action cannot be undone once confirmed.",
+      "vehicle": {
+        "placeholderTitle": "Toyota Camry 2023",
+        "placeholderLicense": "ABC-1234",
+        "placeholderBooking": "#HB-789456",
+        "license": "License: {value}",
+        "bookingId": "Booking ID: {value}"
+      },
+      "notice": {
+        "title": "Important Notice",
+        "message": "Please ensure you have thoroughly inspected the vehicle before confirming receipt."
+      },
+      "actions": {
+        "confirm": "Confirm Receipt"
+      }
+    },
+    "vehicleDetails": {
+      "sections": {
+        "vehicleInfo": "Vehicle Information",
+        "serviceStatus": "Service Status"
+      },
+      "fields": {
+        "licensePlate": "License Plate",
+        "vin": "VIN Number",
+        "mileage": "Mileage",
+        "currentStatus": "Current Status",
+        "lastServiceDate": "Last Service Date",
+        "systemId": "System ID",
+        "idLabel": "ID"
+      },
+      "values": {
+        "mileage": "{value} km"
+      },
+      "statuses": {
+        "ongoing": "Ongoing Service",
+        "active": "Active"
+      },
+      "fallback": {
+        "na": "N/A"
+      }
+    },
+    "collectPayment": {
+      "title": "Collect Payment",
+      "serviceFallback": "Service",
+      "customerLabel": "Customer: {name}",
+      "customerUnknown": "Unknown",
+      "breakdown": {
+        "serviceFee": "Service Fee",
+        "parts": "Parts & Materials",
+        "inspection": "Inspection",
+        "total": "Total Amount"
+      },
+      "confirmation": {
+        "title": "Payment Confirmation",
+        "message": "Please confirm that you have received the payment from the customer before proceeding."
+      },
+      "actions": {
+        "received": "Payment Received"
+      }
+    },
+    "photoGallery": {
+      "defaultTitle": "Body Check Photos",
+      "photosLabel": "Photos",
+      "subtitle": "Review vehicle condition photos",
+      "loading": "Loading photos...",
+      "empty": "No photos available",
+      "photoAlt": "Body Check {index}",
+      "actions": {
+        "reject": "Reject Photos",
+        "approve": "Approve Photos"
+      },
+      "lightbox": {
+        "openOriginal": "Open original",
+        "fullViewAlt": "Full view {index}",
+        "thumbnailAlt": "thumbnail"
+      }
+    },
+    "rejectService": {
+      "title": "Reject Service Request",
+      "subtitle": "Please select a reason for rejecting this service request. This action cannot be undone.",
+      "reasonLabel": "Rejection Reason",
+      "placeholder": "Select a reason...",
+      "reasons": {
+        "technician": "Technician not available",
+        "location": "Location out of service area",
+        "duplicate": "Duplicate request",
+        "incomplete": "Incomplete information",
+        "other": "Other"
+      },
+      "confirm": "Confirm Rejection"
+    },
+    "submitPhotos": {
+      "title": "Submit Photos",
+      "subtitle": "Upload Images",
+      "dragTitle": "Drag and drop your images here",
+      "or": "or",
+      "browse": "click to browse",
+      "fromDevice": "from your device",
+      "supported": "Supports: JPG, PNG, GIF • Max 10MB per file",
+      "fileCount": "{count, plural, one {# file selected} other {# files selected}}",
+      "submit": "Submit {count, plural, one {# Photo} other {# Photos}}"
+    },
+    "quotationBuilder": {
+      "title": "Quotation Builder",
+      "header": "Booking #{id} · {category} · {plate}",
+      "serviceFallback": "Service",
+      "fallback": {
+        "na": "N/A"
+      },
+      "alerts": {
+        "saved": "Quotation saved successfully!",
+        "sent": "Quotation sent to customer!"
+      },
+      "services": {
+        "title": "Services",
+        "add": "Add Service",
+        "select": "Select Service",
+        "columns": {
+          "service": "Service",
+          "qty": "Qty",
+          "price": "Price",
+          "discount": "Discount",
+          "cost": "Cost",
+          "warranty": "Warranty",
+          "total": "Total"
+        }
+      },
+      "parts": {
+        "title": "Parts & Components",
+        "add": "Add Part",
+        "namePlaceholder": "Part Name",
+        "columns": {
+          "part": "Part",
+          "qty": "Qty",
+          "price": "Price",
+          "discount": "Discount",
+          "cost": "Cost",
+          "warranty": "Warranty",
+          "total": "Total"
+        }
+      },
+      "warranty": {
+        "none": "No Warranty",
+        "oneMonth": "1 Month",
+        "threeMonths": "3 Months",
+        "sixMonths": "6 Months",
+        "oneYear": "1 Year"
+      },
+      "summary": {
+        "title": "Quote Summary",
+        "servicesSubtotal": "Services Subtotal",
+        "partsSubtotal": "Parts Subtotal",
+        "inspectionFees": "Inspection Fees",
+        "subtotal": "Subtotal",
+        "total": "Total Amount"
+      },
+      "actions": {
+        "title": "Quote Actions",
+        "validUntil": "Valid Until",
+        "internalNotes": "Internal Notes",
+        "internalNotesPlaceholder": "Add internal notes...",
+        "send": "Send Quote to Customer",
+        "saveDraft": "Save as Draft"
+      }
+    },
+    "serviceRequestDetail": {
+      "title": "Service Request #{id}",
+      "createdLabel": "Created:",
+      "serviceFallback": "Service",
+      "status": {
+        "current": "Current Status",
+        "inProgress": "In Progress"
+      },
+      "quoteStatus": {
+        "label": "Quote Status",
+        "pending": "Pending"
+      },
+      "scheduled": {
+        "label": "Scheduled Date/Time"
+      },
+      "vehicle": {
+        "title": "Vehicle Information",
+        "makeModel": "Make & Model",
+        "vin": "VIN",
+        "plate": "License Plate",
+        "mileage": "Mileage",
+        "color": "Color",
+        "engine": "Engine",
+        "mileageValue": "{value} miles"
+      },
+      "service": {
+        "title": "Service Details",
+        "type": "Service Type",
+        "destination": "Destination",
+        "requestedDate": "Requested Date/Time",
+        "distance": "Distance",
+        "autoServiceCenter": "AutoService Center",
+        "distanceValue": "{value} miles"
+      },
+      "cost": {
+        "title": "Cost Breakdown",
+        "baseTow": "Base Tow Service",
+        "addOns": "Add ons",
+        "transportation": "Transportation fees",
+        "inspection": "Inspection fees",
+        "total": "Total Amount"
+      }
+    }
+  },
+  "vehicles": {
+    "title": "Vehicles",
+    "subtitle": "Manage your fleet vehicles and services",
+    "actions": {
+      "requestService": "Request a Service",
+      "addCar": "Add Car"
+    },
+    "stats": {
+      "numberOfCars": "Number of Cars",
+      "activeServices": "Number of Active Services",
+      "scheduledThisWeek": "{count} scheduled this week"
+    },
+    "fleet": {
+      "title": "Vehicle Fleet",
+      "searchPlaceholder": "Search vehicles..."
+    },
+    "filters": {
+      "allStatus": "All Status",
+      "ongoing": "Ongoing"
+    },
+    "table": {
+      "vehicleId": "Vehicle ID",
+      "makeModelYear": "Make/Model/Year",
+      "plateNumber": "Plate Number",
+      "vinNumber": "VIN Number",
+      "lastServiceDate": "Last Service Date",
+      "action": "Action",
+      "empty": "No vehicles found."
+    },
+    "status": {
+      "ongoing": "Ongoing"
+    },
+    "pagination": {
+      "showing": "Showing {start} to {end} of {total} vehicles",
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "alerts": {
+      "delete": {
+        "title": "Are you sure?",
+        "text": "You won't be able to revert this!",
+        "confirm": "Yes, delete it!"
+      },
+      "deleted": {
+        "title": "Deleted!",
+        "text": "Your vehicle has been deleted.",
+        "failed": "Delete failed"
+      },
+      "error": {
+        "title": "Error!",
+        "deleteFailed": "Failed to delete vehicle."
+      }
+    },
+    "fallback": {
+      "unknown": "Unknown",
+      "na": "N/A"
+    }
+  },
+  "addVehicle": {
+    "title": "Add New Vehicle",
+    "subtitle": "Add a vehicle to your fleet",
+    "stepper": {
+      "details": "Vehicle Details",
+      "complete": "Complete"
+    },
+    "sections": {
+      "vehicleInfo": {
+        "title": "Vehicle Information",
+        "subtitle": "Please fill in the details of the vehicle you want to add to your fleet."
+      }
+    },
+    "fields": {
+      "make": "Vehicle Make",
+      "model": "Vehicle Model",
+      "year": "Vehicle Year",
+      "mileage": "Mileage (KMs)",
+      "color": "Vehicle Color",
+      "licensePlate": "License Plate",
+      "vin": "VIN Number"
+    },
+    "placeholders": {
+      "loadingBrands": "Loading Brands...",
+      "selectMake": "Select Make",
+      "loadingModels": "Loading Models...",
+      "selectModel": "Select Model",
+      "selectMakeFirst": "Select a make first",
+      "enterModel": "Enter Model",
+      "selectYear": "Select Year",
+      "mileage": "e.g. 5000",
+      "color": "e.g. White, Silver, Black",
+      "vin": "Enter 17-character VIN (Optional)"
+    },
+    "units": {
+      "km": "km"
+    },
+    "plate": {
+      "newFormat": "New Format",
+      "oldFormat": "Old Format",
+      "code": "Code",
+      "letter": "Letter",
+      "number": "Number"
+    },
+    "actions": {
+      "uploadImage": "Upload {label}",
+      "imagePreview": "{label} Preview",
+      "adding": "Adding...",
+      "addVehicle": "Add Vehicle"
+    },
+    "imageLabels": {
+      "front": "Front",
+      "back": "Back",
+      "left": "Left",
+      "right": "Right"
+    },
+    "validation": {
+      "makeRequired": "Make is required",
+      "modelRequired": "Model is required",
+      "yearRequired": "Year is required",
+      "colorRequired": "Color is required",
+      "plateRequired": "Plate Number is required",
+      "requiredFields": "Please fill in all required fields"
+    },
+    "errors": {
+      "fileSize": "File size for {direction} image must be less than 5MB.",
+      "fileType": "File type for {direction} image must be JPEG, JPG, or PNG.",
+      "maxImages": "You can only upload a maximum of 4 images.",
+      "fileTooLarge": "File {fileName} is too large (max 5MB). Skipped.",
+      "invalidImage": "File {fileName} is not a valid image. Skipped.",
+      "companyIdMissing": "Company ID not found. Please log in again.",
+      "createFailed": "Failed to create vehicle",
+      "unknown": "Unknown error",
+      "duplicatePlate": "A vehicle with this license plate already exists.",
+      "createError": "Error creating vehicle"
+    },
+    "success": {
+      "vehicleAdded": "Vehicle added successfully"
+    },
+    "helpers": {
+      "vin": "Vehicle Identification Number (17 characters)"
+    },
+    "help": {
+      "title": "Need Help?",
+      "vinInfo": "VIN can be found on your vehicle registration, insurance card, or on the driver's side dashboard near the windshield.",
+      "imageInfo": "Please ensure strictly clear images from all 4 sides are uploaded."
+    }
+  },
+  "editVehicle": {
+    "title": "Edit Vehicle",
+    "subtitle": "Update vehicle details",
+    "sections": {
+      "vehicleInfo": {
+        "title": "Edit Vehicle Information"
+      }
+    },
+    "fields": {
+      "make": "Vehicle Make",
+      "model": "Vehicle Model",
+      "year": "Vehicle Year",
+      "mileage": "Mileage (KMs)",
+      "color": "Vehicle Color",
+      "licensePlate": "License Plate",
+      "vin": "VIN Number"
+    },
+    "placeholders": {
+      "loadingBrands": "Loading Brands...",
+      "selectMake": "Select Make",
+      "loadingModels": "Loading Models...",
+      "selectModel": "Select Model",
+      "selectMakeFirst": "Select a make first",
+      "enterModel": "Enter Model",
+      "selectYear": "Select Year",
+      "mileage": "e.g. 5000",
+      "color": "e.g. White, Silver",
+      "vin": "Enter 17-character VIN (Optional)"
+    },
+    "units": {
+      "km": "km"
+    },
+    "plate": {
+      "newFormat": "New Format",
+      "oldFormat": "Old Format"
+    },
+    "actions": {
+      "updating": "Updating...",
+      "updateVehicle": "Update Vehicle"
+    },
+    "validation": {
+      "makeRequired": "Make is required",
+      "modelRequired": "Model is required",
+      "yearRequired": "Year is required",
+      "colorRequired": "Color is required",
+      "plateRequired": "Plate Number is required",
+      "requiredFields": "Please fill in all required fields"
+    },
+    "errors": {
+      "vehicleIdMissing": "Vehicle ID missing",
+      "updateFailed": "Failed to update vehicle",
+      "unknown": "Unknown error",
+      "updateError": "Error updating vehicle",
+      "autoSelectModel": "Could not auto-select model '{model}'. Please select manually."
+    },
+    "success": {
+      "vehicleUpdated": "Vehicle updated successfully"
+    }
+  },
+  "finance": {
+    "title": "Finance",
+    "subtitle": "Manage your transactions and payments",
+    "stats": {
+      "totalTransactions": "Total Transactions",
+      "totalOutstanding": "Total Outstanding Amount",
+      "month": "January",
+      "year": "2024",
+      "outstandingPerMonth": "Outstanding Per Month"
+    },
+    "history": {
+      "title": "Transaction History",
+      "exportAll": "Export All"
+    },
+    "filters": {
+      "searchPlaceholder": "Search transactions...",
+      "allStatus": "All Status",
+      "allMethods": "All Methods"
+    },
+    "table": {
+      "transactionId": "Transaction ID",
+      "date": "Date",
+      "bookingId": "Booking ID",
+      "vehicleId": "Vehicle ID",
+      "makeModelYear": "Make/Model/Year",
+      "serviceType": "Service Type",
+      "serviceCost": "Service Cost",
+      "paymentStatus": "Payment Status",
+      "paymentMethod": "Payment Method",
+      "action": "Action",
+      "invoice": "Invoice"
+    },
+    "pagination": {
+      "showing": "Showing 1 to 5 of 1,247 results"
+    }
+  },
+  "login": {
+    "metaTitle": "Login - HAKIM for Business",
+    "metaDescription": "Login to your HAKIM for Business account",
+    "brandTagline": "for Business",
+    "welcomeTitle": "Welcome back",
+    "welcomeSubtitle": "Sign in to your business account",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "Enter your email",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "forgotPassword": "Forgot password?",
+    "signIn": "Sign in",
+    "signingIn": "Signing in...",
+    "noAccount": "Don't have an account?",
+    "createAccount": "Create account",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "support": "Support",
+    "secureLogin": "Secure business login powered by",
+    "validation": {
+      "emailRequired": "Please enter email address",
+      "emailInvalid": "Please enter a valid email address",
+      "passwordRequired": "Please enter password"
+    },
+    "errors": {
+      "unexpected": "An unexpected error occurred. Please try again.",
+      "invalidCredentials": "Invalid email or password"
+    }
+  },
+  "register": {
+    "metaTitle": "Register - HAKIM for Business",
+    "metaDescription": "Register your business with HAKIM",
+    "brandTagline": "for Business",
+    "navHelp": "Help",
+    "navCall": "Call",
+    "pageTitle": "Register Your Business",
+    "pageSubtitle": "Join HAKIM for Business and streamline your company's transportation needs. Complete the registration process in three simple steps.",
+    "stepper": {
+      "company": "Company Information",
+      "contact": "Contact Person",
+      "fleet": "Fleet Information"
+    },
+    "section": {
+      "companyInfo": "Company Information & Trade License",
+      "contactPerson": "Primary Contact Person",
+      "fleetInfo": "Fleet Size & Type"
+    },
+    "infoBanner": "These credentials will be used for your business account login",
+    "fields": {
+      "companyName": "Company Name *",
+      "tradeLicenseNumber": "Trade License Number *",
+      "companyLocation": "Company Location *",
+      "city": "City *",
+      "companyAddress": "Company Address *",
+      "tradeLicenseDocument": "Trade License Document *",
+      "fullName": "Full Name *",
+      "jobTitle": "Job Title *",
+      "email": "Email Address *",
+      "emailHint": "(Login Username)",
+      "password": "Password *",
+      "passwordHint": "(Login Password)",
+      "phoneNumber": "Phone Number *",
+      "fleetSize": "Estimated Fleet Size *",
+      "vehicleType": "Primary Vehicle Type *"
+    },
+    "placeholders": {
+      "companyName": "Enter your company name",
+      "tradeLicenseNumber": "Enter license number",
+      "companyAddress": "Enter complete company address",
+      "fullName": "Enter full name",
+      "jobTitle": "Enter job title",
+      "email": "Enter email address",
+      "password": "Create password",
+      "phoneNumber": "Enter phone number",
+      "fleetSize": "Enter fleet size",
+      "vehicleType": "Select vehicle type",
+      "detectingCity": "Detecting city...",
+      "autoDetectedCity": "Auto-detected from location",
+      "locationSelected": "Selected Location: {lat}, {lng}"
+    },
+    "vehicleTypes": {
+      "sedan": "Sedan",
+      "suv": "SUV",
+      "van": "Van",
+      "truck": "Truck",
+      "luxury": "Luxury"
+    },
+    "upload": {
+      "cta": "Upload your trade license document",
+      "helper": "PDF, JPG or PNG files up to 5MB",
+      "chooseFile": "Choose File"
+    },
+    "passwordCriteria": {
+      "length": "6+ Characters",
+      "upper": "Uppercase Letter",
+      "number": "Number",
+      "special": "Special Char (!@#$%^&*)"
+    },
+    "actions": {
+      "back": "Back",
+      "register": "Register",
+      "registering": "Registering..."
+    },
+    "footer": {
+      "needHelp": "Need assistance with your registration?",
+      "callSupport": "Call Support",
+      "emailUs": "Email Us",
+      "liveChat": "Live Chat",
+      "copyright": "© 2024 HAKIM for Business. All rights reserved.",
+      "privacyPolicy": "Privacy Policy",
+      "termsOfService": "Terms of Service",
+      "support": "Support"
+    },
+    "alerts": {
+      "unsupported": {
+        "title": "Unsupported",
+        "text": "Geolocation is not supported by your browser"
+      },
+      "permissionDenied": {
+        "title": "Permission Denied",
+        "text": "We cannot detect your location because permission was denied.",
+        "hint": "Please click the lock/settings icon in your browser address bar and allow location access, then click Retry.",
+        "retry": "Retry Detection"
+      },
+      "missingInfo": {
+        "title": "Missing Information",
+        "text": "Please fill in all required fields and upload trade license."
+      },
+      "invalidEmail": {
+        "title": "Invalid Email",
+        "text": "Please enter a valid email address."
+      },
+      "weakPassword": {
+        "title": "Weak Password",
+        "text": "Please ensure all password requirements are met."
+      },
+      "registerSuccess": {
+        "title": "Registration Successful!",
+        "text": "Your company has been registered. You can now login.",
+        "confirm": "Go to Login"
+      },
+      "registerFailed": {
+        "title": "Registration Failed",
+        "fallback": "Something went wrong. Please try again."
+      }
+    }
+  },
+  "errors": {
+    "actions": {
+      "home": "Go to Homepage",
+      "back": "Go Back"
+    },
+    "notFound": {
+      "title": "Page Not Found",
+      "description": "The page you are looking for doesn't exist or has been moved.",
+      "help": "Need help? Contact our support team."
+    },
+    "serverError": {
+      "title": "Server Error",
+      "description": "Something went wrong on our end. We're working to fix this issue.",
+      "help": "If this problem persists, please contact support."
+    },
+    "generic": {
+      "title": "An error occurred",
+      "withCode": "Error {statusCode}",
+      "description": "Something went wrong. Please try again later.",
+      "notFound": "The page you are looking for could not be found."
+    }
+  }
+}

@@ -17,9 +17,13 @@ import {
 import { authAPI } from '../services/api/auth.api';
 import LocationPicker from '../components/common/LocationPicker';
 import Swal from 'sweetalert2';
+import { useTranslations } from 'next-intl';
+import LanguageSwitcher from '../components/common/LanguageSwitcher';
 
 export default function Register() {
     const router = useRouter();
+    const t = useTranslations('register');
+    const tCommon = useTranslations('common');
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
@@ -49,6 +53,11 @@ export default function Register() {
     const [permissionDenied, setPermissionDenied] = useState(false);
     const [detectingLocation, setDetectingLocation] = useState(false);
 
+    const validateEmail = (email: string): boolean => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
+
     useEffect(() => {
         const pwd = formData.password;
         setPasswordCriteria({
@@ -63,8 +72,8 @@ export default function Register() {
         if (!navigator.geolocation) {
             Swal.fire({
                 icon: 'error',
-                title: 'Unsupported',
-                text: 'Geolocation is not supported by your browser',
+                title: t('alerts.unsupported.title'),
+                text: t('alerts.unsupported.text'),
                 confirmButtonColor: '#FCD34D'
             });
             return;
@@ -178,10 +187,21 @@ export default function Register() {
         if (!formData.companyName || !formData.tradeLicenseNumber || !formData.email || !formData.password || !tradeLicenseFile) {
             Swal.fire({
                 icon: 'error',
-                title: 'Missing Information',
-                text: 'Please fill in all required fields and upload trade license.',
+                title: t('alerts.missingInfo.title'),
+                text: t('alerts.missingInfo.text'),
                 confirmButtonColor: '#FCD34D',
-                confirmButtonText: 'OK'
+                confirmButtonText: tCommon('actions.ok')
+            });
+            return;
+        }
+
+        if (!validateEmail(formData.email)) {
+            Swal.fire({
+                icon: 'error',
+                title: t('alerts.invalidEmail.title'),
+                text: t('alerts.invalidEmail.text'),
+                confirmButtonColor: '#FCD34D',
+                confirmButtonText: tCommon('actions.ok')
             });
             return;
         }
@@ -189,10 +209,10 @@ export default function Register() {
         if (!passwordCriteria.length || !passwordCriteria.upper || !passwordCriteria.number || !passwordCriteria.special) {
             Swal.fire({
                 icon: 'error',
-                title: 'Weak Password',
-                text: 'Please ensure all password requirements are met.',
+                title: t('alerts.weakPassword.title'),
+                text: t('alerts.weakPassword.text'),
                 confirmButtonColor: '#FCD34D',
-                confirmButtonText: 'OK'
+                confirmButtonText: tCommon('actions.ok')
             });
             return;
         }
@@ -233,10 +253,10 @@ export default function Register() {
 
             Swal.fire({
                 icon: 'success',
-                title: 'Registration Successful!',
-                text: 'Your company has been registered. You can now login.',
+                title: t('alerts.registerSuccess.title'),
+                text: t('alerts.registerSuccess.text'),
                 confirmButtonColor: '#FCD34D',
-                confirmButtonText: 'Go to Login'
+                confirmButtonText: t('alerts.registerSuccess.confirm')
             }).then(() => {
                 router.push('/login');
             });
@@ -248,11 +268,11 @@ export default function Register() {
             const errorObj = error as { response?: { data?: { error?: { message?: string }; message?: string } } };
             const errorMessage = errorObj?.response?.data?.error?.message ||
                 errorObj?.response?.data?.message ||
-                'Something went wrong. Please try again.';
+                t('alerts.registerFailed.fallback');
 
             Swal.fire({
                 icon: 'error',
-                title: 'Registration Failed',
+                title: t('alerts.registerFailed.title'),
                 text: errorMessage,
                 confirmButtonColor: '#d33'
             });
@@ -264,8 +284,8 @@ export default function Register() {
     return (
         <div className="min-h-screen bg-[#F9FAFB] font-sans text-gray-900">
             <Head>
-                <title>Register - HAKIM for Business</title>
-                <meta name="description" content="Register your business with HAKIM" />
+                <title>{t('metaTitle')}</title>
+                <meta name="description" content={t('metaDescription')} />
             </Head>
 
             {/* Top Navigation Bar */}
@@ -279,12 +299,13 @@ export default function Register() {
                     </div>
                     <div>
                         <h1 className="text-xl font-black tracking-tight text-gray-900 leading-none">HAKIM</h1>
-                        <p className="text-[10px] text-gray-500 font-bold tracking-wide uppercase">for Business</p>
+                        <p className="text-[10px] text-gray-500 font-bold tracking-wide uppercase">{t('brandTagline')}</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-4 text-gray-500">
                     <FaQuestionCircle className="w-5 h-5 cursor-pointer hover:text-gray-700 transition-colors" />
                     <FaPhoneAlt className="w-4 h-4 cursor-pointer hover:text-gray-700 transition-colors" />
+                    <LanguageSwitcher />
                 </div>
             </nav>
 
@@ -292,33 +313,32 @@ export default function Register() {
 
                 {/* Page Title & Subtitle */}
                 <div className="text-center mb-12">
-                    <h1 className="text-[28px] font-bold text-gray-900 mb-2">Register Your Business</h1>
+                    <h1 className="text-[28px] font-bold text-gray-900 mb-2">{t('pageTitle')}</h1>
                     <p className="text-gray-500 text-sm max-w-lg mx-auto leading-relaxed">
-                        Join HAKIM for Business and streamline your company's transportation needs.
-                        Complete the registration process in three simple steps.
+                        {t('pageSubtitle')}
                     </p>
                 </div>
 
                 {/* Stepper */}
                 <div className="flex justify-center items-center mb-12 text-xs font-medium text-gray-400">
                     <div className="flex items-center">
-                        <div className="w-8 h-8 rounded-full bg-[#FCD34D] text-gray-900 flex items-center justify-center font-bold mr-2 text-sm">1</div>
-                        <span className="text-gray-900 font-bold">Company Information</span>
+                        <div className="w-8 h-8 rounded-full bg-[#FCD34D] text-gray-900 flex items-center justify-center font-bold me-2 text-sm">1</div>
+                        <span className="text-gray-900 font-bold">{t('stepper.company')}</span>
                     </div>
                     <div className="w-12 h-[1px] bg-gray-200 mx-4"></div>
                     <div className="flex items-center">
-                        <div className="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-bold mr-2 text-sm">2</div>
-                        <span>Contact Person</span>
+                        <div className="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-bold me-2 text-sm">2</div>
+                        <span>{t('stepper.contact')}</span>
                     </div>
                     <div className="w-12 h-[1px] bg-gray-200 mx-4"></div>
                     <div className="flex items-center">
-                        <div className="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-bold mr-2 text-sm">3</div>
-                        <span>Fleet Information</span>
+                        <div className="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-bold me-2 text-sm">3</div>
+                        <span>{t('stepper.fleet')}</span>
                     </div>
                 </div>
 
                 {/* Main Form Card */}
-                <form onSubmit={handleSubmit} className="bg-white rounded-[24px] shadow-[0_4px_24px_rgba(0,0,0,0.04)] p-8 sm:p-10">
+                <form onSubmit={handleSubmit} noValidate className="bg-white rounded-[24px] shadow-[0_4px_24px_rgba(0,0,0,0.04)] p-8 sm:p-10">
 
                     {/* Section 1: Company Information */}
                     <section className="mb-10">
@@ -326,30 +346,30 @@ export default function Register() {
                             <div className="w-8 h-8 bg-[#FCD34D] rounded-full flex items-center justify-center text-gray-900">
                                 <FaBuilding className="text-sm" />
                             </div>
-                            <h2 className="text-lg font-bold text-gray-800">Company Information & Trade License</h2>
+                            <h2 className="text-lg font-bold text-gray-800">{t('section.companyInfo')}</h2>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                             <div>
-                                <label className="block text-xs font-bold text-gray-700 mb-2">Company Name *</label>
+                                <label className="block text-xs font-bold text-gray-700 mb-2">{t('fields.companyName')}</label>
                                 <input
                                     type="text"
                                     name="companyName"
                                     value={formData.companyName}
                                     onChange={handleChange}
-                                    placeholder="Enter your company name"
+                                    placeholder={t('placeholders.companyName')}
                                     required
                                     className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FCD34D] focus:border-transparent transition-all"
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs font-bold text-gray-700 mb-2">Trade License Number *</label>
+                                <label className="block text-xs font-bold text-gray-700 mb-2">{t('fields.tradeLicenseNumber')}</label>
                                 <input
                                     type="text"
                                     name="tradeLicenseNumber"
                                     value={formData.tradeLicenseNumber}
                                     onChange={handleChange}
-                                    placeholder="Enter license number"
+                                    placeholder={t('placeholders.tradeLicenseNumber')}
                                     required
                                     className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FCD34D] focus:border-transparent transition-all"
                                 />
@@ -357,7 +377,7 @@ export default function Register() {
                         </div>
 
                         <div className="mb-6">
-                            <label className="block text-xs font-bold text-gray-700 mb-2">Company Location *</label>
+                            <label className="block text-xs font-bold text-gray-700 mb-2">{t('fields.companyLocation')}</label>
 
                             {/* Replaced placeholder with LocationPicker */}
                             {permissionDenied ? (
@@ -365,19 +385,19 @@ export default function Register() {
                                     <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-3">
                                         <FaTimesCircle className="text-red-500 text-xl" />
                                     </div>
-                                    <h3 className="text-sm font-bold text-red-800 mb-1">Permission Denied</h3>
+                                    <h3 className="text-sm font-bold text-red-800 mb-1">{t('alerts.permissionDenied.title')}</h3>
                                     <p className="text-xs text-red-600 mb-2 max-w-xs">
-                                        We cannot detect your location because permission was denied.
+                                        {t('alerts.permissionDenied.text')}
                                     </p>
                                     <p className="text-[10px] text-red-500 mb-4 max-w-xs">
-                                        Please click the lock/settings icon in your browser address bar and allow location access, then click Retry.
+                                        {t('alerts.permissionDenied.hint')}
                                     </p>
                                     <button
                                         type="button"
                                         onClick={detectLocation}
                                         className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-md transition-colors shadow-sm"
                                     >
-                                        Retry Detection
+                                        {t('alerts.permissionDenied.retry')}
                                     </button>
                                 </div>
                             ) : (
@@ -391,21 +411,21 @@ export default function Register() {
 
                             {!permissionDenied && location && (
                                 <p className="mt-2 text-xs text-green-600 flex items-center">
-                                    <FaMapMarkerAlt className="mr-1" />
-                                    {location.fullAddress || `Selected Location: ${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}`}
+                                    <FaMapMarkerAlt className="me-1" />
+                                    {location.fullAddress || t('placeholders.locationSelected', { lat: location.lat.toFixed(4), lng: location.lng.toFixed(4) })}
                                 </p>
                             )}
                         </div>
 
                         <div className="mb-6">
-                            <label className="block text-xs font-bold text-gray-700 mb-2">City *</label>
+                            <label className="block text-xs font-bold text-gray-700 mb-2">{t('fields.city')}</label>
                             <div className="relative">
                                 <input
                                     type="text"
                                     name="city"
                                     value={formData.city}
                                     readOnly
-                                    placeholder={detectingLocation ? "Detecting city..." : "Auto-detected from location"}
+                                    placeholder={detectingLocation ? t('placeholders.detectingCity') : t('placeholders.autoDetectedCity')}
                                     className={`w-64 px-4 py-3 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none transition-all ${permissionDenied ? 'bg-red-50 border-red-200' : 'bg-gray-50 text-gray-500 cursor-not-allowed'
                                         }`}
                                 />
@@ -413,12 +433,12 @@ export default function Register() {
                         </div>
 
                         <div className="mb-6">
-                            <label className="block text-xs font-bold text-gray-700 mb-2">Company Address *</label>
+                            <label className="block text-xs font-bold text-gray-700 mb-2">{t('fields.companyAddress')}</label>
                             <textarea
                                 name="companyAddress"
                                 value={formData.companyAddress}
                                 onChange={handleChange}
-                                placeholder="Enter complete company address"
+                                placeholder={t('placeholders.companyAddress')}
                                 rows={3}
                                 required
                                 className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FCD34D] focus:border-transparent transition-all resize-none"
@@ -426,7 +446,7 @@ export default function Register() {
                         </div>
 
                         <div className="mb-6">
-                            <label className="block text-xs font-bold text-gray-700 mb-2">Trade License Document *</label>
+                            <label className="block text-xs font-bold text-gray-700 mb-2">{t('fields.tradeLicenseDocument')}</label>
                             <div className="w-full border-2 border-dashed border-gray-200 rounded-lg p-8 flex flex-col items-center justify-center text-center hover:bg-gray-50 transition-colors cursor-pointer group relative">
                                 <input
                                     type="file"
@@ -438,11 +458,11 @@ export default function Register() {
                                     <FaCloudUploadAlt className="text-gray-400 text-xl" />
                                 </div>
                                 <p className="text-sm font-medium text-gray-700">
-                                    {tradeLicenseFile ? tradeLicenseFile.name : 'Upload your trade license document'}
+                                    {tradeLicenseFile ? tradeLicenseFile.name : t('upload.cta')}
                                 </p>
-                                <p className="text-xs text-gray-400 mt-1 mb-4">PDF, JPG or PNG files up to 5MB</p>
+                                <p className="text-xs text-gray-400 mt-1 mb-4">{t('upload.helper')}</p>
                                 <button type="button" className="px-5 py-2 bg-[#FCD34D] hover:bg-[#FBBF24] text-gray-900 text-xs font-bold rounded-md transition-colors shadow-sm pointe-events-none">
-                                    Choose File
+                                    {t('upload.chooseFile')}
                                 </button>
                             </div>
                         </div>
@@ -454,35 +474,35 @@ export default function Register() {
                             <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500">
                                 <FaUser className="text-sm" />
                             </div>
-                            <h2 className="text-lg font-bold text-gray-600">Primary Contact Person</h2>
+                            <h2 className="text-lg font-bold text-gray-600">{t('section.contactPerson')}</h2>
                         </div>
 
                         <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 flex items-start gap-3 mb-6">
                             <div className="text-blue-500 mt-0.5"><FaQuestionCircle className="w-4 h-4" /></div>
-                            <p className="text-xs text-blue-700 leading-tight">These credentials will be used for your business account login</p>
+                            <p className="text-xs text-blue-700 leading-tight">{t('infoBanner')}</p>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                             <div>
-                                <label className="block text-xs font-bold text-gray-700 mb-2">Full Name *</label>
+                                <label className="block text-xs font-bold text-gray-700 mb-2">{t('fields.fullName')}</label>
                                 <input
                                     type="text"
                                     name="fullName"
                                     value={formData.fullName}
                                     onChange={handleChange}
-                                    placeholder="Enter full name"
+                                    placeholder={t('placeholders.fullName')}
                                     required
                                     className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FCD34D] focus:border-transparent transition-all"
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs font-bold text-gray-700 mb-2">Job Title *</label>
+                                <label className="block text-xs font-bold text-gray-700 mb-2">{t('fields.jobTitle')}</label>
                                 <input
                                     type="text"
                                     name="jobTitle"
                                     value={formData.jobTitle}
                                     onChange={handleChange}
-                                    placeholder="Enter job title"
+                                    placeholder={t('placeholders.jobTitle')}
                                     required
                                     className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FCD34D] focus:border-transparent transition-all"
                                 />
@@ -491,33 +511,39 @@ export default function Register() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                             <div>
-                                <label className="block text-xs font-bold text-gray-700 mb-2">Email Address * <span className="text-blue-400 font-normal text-[10px] ml-1">(Login Username)</span></label>
+                                <label className="block text-xs font-bold text-gray-700 mb-2">
+                                    {t('fields.email')}{' '}
+                                    <span className="text-blue-400 font-normal text-[10px] ms-1">{t('fields.emailHint')}</span>
+                                </label>
                                 <input
                                     type="email"
                                     name="email"
                                     value={formData.email}
                                     onChange={handleChange}
-                                    placeholder="Enter email address"
+                                    placeholder={t('placeholders.email')}
                                     required
                                     className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FCD34D] focus:border-transparent transition-all"
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs font-bold text-gray-700 mb-2">Password * <span className="text-blue-400 font-normal text-[10px] ml-1">(Login Password)</span></label>
+                                <label className="block text-xs font-bold text-gray-700 mb-2">
+                                    {t('fields.password')}{' '}
+                                    <span className="text-blue-400 font-normal text-[10px] ms-1">{t('fields.passwordHint')}</span>
+                                </label>
                                 <div className="relative">
                                     <input
                                         type={showPassword ? "text" : "password"}
                                         name="password"
                                         value={formData.password}
                                         onChange={handleChange}
-                                        placeholder="Create password"
+                                    placeholder={t('placeholders.password')}
                                         required
                                         className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FCD34D] focus:border-transparent transition-all pr-10"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+                                        className="absolute inset-y-0 end-0 pe-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
                                     >
                                         {showPassword ? <FaEyeSlash /> : <FaEye />}
                                     </button>
@@ -525,29 +551,29 @@ export default function Register() {
                                 {/* Password Strength Indicators */}
                                 <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1">
                                     <div className={`text-[10px] flex items-center gap-1 ${passwordCriteria.length ? 'text-green-600 font-medium' : 'text-gray-400'}`}>
-                                        {passwordCriteria.length ? <FaCheckCircle /> : <FaTimesCircle className="text-gray-300" />} 6+ Characters
+                                        {passwordCriteria.length ? <FaCheckCircle /> : <FaTimesCircle className="text-gray-300" />} {t('passwordCriteria.length')}
                                     </div>
                                     <div className={`text-[10px] flex items-center gap-1 ${passwordCriteria.upper ? 'text-green-600 font-medium' : 'text-gray-400'}`}>
-                                        {passwordCriteria.upper ? <FaCheckCircle /> : <FaTimesCircle className="text-gray-300" />} Uppercase Letter
+                                        {passwordCriteria.upper ? <FaCheckCircle /> : <FaTimesCircle className="text-gray-300" />} {t('passwordCriteria.upper')}
                                     </div>
                                     <div className={`text-[10px] flex items-center gap-1 ${passwordCriteria.number ? 'text-green-600 font-medium' : 'text-gray-400'}`}>
-                                        {passwordCriteria.number ? <FaCheckCircle /> : <FaTimesCircle className="text-gray-300" />} Number
+                                        {passwordCriteria.number ? <FaCheckCircle /> : <FaTimesCircle className="text-gray-300" />} {t('passwordCriteria.number')}
                                     </div>
                                     <div className={`text-[10px] flex items-center gap-1 ${passwordCriteria.special ? 'text-green-600 font-medium' : 'text-gray-400'}`}>
-                                        {passwordCriteria.special ? <FaCheckCircle /> : <FaTimesCircle className="text-gray-300" />} Special Char (!@#$%^&*)
+                                        {passwordCriteria.special ? <FaCheckCircle /> : <FaTimesCircle className="text-gray-300" />} {t('passwordCriteria.special')}
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <div className="mb-6">
-                            <label className="block text-xs font-bold text-gray-700 mb-2">Phone Number *</label>
+                            <label className="block text-xs font-bold text-gray-700 mb-2">{t('fields.phoneNumber')}</label>
                             <input
                                 type="tel"
                                 name="phoneNumber"
                                 value={formData.phoneNumber}
                                 onChange={handleChange}
-                                placeholder="Enter phone number"
+                                placeholder={t('placeholders.phoneNumber')}
                                 required
                                 className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FCD34D] focus:border-transparent transition-all"
                             />
@@ -560,19 +586,19 @@ export default function Register() {
                             <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500">
                                 <FaTruck className="text-sm" />
                             </div>
-                            <h2 className="text-lg font-bold text-gray-600">Fleet Size & Type</h2>
+                            <h2 className="text-lg font-bold text-gray-600">{t('section.fleetInfo')}</h2>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                             <div>
-                                <label className="block text-xs font-bold text-gray-700 mb-2">Estimated Fleet Size *</label>
+                                <label className="block text-xs font-bold text-gray-700 mb-2">{t('fields.fleetSize')}</label>
                                 <div className="relative">
                                     <input
                                         type="number"
                                         name="fleetSize"
                                         value={formData.fleetSize}
                                         onChange={handleChange}
-                                        placeholder="Enter fleet size"
+                                        placeholder={t('placeholders.fleetSize')}
                                         min="1"
                                         required
                                         className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FCD34D] focus:border-transparent transition-all"
@@ -580,7 +606,7 @@ export default function Register() {
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-xs font-bold text-gray-700 mb-2">Primary Vehicle Type *</label>
+                                <label className="block text-xs font-bold text-gray-700 mb-2">{t('fields.vehicleType')}</label>
                                 <div className="relative">
                                     <select
                                         name="vehicleType"
@@ -589,14 +615,14 @@ export default function Register() {
                                         required
                                         className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-lg text-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#FCD34D] focus:bg-white transition-all appearance-none cursor-pointer"
                                     >
-                                        <option value="" disabled>Select vehicle type</option>
-                                        <option value="sedan">Sedan</option>
-                                        <option value="suv">SUV</option>
-                                        <option value="van">Van</option>
-                                        <option value="truck">Truck</option>
-                                        <option value="luxury">Luxury</option>
+                                        <option value="" disabled>{t('placeholders.vehicleType')}</option>
+                                        <option value="sedan">{t('vehicleTypes.sedan')}</option>
+                                        <option value="suv">{t('vehicleTypes.suv')}</option>
+                                        <option value="van">{t('vehicleTypes.van')}</option>
+                                        <option value="truck">{t('vehicleTypes.truck')}</option>
+                                        <option value="luxury">{t('vehicleTypes.luxury')}</option>
                                     </select>
-                                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                                    <div className="pointer-events-none absolute inset-y-0 end-0 flex items-center px-4 text-gray-500">
                                         <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                                     </div>
                                 </div>
@@ -611,14 +637,14 @@ export default function Register() {
                             onClick={() => router.back()}
                             className="text-sm font-bold text-gray-600 hover:text-gray-900 transition-colors"
                         >
-                            Back
+                            {tCommon('actions.back')}
                         </button>
                         <button
                             type="submit"
                             disabled={loading}
                             className="px-8 py-3 bg-[#FCD34D] hover:bg-[#FBBF24] text-gray-900 text-sm font-bold rounded-lg shadow-sm hover:shadow-md transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {loading ? 'Registering...' : 'Register'}
+                            {loading ? t('actions.registering') : t('actions.register')}
                         </button>
                     </div>
 
@@ -627,12 +653,12 @@ export default function Register() {
                 {/* Footer Text */}
                 <div className="mt-8 text-center space-y-4">
                     <p className="text-xs text-gray-400 font-medium">
-                        Need assistance with your registration?
+                        {t('footer.needHelp')}
                     </p>
                     <div className="flex justify-center gap-6 text-[11px] font-bold text-[#FCD34D]">
-                        <a href="#" className="flex items-center gap-1 hover:underline"><FaPhoneAlt /> Call Support</a>
-                        <a href="#" className="flex items-center gap-1 hover:underline"><span className="text-lg">✉</span> Email Us</a>
-                        <a href="#" className="flex items-center gap-1 hover:underline"><span className="text-lg">💬</span> Live Chat</a>
+                        <a href="#" className="flex items-center gap-1 hover:underline"><FaPhoneAlt /> {t('footer.callSupport')}</a>
+                        <a href="#" className="flex items-center gap-1 hover:underline"><span className="text-lg">✉</span> {t('footer.emailUs')}</a>
+                        <a href="#" className="flex items-center gap-1 hover:underline"><span className="text-lg">💬</span> {t('footer.liveChat')}</a>
                     </div>
                 </div>
 
@@ -646,12 +672,12 @@ export default function Register() {
                             <path d="M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM10 4h4v2h-4V4zm10 16H4V8h16v12z" />
                         </svg>
                     </div>
-                    <span>© 2024 HAKIM for Business. All rights reserved.</span>
+                    <span>{t('footer.copyright')}</span>
                 </div>
                 <div className="flex gap-6">
-                    <a href="#" className="hover:text-gray-700">Privacy Policy</a>
-                    <a href="#" className="hover:text-gray-700">Terms of Service</a>
-                    <a href="#" className="hover:text-gray-700">Support</a>
+                    <a href="#" className="hover:text-gray-700">{t('footer.privacyPolicy')}</a>
+                    <a href="#" className="hover:text-gray-700">{t('footer.termsOfService')}</a>
+                    <a href="#" className="hover:text-gray-700">{t('footer.support')}</a>
                 </div>
             </footer>
         </div>

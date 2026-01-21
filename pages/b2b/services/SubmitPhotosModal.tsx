@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { FaTimes, FaCloudUploadAlt, FaUpload } from 'react-icons/fa';
+import { useTranslations } from 'next-intl';
 
 interface SubmitPhotosModalProps {
     isOpen: boolean;
@@ -16,6 +17,8 @@ export default function SubmitPhotosModal({
     const [isClosing, setIsClosing] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const t = useTranslations('modals.submitPhotos');
+    const tCommon = useTranslations('common');
 
     useEffect(() => {
         if (isOpen) {
@@ -74,7 +77,7 @@ export default function SubmitPhotosModal({
             <div className={`relative bg-white rounded-2xl shadow-xl w-full max-w-lg transform transition-all duration-200 ${isClosing ? 'scale-95' : 'scale-100'}`}>
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-                    <h2 className="text-lg font-bold text-gray-900">Submit Photos</h2>
+                    <h2 className="text-lg font-bold text-gray-900">{t('title')}</h2>
                     <button
                         onClick={handleClose}
                         className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -85,7 +88,7 @@ export default function SubmitPhotosModal({
 
                 {/* Content */}
                 <div className="p-6">
-                    <p className="text-sm font-medium text-gray-700 mb-3">Upload Images</p>
+                    <p className="text-sm font-medium text-gray-700 mb-3">{t('subtitle')}</p>
 
                     <div
                         onDragOver={onDragOver}
@@ -99,18 +102,18 @@ export default function SubmitPhotosModal({
                         </div>
 
                         <h3 className="text-base font-semibold text-gray-900 mb-1">
-                            Drag and drop your images here
+                            {t('dragTitle')}
                         </h3>
                         <p className="text-sm text-gray-500 mb-2">
-                            or <button
+                            {t('or')} <button
                                 onClick={() => fileInputRef.current?.click()}
                                 className="text-yellow-500 hover:text-yellow-600 font-medium hover:underline"
                             >
-                                click to browse
-                            </button> from your device
+                                {t('browse')}
+                            </button> {t('fromDevice')}
                         </p>
                         <p className="text-xs text-gray-400">
-                            Supports: JPG, PNG, GIF • Max 10MB per file
+                            {t('supported')}
                         </p>
 
                         <input
@@ -127,7 +130,7 @@ export default function SubmitPhotosModal({
                     {files.length > 0 && (
                         <div className="mt-4 flex flex-wrap gap-2">
                             <div className="text-sm text-gray-600">
-                                {files.length} file{files.length !== 1 ? 's' : ''} selected
+                                {t('fileCount', { count: files.length })}
                             </div>
                         </div>
                     )}
@@ -139,14 +142,14 @@ export default function SubmitPhotosModal({
                         onClick={handleClose}
                         className="px-4 py-2 bg-white border border-gray-200 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
                     >
-                        Cancel
+                        {tCommon('actions.cancel')}
                     </button>
                     <button
                         onClick={handleSubmit}
                         className="px-4 py-2 bg-yellow-400 text-gray-900 text-sm font-bold rounded-lg hover:bg-yellow-500 transition-colors flex items-center gap-2"
                     >
                         <FaUpload className="w-4 h-4" />
-                        Submit {files.length > 0 ? `${files.length} ` : ''}Photos
+                        {t('submit', { count: files.length })}
                     </button>
                 </div>
             </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FaTimes, FaImage, FaCheck, FaBan, FaChevronLeft, FaChevronRight, FaExpand, FaDownload } from 'react-icons/fa';
+import { useTranslations } from 'next-intl';
 
 interface PhotoGalleryModalProps {
     isOpen: boolean;
@@ -15,11 +16,12 @@ export default function PhotoGalleryModal({
     isOpen,
     onClose,
     photos,
-    title = 'Body Check Photos',
+    title,
     onApprove,
     onReject,
     isLoading = false
 }: PhotoGalleryModalProps) {
+    const t = useTranslations('modals.photoGallery');
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -43,6 +45,7 @@ export default function PhotoGalleryModal({
     };
 
     if (!isOpen) return null;
+    const modalTitle = title || t('defaultTitle');
 
     const openLightbox = (index: number) => {
         setCurrentIndex(index);
@@ -87,7 +90,7 @@ export default function PhotoGalleryModal({
                     {/* Close Button */}
                     <button
                         onClick={onClose}
-                        className="absolute top-4 right-4 z-10 p-2 bg-white/50 hover:bg-white rounded-full text-gray-400 hover:text-gray-600 transition-colors shadow-sm"
+                        className="absolute top-4 end-4 z-10 p-2 bg-white/50 hover:bg-white rounded-full text-gray-400 hover:text-gray-600 transition-colors shadow-sm"
                     >
                         <FaTimes />
                     </button>
@@ -97,12 +100,12 @@ export default function PhotoGalleryModal({
                         <div className="relative z-10 flex justify-between items-start">
                             <div>
                                 <div className="flex items-baseline gap-3 mb-1">
-                                    <h2 className="text-2xl font-black text-gray-900">{title}</h2>
+                                    <h2 className="text-2xl font-black text-gray-900">{modalTitle}</h2>
                                     <span className="px-3 py-1 bg-white/40 text-gray-900 text-xs font-bold rounded-full border border-white/20 flex items-center gap-1 backdrop-blur-sm">
-                                        <FaImage className="text-gray-900" /> {isLoading ? '...' : photos.length} Photos
+                                        <FaImage className="text-gray-900" /> {isLoading ? '...' : photos.length} {t('photosLabel')}
                                     </span>
                                 </div>
-                                <p className="text-sm font-medium text-gray-900/70">Review vehicle condition photos</p>
+                                <p className="text-sm font-medium text-gray-900/70">{t('subtitle')}</p>
                             </div>
                             <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-lg text-[#FCD34D]">
                                 <FaImage className="text-xl" />
@@ -118,14 +121,14 @@ export default function PhotoGalleryModal({
                                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                 </svg>
-                                <p className="text-gray-500 font-medium animate-pulse">Loading photos...</p>
+                                <p className="text-gray-500 font-medium animate-pulse">{t('loading')}</p>
                             </div>
                         ) : photos.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-20 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
                                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                                     <FaImage className="text-gray-300 text-2xl" />
                                 </div>
-                                <p className="text-gray-400 font-medium">No photos available</p>
+                                <p className="text-gray-400 font-medium">{t('empty')}</p>
                             </div>
                         ) : (
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -142,7 +145,7 @@ export default function PhotoGalleryModal({
                                         )}
                                         <img
                                             src={photoUrl}
-                                            alt={`Body Check ${index + 1}`}
+                                            alt={t('photoAlt', { index: index + 1 })}
                                             className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-110 ${loadedImages.has(index) ? 'opacity-100' : 'opacity-0'}`}
                                             onLoad={() => handleImageLoad(index)}
                                             loading="lazy"
@@ -165,7 +168,7 @@ export default function PhotoGalleryModal({
                                         onClick={onReject}
                                         className="px-6 py-3 bg-white border border-gray-200 text-gray-700 font-bold rounded-xl hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all flex items-center gap-2 shadow-sm"
                                     >
-                                        <FaBan /> Reject Photos
+                                        <FaBan /> {t('actions.reject')}
                                     </button>
                                 )}
                                 {onApprove && (
@@ -173,7 +176,7 @@ export default function PhotoGalleryModal({
                                         onClick={onApprove}
                                         className="px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl shadow-lg shadow-green-500/30 transition-all flex items-center gap-2 transform hover:-translate-y-0.5"
                                     >
-                                        <FaCheck /> Approve Photos
+                                        <FaCheck /> {t('actions.approve')}
                                     </button>
                                 )}
                             </div>
@@ -194,7 +197,7 @@ export default function PhotoGalleryModal({
                             <button
                                 onClick={(e) => handleDownload(e, photos[currentIndex])}
                                 className="p-2 hover:bg-white/10 rounded-full transition-colors"
-                                title="Open original"
+                                title={t('lightbox.openOriginal')}
                             >
                                 <FaDownload />
                             </button>
@@ -211,22 +214,22 @@ export default function PhotoGalleryModal({
                     <div className="flex-1 relative flex items-center justify-center p-4">
                         <button
                             onClick={prevImage}
-                            className="absolute left-4 z-10 p-3 bg-black/50 hover:bg-black/70 text-white rounded-full backdrop-blur-md transition-all hover:scale-110"
+                            className="absolute start-4 z-10 p-3 bg-black/50 hover:bg-black/70 text-white rounded-full backdrop-blur-md transition-all hover:scale-110"
                         >
-                            <FaChevronLeft className="text-xl" />
+                            <FaChevronLeft className="text-xl rtl:rotate-180" />
                         </button>
 
                         <img
                             src={photos[currentIndex]}
-                            alt={`Full view ${currentIndex + 1}`}
+                            alt={t('lightbox.fullViewAlt', { index: currentIndex + 1 })}
                             className="max-h-[85vh] max-w-full object-contain shadow-2xl rounded-lg"
                         />
 
                         <button
                             onClick={nextImage}
-                            className="absolute right-4 z-10 p-3 bg-black/50 hover:bg-black/70 text-white rounded-full backdrop-blur-md transition-all hover:scale-110"
+                            className="absolute end-4 z-10 p-3 bg-black/50 hover:bg-black/70 text-white rounded-full backdrop-blur-md transition-all hover:scale-110"
                         >
-                            <FaChevronRight className="text-xl" />
+                            <FaChevronRight className="text-xl rtl:rotate-180" />
                         </button>
                     </div>
 
@@ -238,7 +241,7 @@ export default function PhotoGalleryModal({
                                 onClick={(e) => { e.stopPropagation(); setCurrentIndex(idx); }}
                                 className={`h-full aspect-square rounded-lg overflow-hidden border-2 transition-all ${idx === currentIndex ? 'border-orange-500 opacity-100 scale-105' : 'border-transparent opacity-50 hover:opacity-100'}`}
                             >
-                                <img src={photo} alt="thumbnail" className="w-full h-full object-cover" />
+                                <img src={photo} alt={t('lightbox.thumbnailAlt')} className="w-full h-full object-cover" />
                             </button>
                         ))}
                     </div>

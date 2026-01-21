@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { FaFileInvoiceDollar, FaTruck, FaWrench, FaShieldAlt, FaTimes, FaCheckCircle, FaCalculator, FaClock, FaCamera, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { useTranslations } from 'next-intl';
 
 interface QuotationModalProps {
     isOpen: boolean;
@@ -47,6 +48,7 @@ interface QuotationModalProps {
 
 export default function QuotationModal({ isOpen, onClose, quotationData, onAccept, onPayLater, onReject, acceptLabel, rejectLabel }: QuotationModalProps) {
     const [processingAction, setProcessingAction] = useState<'accept' | 'reject' | 'payLater' | null>(null);
+    const t = useTranslations('modals.quotation');
 
     const handleAction = async (action: 'accept' | 'reject' | 'payLater', handler?: () => Promise<void> | void) => {
         if (!handler) return;
@@ -70,7 +72,7 @@ export default function QuotationModal({ isOpen, onClose, quotationData, onAccep
                     {/* Close Button */}
                     <button
                         onClick={onClose}
-                        className="absolute top-4 right-4 z-10 p-2 bg-white/50 hover:bg-white rounded-full text-gray-400 hover:text-gray-600 transition-colors"
+                        className="absolute top-4 end-4 z-10 p-2 bg-white/50 hover:bg-white rounded-full text-gray-400 hover:text-gray-600 transition-colors"
                     >
                         <FaTimes />
                     </button>
@@ -80,14 +82,14 @@ export default function QuotationModal({ isOpen, onClose, quotationData, onAccep
                         <div className="relative z-10 flex justify-between items-start">
                             <div>
                                 <div className="flex items-baseline gap-3 mb-1">
-                                    <h2 className="text-2xl font-black text-gray-900">Quotation</h2>
+                                    <h2 className="text-2xl font-black text-gray-900">{t('title')}</h2>
                                     {quotationData.status === 'approved_by_customer' && (
                                         <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full border border-green-200 flex items-center gap-1 transform -translate-y-0.5">
-                                            <FaCheckCircle /> Approved
+                                            <FaCheckCircle /> {t('status.approved')}
                                         </span>
                                     )}
                                 </div>
-                                <p className="text-sm font-medium text-gray-800/70">Professional Service Estimate</p>
+                                <p className="text-sm font-medium text-gray-800/70">{t('subtitle')}</p>
                             </div>
                             <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-lg text-[#FCD34D]">
                                 <FaFileInvoiceDollar className="text-xl" />
@@ -101,19 +103,19 @@ export default function QuotationModal({ isOpen, onClose, quotationData, onAccep
                         {/* Info Grid */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                             <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
-                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Quotation ID</p>
-                                <p className="font-bold text-gray-900">{quotationData?.reference_id || quotationData?.booking_id?.substring(0, 8) || 'N/A'}</p>
+                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">{t('info.quotationId')}</p>
+                                <p className="font-bold text-gray-900">{quotationData?.reference_id || quotationData?.booking_id?.substring(0, 8) || t('fallback.na')}</p>
                             </div>
                             <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
-                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Date Issued</p>
+                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">{t('info.dateIssued')}</p>
                                 <p className="font-bold text-gray-900">
                                     {quotationData?.created_at
                                         ? new Date(quotationData.created_at).toLocaleDateString()
-                                        : 'N/A'}
+                                        : t('fallback.na')}
                                 </p>
                             </div>
                             <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
-                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Valid Until</p>
+                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">{t('info.validUntil')}</p>
                                 <p className="font-bold text-gray-900">
                                     {quotationData?.created_at
                                         ? (() => {
@@ -121,7 +123,7 @@ export default function QuotationModal({ isOpen, onClose, quotationData, onAccep
                                             date.setDate(date.getDate() + 7);
                                             return date.toLocaleDateString();
                                         })()
-                                        : 'N/A'}
+                                        : t('fallback.na')}
                                 </p>
                             </div>
                         </div>
@@ -131,7 +133,7 @@ export default function QuotationModal({ isOpen, onClose, quotationData, onAccep
                         {/* Fees Breakdown */}
                         <div className="mb-8">
                             <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2 mb-4">
-                                <FaFileInvoiceDollar className="text-[#FCD34D]" /> Fees Breakdown
+                                <FaFileInvoiceDollar className="text-[#FCD34D]" /> {t('fees.title')}
                             </h3>
 
                             <div className="space-y-4">
@@ -153,14 +155,14 @@ export default function QuotationModal({ isOpen, onClose, quotationData, onAccep
                                                                 </div>
                                                                 <div>
                                                                     <p className="text-sm font-bold text-gray-900">
-                                                                        {svc.service_name || svc.name || `Service Item ${services.length > 1 ? idx + 1 : ''}`}
+                                                                        {svc.service_name || svc.name || t('fees.serviceItem', { index: services.length > 1 ? idx + 1 : '' })}
                                                                     </p>
                                                                     <p className="text-xs text-gray-500">
-                                                                        Quantity: {svc.quantity} {Number(svc.discount_amount) > 0 && <span className="text-green-600 ml-2">(-{currencySymbol} {svc.discount_amount} Discount)</span>}
+                                                                        {t('fees.quantity', { count: svc.quantity })} {Number(svc.discount_amount) > 0 && <span className="text-green-600 ms-2">{t('fees.discount', { currency: currencySymbol, amount: svc.discount_amount })}</span>}
                                                                     </p>
                                                                 </div>
                                                             </div>
-                                                            <div className="text-right">
+                                                            <div className="text-end">
                                                                 <span className="font-bold text-gray-900 block">
                                                                     {currencySymbol} {Number(svc.total_amount).toFixed(2)}
                                                                 </span>
@@ -173,10 +175,10 @@ export default function QuotationModal({ isOpen, onClose, quotationData, onAccep
                                                         </div>
                                                         {/* Addons */}
                                                         {svc.quotation_addons && svc.quotation_addons.length > 0 && (
-                                                            <div className="mt-2 pl-14 pr-0 space-y-1">
+                                                            <div className="mt-2 ps-14 pe-0 space-y-1">
                                                                 {svc.quotation_addons.map((addon, aIdx: number) => (
                                                                     <div key={aIdx} className="flex justify-between text-xs text-gray-500">
-                                                                        <span>+ {addon.name || 'Add-on'}</span>
+                                                                        <span>+ {addon.name || t('fees.addOn')}</span>
                                                                         <span> {currencySymbol} {Number(addon.price || 0).toFixed(2)}</span>
                                                                     </div>
                                                                 ))}
@@ -194,10 +196,10 @@ export default function QuotationModal({ isOpen, onClose, quotationData, onAccep
                                                             </div>
                                                             <div>
                                                                 <p className="text-sm font-bold text-gray-900">
-                                                                    {part.name || 'Replacement Part'}
+                                                                    {part.name || t('fees.replacementPart')}
                                                                 </p>
                                                                 <p className="text-xs text-gray-500">
-                                                                    Qty: {part.quantity}
+                                                                    {t('fees.qty', { count: part.quantity })}
                                                                 </p>
                                                             </div>
                                                         </div>
@@ -224,10 +226,10 @@ export default function QuotationModal({ isOpen, onClose, quotationData, onAccep
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-bold text-gray-900">
-                                                            {quotationData?.service_catalog?.name || 'Service'}
+                                                            {quotationData?.service_catalog?.name || t('fees.service')}
                                                         </p>
                                                         <p className="text-xs text-gray-500">
-                                                            {quotationData?.service_catalog?.description_structured?.[0]?.description || 'Service Charges'}
+                                                            {quotationData?.service_catalog?.description_structured?.[0]?.description || t('fees.serviceCharges')}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -244,8 +246,8 @@ export default function QuotationModal({ isOpen, onClose, quotationData, onAccep
                                                             <FaTruck className="text-sm" />
                                                         </div>
                                                         <div>
-                                                            <p className="text-sm font-bold text-gray-900">Transportation</p>
-                                                            <p className="text-xs text-gray-500">Pickup and Delivery Fees</p>
+                                                        <p className="text-sm font-bold text-gray-900">{t('fees.transportation')}</p>
+                                                        <p className="text-xs text-gray-500">{t('fees.transportationFees')}</p>
                                                         </div>
                                                     </div>
                                                     <span className="font-bold text-gray-900">
@@ -265,7 +267,7 @@ export default function QuotationModal({ isOpen, onClose, quotationData, onAccep
                                 <div className="w-10 h-10 bg-gray-900 rounded-lg flex items-center justify-center text-[#FCD34D]">
                                     <FaCalculator />
                                 </div>
-                                <span className="font-bold text-gray-900">Total Amount</span>
+                                <span className="font-bold text-gray-900">{t('total.title')}</span>
                             </div>
                             <span className="text-2xl font-black text-gray-900">
                                 {(() => {
@@ -281,7 +283,7 @@ export default function QuotationModal({ isOpen, onClose, quotationData, onAccep
                         {/* Warranty Details */}
                         <div className="mb-8">
                             <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2 mb-4">
-                                <FaShieldAlt className="text-[#FCD34D]" /> Warranty Details
+                                <FaShieldAlt className="text-[#FCD34D]" /> {t('warranty.title')}
                             </h3>
                             <div className="bg-green-50 rounded-xl p-5 border border-green-100 flex gap-4">
                                 <div className="w-10 h-10 bg-[#22C55E] rounded-full flex-shrink-0 flex items-center justify-center text-white shadow-sm">
@@ -289,11 +291,10 @@ export default function QuotationModal({ isOpen, onClose, quotationData, onAccep
                                 </div>
                                 <div>
                                     <p className="font-bold text-gray-900 mb-1">
-                                        {quotationData?.service_catalog?.warranty_info || 'Standard Warranty'}
+                                        {quotationData?.service_catalog?.warranty_info || t('warranty.standard')}
                                     </p>
                                     <p className="text-xs text-gray-600 leading-relaxed">
-                                        This service comes with the specified warranty coverage.
-                                        Your satisfaction and vehicle performance are guaranteed.
+                                        {t('warranty.description')}
                                     </p>
                                 </div>
                             </div>
@@ -318,7 +319,7 @@ export default function QuotationModal({ isOpen, onClose, quotationData, onAccep
                                             ) : (
                                                 <FaCheckCircle className="text-white group-hover:scale-110 transition-transform" />
                                             )}
-                                            {acceptLabel || 'Accept & Pay Now'}
+                                            {acceptLabel || t('actions.acceptPayNow')}
                                         </button>
                                         {onPayLater && (
                                             <button
@@ -332,7 +333,7 @@ export default function QuotationModal({ isOpen, onClose, quotationData, onAccep
                                                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                                     </svg>
                                                 ) : <FaClock className="text-gray-900" />}
-                                                Accept & Pay Later
+                                                {t('actions.acceptPayLater')}
                                             </button>
                                         )}
                                     </>
@@ -349,7 +350,7 @@ export default function QuotationModal({ isOpen, onClose, quotationData, onAccep
                                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                             </svg>
                                         ) : <FaTimes className="text-gray-400" />}
-                                        {rejectLabel || 'Reject'}
+                                        {rejectLabel || t('actions.reject')}
                                     </button>
                                 )}
                             </div>
@@ -363,7 +364,7 @@ export default function QuotationModal({ isOpen, onClose, quotationData, onAccep
                                 </svg>
                             </div>
                             <p className="text-[10px] text-blue-600 leading-normal">
-                                By accepting this quotation, you agree to the terms and conditions of service. Payment will be processed securely through our payment gateway.
+                                {t('disclaimer')}
                             </p>
                         </div>
 

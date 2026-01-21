@@ -1,0 +1,1196 @@
+{
+  "common": {
+    "language": {
+      "label": "زمان",
+      "english": "English",
+      "arabic": "العربية",
+      "kurdish": "کوردی"
+    },
+    "actions": {
+      "back": "گەڕانەوە",
+      "close": "داخستن",
+      "cancel": "هەڵوەشاندنەوە",
+      "save": "پاشەکەوت",
+      "submit": "ناردن",
+      "ok": "باشە"
+    },
+    "notifications": {
+      "title": "ئاگادارییەکان",
+      "clearAll": "هەمووی پاک بکە",
+      "empty": "هێشتا ئاگاداری نییە"
+    }
+  },
+  "adminLayout": {
+    "loading": "چاوەڕوانبە...",
+    "notifications": "ئاگادارییەکان",
+    "welcomeBack": "بەخێربێیتەوە،",
+    "logout": "چوونەدەرەوە",
+    "adminLabel": "بەڕێوەبەر",
+    "brand": {
+      "forBusiness": "بۆ کار"
+    },
+    "menu": {
+      "dashboard": {
+        "title": "داشبۆرد",
+        "description": "پوختە و KPI"
+      },
+      "services": {
+        "title": "خزمەتگوزارییەکان",
+        "description": "داواکارییەکانی خزمەتگوزاری"
+      },
+      "vehicles": {
+        "title": "ئۆتۆمبیلەکان",
+        "description": "بەڕێوەبردنی فلیت"
+      },
+      "account": {
+        "title": "هەژمار",
+        "description": "وردەکارییەکانی کاروبار"
+      },
+      "finance": {
+        "title": "دارایی",
+        "description": "پارەدان و فاکتۆرەکان"
+      }
+    }
+  },
+  "dashboard": {
+    "title": "داشبۆرد",
+    "subtitle": "بەڕێوەبردنی ئۆتۆمبیلەکان و داواکارییەکانی خزمەتگوزاری",
+    "actions": {
+      "addCars": "زیادکردنی ئۆتۆمبیل",
+      "createRequest": "دروستکردنی داواکاری",
+      "arrivedAtServiceCenter": "گەیشتنە ناوەندی خزمەتگوزاری",
+      "viewQuotation": "بینینی پێشنیار",
+      "viewEstimatedPrice": "بینینی نرخەی خەمڵاندراو",
+      "viewBodyCheck": "بینینی فحصی لاشە",
+      "accept": "قبوڵ",
+      "reject": "ڕەتکردنەوە",
+      "submitQuote": "ناردنی پێشنیار",
+      "editQuote": "دەستکاریکردنی پێشنیار",
+      "photos": "وێنەکان",
+      "collect": "کۆکردنەوە",
+      "approvePhotos": "پەسەندکردنی وێنەکان",
+      "rejectPhotos": "ڕەتکردنەوەی وێنەکان"
+    },
+    "stats": {
+      "totalCars": "کۆی ئۆتۆمبیلەکان",
+      "activeRequests": "داواکارییە چالاکەکان",
+      "completedRequests": "داواکارییە تەواوبووەکان"
+    },
+    "activeRequests": {
+      "title": "داواکارییە چالاکەکان",
+      "searchPlaceholder": "داواکاری بگەڕێ..."
+    },
+    "filters": {
+      "allStatuses": "هەموو دۆخەکان",
+      "assigned": "نێردراو",
+      "accepted": "قبوڵکراو",
+      "bodyChecking": "فحصی لاشە",
+      "fixing": "چاککردنەوە",
+      "completed": "تەواوبوو"
+    },
+    "table": {
+      "bookingId": "ژمارەی حجز",
+      "plateNumber": "ژمارەی تەختە",
+      "vehicle": "ئۆتۆمبیل",
+      "serviceType": "جۆری خزمەتگوزاری",
+      "category": "پۆل",
+      "serviceCost": "تێچووی خزمەتگوزاری",
+      "status": "دۆخ",
+      "time": "کات",
+      "actions": "کردارەکان",
+      "empty": "هیچ داواکارییەک نەدۆزرایەوە.",
+      "pending": "چاوەڕوان",
+      "na": "نەبوو"
+    },
+    "alerts": {
+      "error": {
+        "title": "هەڵە",
+        "noBookingContext": "چوارچێوەی حجز نەدۆزرایەوە",
+        "approvePhotosFailed": "پەسەندکردنی وێنەکان سەرکەوتوو نەبوو",
+        "rejectPhotosFailed": "ڕەتکردنەوەی وێنەکان سەرکەوتوو نەبوو",
+        "fetchQuotationDetails": "ناتوانرێت وردەکاری پێشنیار بهێنرێت",
+        "loadQuotation": "بارکردنی پێشنیار سەرکەوتوو نەبوو",
+        "fetchBodyCheckPhotos": "وێنەکانی فحصی لاشە ناتوانرێت بهێنرێت",
+        "notifyServiceCenterFailed": "ئاگادارکردنی ناوەندی خزمەتگوزاری سەرکەوتوو نەبوو.",
+        "confirm": "باشە"
+      },
+      "warning": {
+        "title": "ئاگادارکردنەوە",
+        "noPhotosToApprove": "هیچ وێنەیەک بۆ پەسەندکردن نییە"
+      },
+      "success": {
+        "title": "سەرکەوتوو!",
+        "bodyCheckApproved": "وێنەکانی فحصی لاشە پەسەندکران",
+        "serviceCenterNotified": "ناوەندی خزمەتگوزاری ئاگادارکراوە لە گەیشتنت.",
+        "photosSubmitted": "{count} وێنە بە سەرکەوتوویی نێردران."
+      },
+      "rejected": {
+        "title": "ڕەتکرایەوە!",
+        "quotationSuccess": "پێشنیار بە سەرکەوتوویی ڕەتکرایەوە.",
+        "failed": "ڕەتکردنەوە سەرکەوتوو نەبوو",
+        "quotationFailed": "ڕەتکردنەوەی پێشنیار سەرکەوتوو نەبوو",
+        "bodyCheckPhotos": "وێنەکانی فحصی لاشە ڕەتکران"
+      },
+      "approveQuotation": {
+        "title": "پەسەندکردنی پێشنیار؟",
+        "text": "دڵنیایت لە پەسەندکردنی ئەم پێشنیارە؟",
+        "confirm": "بەڵێ، پەسەند"
+      },
+      "approved": {
+        "title": "پەسەندکرا!",
+        "quotationSuccess": "پێشنیار بە سەرکەوتوویی پەسەندکرا.",
+        "failed": "پەسەندکردن سەرکەوتوو نەبوو",
+        "quotationFailed": "پەسەندکردنی پێشنیار سەرکەوتوو نەبوو"
+      },
+      "info": {
+        "title": "زانیاری",
+        "noQuotation": "هیچ پێشنیارێک بۆ ئەم حجزە نییە"
+      },
+      "acceptRequest": {
+        "title": "قبوڵکردنی داواکاری؟",
+        "text": "دڵنیایت داواکاری ژمارە #{id} قبوڵ بکەیت؟",
+        "confirm": "بەڵێ، قبوڵ بکە"
+      },
+      "accepted": {
+        "title": "قبوڵکرا!",
+        "text": "داواکاری ژمارە #{id} قبوڵکرا."
+      },
+      "draftSaved": {
+        "title": "ڕەشنووس پاشەکەوتکرا!",
+        "text": "ڕەشنووسی پێشنیار پاشەکەوتکرا."
+      },
+      "quotationSent": {
+        "title": "پێشنیار نێردرا!",
+        "text": "پێشنیار بۆ کڕیار نێردرا."
+      },
+      "processing": {
+        "title": "لە پڕۆسەدایە...",
+        "notifying": "ناوەندی خزمەتگوزاری ئاگادار دەکرێت..."
+      },
+      "paymentRecorded": {
+        "title": "پارەدان تۆمارکرا!",
+        "text": "پارەدان بە سەرکەوتوویی تۆمارکرا."
+      },
+      "rejectBodyCheck": {
+        "title": "ڕەتکردنەوەی وێنەکانی فحصی لاشە",
+        "reasonLabel": "هۆکاری ڕەتکردنەوە",
+        "reasonPlaceholder": "هۆکاری ڕەتکردنەوە بنوسە...",
+        "reasonRequired": "پێویستە هۆکار بنوسیت!"
+      }
+    },
+    "modals": {
+      "bodyCheckTitle": "فحصی لاشە - {vehicle}",
+      "vehicleFallback": "ئۆتۆمبیل"
+    }
+  },
+  "servicesCreate": {
+    "title": "داواکاری خزمەتگوزاری",
+    "subtitle": "داواکاری خزمەتگوزاری نوێ بۆ ئۆتۆمبیلەکانت بنێرە",
+    "fallback": {
+      "na": "نەبوو"
+    },
+    "serviceDetails": {
+      "title": "وردەکاری خزمەتگوزاری",
+      "selectCategory": "پۆل هەڵبژێرە",
+      "selectService": "خزمەتگوزاری هەڵبژێرە",
+      "chooseCategory": "پۆلێک هەڵبژێرە",
+      "chooseService": "خزمەتگوزارییەک هەڵبژێرە",
+      "loading": "بار دەکرێت...",
+      "scheduleType": "جۆری کاتژمێر",
+      "preferredDate": "ڕێکەوتی پەسەندکراو",
+      "preferredTime": "کاتی پەسەندکراو",
+      "am": "AM",
+      "pm": "PM",
+      "serviceProvider": "پێشکەشکەری خزمەتگوزاری",
+      "chooseProvider": "پێشکەشکەر هەڵبژێرە"
+    },
+    "map": {
+      "pickupSelected": "شوێنی وەرگرتن دیاریکرا",
+      "pinPickup": "شوێنی وەرگرتن نیشان بکە",
+      "pinLocation": "شوێن نیشان بکە بۆ دۆزینەوەی نزیکترین ناوەند",
+      "permissionDenied": {
+        "title": "ڕێگاپێدان ڕەتکرایەوە",
+        "message": "ناتوانین شوێنەکەت دیاری بکەین چونکە ڕێگاپێدان ڕەتکراوە.",
+        "hint": "تکایە ڕێگای شوێن لە ڕێکخستنەکانی وێبگەڕەکەت بدە و دووبارە هەوڵ بدە.",
+        "retry": "دووبارە هەوڵدان"
+      },
+      "selectedPickup": "ناونیشانی وەرگرتنی دیاریکرا:",
+      "dropoffSelected": "شوێنی دانانی دیاریکرا",
+      "pinDropoff": "شوێنی دانانی نیشان بکە",
+      "selectedDropoff": "ناونیشانی دانانی دیاریکرا:"
+    },
+    "location": {
+      "detecting": "شوێنت دەناسێنرێت...",
+      "detected": "شوێن دیاریکرا",
+      "addressFailed": "ناتوانرێت وردەکاری ناونیشان بهێنرێت",
+      "accessDenied": "دەستڕاگەیشتن بە شوێن ڕەتکرایەوە",
+      "destinationCenter": "ناوەندی مقصد",
+      "serviceCenter": "شوێنی ناوەندی خزمەتگوزاری",
+      "searchingNearby": "لە نزیکدا دەگەڕێت...",
+      "noCenters": "هیچ ناوەندێک نەبوو",
+      "selectOnMap": "لەسەر نەخشە هەڵبژێرە",
+      "chooseLocation": "شوێن هەڵبژێرە",
+      "center": "ناوەند",
+      "nearbyCenter": "ناوەندی نزیک"
+    },
+    "vehicles": {
+      "title": "ئۆتۆمبیل هەڵبژێرە",
+      "available": "{count} ئۆتۆمبیل بەردەستە",
+      "searchPlaceholder": "بگەڕێ لە مارکە، مۆدێل، یان پلاک...",
+      "table": {
+        "makeModelYear": "مارکە/مۆدێل/ساڵ",
+        "plateNumber": "ژمارەی پلاک",
+        "lastService": "دوایین کات/ڕۆژی خزمەتگوزاری",
+        "note": "تێبینی"
+      },
+      "notePlaceholder": "تێبینی زیاد بکە..."
+    },
+    "errors": {
+      "loadVehicles": "هێنانی ئۆتۆمبیلەکان سەرکەوتوو نەبوو",
+      "noServiceCenters": "هیچ ناوەندی خزمەتگوزارییەکی نزیک نەدۆزرایەوە.",
+      "nearbyCentersFailed": "ناتوانرێت ناوەندی نزیک بدۆزرێتەوە",
+      "categoriesFailed": "هێنانی پۆلەکانی خزمەتگوزاری سەرکەوتوو نەبوو",
+      "servicesFailed": "هێنانی خزمەتگوزارییەکان سەرکەوتوو نەبوو",
+      "companyMissing": "زانیاری کۆمپانیا نییە",
+      "selectVehicle": "تکایە بەلایەنی کەمەوە یەک ئۆتۆمبیل هەڵبژێرە",
+      "selectServiceProvider": "تکایە خزمەتگوزاری و پێشکەشکەر هەڵبژێرە",
+      "selectScheduleType": "تکایە جۆری کاتژمێر هەڵبژێرە",
+      "selectScheduleTime": "تکایە ڕێکەوت و کات هەڵبژێرە بۆ خزمەتگوزاری کاتژمێراو",
+      "pickupLocation": "تکایە شوێنی وەرگرتن نیشان بکە",
+      "dropoffLocation": "تکایە شوێنی دانانی نیشان بکە",
+      "selectServiceCenter": "تکایە شوێنی ناوەندی خزمەتگوزاری هەڵبژێرە",
+      "scheduleFuture": "کاتی کاتژمێرکردن دەبێت بەلایەنی کەمەوە 30 خولەک لە دواوە بێت"
+    },
+    "submission": {
+      "submitting": "داواکاری حجز دەنێررێت...",
+      "success": "حجزەکان بە سەرکەوتوویی دروستکران",
+      "failed": "دروستکردنی حجزەکان سەرکەوتوو نەبوو",
+      "processing": "لە پڕۆسەدایە...",
+      "submit": "ناردنی داواکاری ({count})"
+    }
+  },
+  "servicesRequests": {
+    "title": "داواکارییەکانی خزمەتگوزاری",
+    "actions": {
+      "requestService": "داواکاری خزمەتگوزاری",
+      "waitingQuotation": "چاوەڕوانی پێشنیار...",
+      "arrivedAtServiceCenter": "گەیشت بە ناوەندی خزمەتگوزاری",
+      "viewQuotation": "بینینی پێشنیار",
+      "viewEstimatedPrice": "بینینی نرخەی خەمڵاندراو",
+      "viewBodyCheck": "بینینی فحصی لاشە",
+      "accept": "قبوڵ",
+      "reject": "ڕەتکردنەوە",
+      "submitQuotation": "ناردنی پێشنیار",
+      "submitPhotos": "ناردنی وێنەکان",
+      "editQuotation": "دەستکاریکردنی پێشنیار",
+      "collectPayment": "کۆکردنەوەی پارە",
+      "approvePhotos": "پەسەندکردنی وێنەکان",
+      "rejectPhotos": "ڕەتکردنەوەی وێنەکان",
+      "approveQuotation": "پەسەندکردنی پێشنیار",
+      "rejectQuotation": "ڕەتکردنەوەی پێشنیار"
+    },
+    "stats": {
+      "totalRequests": "کۆی داواکارییەکان",
+      "activeServices": "خزمەتگوزارییە چالاکەکان",
+      "completed": "تەواوبوو"
+    },
+    "filters": {
+      "searchPlaceholder": "بگەڕێ بە ژمارەی حجز، ئۆتۆمبیل، یان پلاک...",
+      "allStatuses": "هەموو دۆخەکان",
+      "assigned": "نێردراو",
+      "accepted": "قبوڵکراو",
+      "bodyChecking": "فحصی لاشە",
+      "awaitingApproval": "چاوەڕوانی پەسەندکردن",
+      "fixing": "چاککردنەوە",
+      "pendingPayment": "چاوەڕوانی پارەدان",
+      "completed": "تەواوبوو",
+      "allCategories": "هەموو پۆلەکان"
+    },
+    "table": {
+      "bookingId": "ژمارەی حجز",
+      "customer": "کڕیار",
+      "vehicle": "ئۆتۆمبیل",
+      "service": "خزمەتگوزاری",
+      "status": "دۆخ",
+      "scheduled": "کاتژمێراو",
+      "payment": "پارەدان",
+      "actions": "کردارەکان",
+      "empty": "هیچ داواکارییەک نەدۆزرایەوە.",
+      "plateLabel": "پلاک:"
+    },
+    "pagination": {
+      "showing": "پیشاندانی {start} تا {end} لە کۆی {total} داواکاری"
+    },
+    "modals": {
+      "bodyCheckTitle": "فحصی لاشە - {vehicle}",
+      "vehicleFallback": "ئۆتۆمبیل"
+    },
+    "alerts": {
+      "error": {
+        "title": "هەڵە",
+        "noBookingContext": "چوارچێوەی حجز نەدۆزرایەوە",
+        "approvePhotosFailed": "پەسەندکردنی وێنەکان سەرکەوتوو نەبوو",
+        "rejectPhotosFailed": "ڕەتکردنەوەی وێنەکان سەرکەوتوو نەبوو",
+        "fetchQuotationDetails": "ناتوانرێت وردەکاری پێشنیار بهێنرێت",
+        "loadQuotation": "بارکردنی پێشنیار سەرکەوتوو نەبوو",
+        "notifyServiceCenterFailed": "ئاگادارکردنی ناوەندی خزمەتگوزاری سەرکەوتوو نەبوو.",
+        "confirm": "باشە",
+        "fetchBodyCheckPhotos": "وێنەکانی فحصی لاشە ناتوانرێت بهێنرێت"
+      },
+      "warning": {
+        "title": "ئاگادارکردنەوە",
+        "noPhotosToApprove": "هیچ وێنەیەک بۆ پەسەندکردن نییە"
+      },
+      "success": {
+        "title": "سەرکەوتوو!",
+        "bodyCheckApproved": "وێنەکانی فحصی لاشە پەسەندکران",
+        "serviceCenterNotified": "ناوەندی خزمەتگوزاری ئاگادارکراوە لە گەیشتنت.",
+        "photosSubmitted": "{count} وێنە بە سەرکەوتوویی نێردران."
+      },
+      "rejected": {
+        "title": "ڕەتکرایەوە!",
+        "quotationSuccess": "پێشنیار بە سەرکەوتوویی ڕەتکرایەوە.",
+        "failed": "ڕەتکردنەوە سەرکەوتوو نەبوو",
+        "quotationFailed": "ڕەتکردنەوەی پێشنیار سەرکەوتوو نەبوو",
+        "bodyCheckPhotos": "وێنەکانی فحصی لاشە ڕەتکران"
+      },
+      "approveQuotation": {
+        "title": "پەسەندکردنی پێشنیار؟",
+        "text": "دڵنیایت لە پەسەندکردنی ئەم پێشنیارە؟",
+        "confirm": "بەڵێ، پەسەند",
+        "cancel": "هەڵوەشاندنەوە"
+      },
+      "approved": {
+        "title": "پەسەندکرا!",
+        "quotationSuccess": "پێشنیار بە سەرکەوتوویی پەسەندکرا.",
+        "failed": "پەسەندکردن سەرکەوتوو نەبوو",
+        "quotationFailed": "پەسەندکردنی پێشنیار سەرکەوتوو نەبوو"
+      },
+      "info": {
+        "title": "زانیاری",
+        "noQuotation": "هیچ پێشنیارێک بۆ ئەم حجزە نییە"
+      },
+      "acceptRequest": {
+        "title": "قبوڵکردنی داواکاری؟",
+        "text": "دڵنیایت داواکاری ژمارە #{id} قبوڵ بکەیت؟",
+        "confirm": "بەڵێ، قبوڵ بکە",
+        "cancel": "هەڵوەشاندنەوە"
+      },
+      "accepted": {
+        "title": "قبوڵکرا!",
+        "text": "داواکاری ژمارە #{id} بە سەرکەوتوویی قبوڵکرا."
+      },
+      "paymentRecorded": {
+        "title": "پارەدان تۆمارکرا!",
+        "text": "پارەدانی داواکاری ژمارە #{id} بە سەرکەوتوویی تۆمارکرا."
+      },
+      "draftSaved": {
+        "title": "ڕەشنووس پاشەکەوتکرا!",
+        "text": "ڕەشنووسی پێشنیار بۆ داواکاری ژمارە #{id} پاشەکەوتکرا."
+      },
+      "quotationSent": {
+        "title": "پێشنیار نێردرا!",
+        "text": "پێشنیار بۆ داواکاری ژمارە #{id} بۆ کڕیار نێردرا."
+      },
+      "processing": {
+        "title": "لە پڕۆسەدایە...",
+        "notifying": "ناوەندی خزمەتگوزاری ئاگادار دەکرێت..."
+      },
+      "photoReview": {
+        "approveTitle": "پەسەندکردنی وێنەکان؟",
+        "rejectTitle": "ڕەتکردنەوەی وێنەکان؟",
+        "approveText": "دڵنیایت لە پەسەندکردنی وێنەکانی فحصی لاشە؟",
+        "rejectText": "دڵنیایت لە ڕەتکردنەوەی ئەم وێنانە؟",
+        "approveConfirm": "بەڵێ، پەسەند",
+        "rejectConfirm": "بەڵێ، ڕەت بکە",
+        "approved": "وێنەکان بە سەرکەوتوویی پەسەندکران.",
+        "rejected": "وێنەکان بە سەرکەوتوویی ڕەتکران.",
+        "failed": "پڕۆسەی پشکنینی وێنەکان سەرکەوتوو نەبوو"
+      },
+      "rejectBodyCheck": {
+        "title": "ڕەتکردنەوەی وێنەکانی فحصی لاشە",
+        "reasonLabel": "هۆکاری ڕەتکردنەوە",
+        "reasonPlaceholder": "هۆکاری ڕەتکردنەوە بنوسە...",
+        "reasonRequired": "پێویستە هۆکار بنوسیت!"
+      }
+    }
+  },
+  "account": {
+    "title": "ڕێکخستنەکانی هەژمار",
+    "subtitle": {
+      "editing": "زانیاری و ڕێکخستنەکانی هەژماری کاروبارت بەڕێوەبە",
+      "viewing": "زانیاری هەژماری کاروبارت ببینە و بەڕێوەبە"
+    },
+    "company": {
+      "title": "زانیاری کۆمپانیا",
+      "edit": "دەستکاریکردنی زانیاری",
+      "fields": {
+        "name": "ناوی کۆمپانیا",
+        "tradeLicense": "ژمارەی مۆڵەتی بازرگانی",
+        "address": "ناونیشانی ئێستا",
+        "city": "شار"
+      },
+      "notSet": "دانەنراو",
+      "cityValue": "{city}، ئیمارات",
+      "tradeDocument": {
+        "title": "بەڵگەی مۆڵەتی بازرگانی",
+        "current": "بەڵگەی ئێستا بارکراوە",
+        "empty": "هیچ بەڵگەیەک بارنەکراوە",
+        "emptyTitle": "بەڵگە نییە",
+        "upload": "بارکردنی بەڵگە",
+        "change": "گۆڕینی بەڵگە",
+        "download": "داگرتنی مۆڵەت"
+      }
+    },
+    "contact": {
+      "title": "کەسی پەیوەندی سەرەکی",
+      "edit": "دەستکاریکردنی پەیوەندی",
+      "fields": {
+        "fullName": "ناوی تەواو",
+        "jobTitle": "ناونیشانی کار",
+        "email": "ئیمەیڵ",
+        "phone": "ژمارەی تەلەفۆن"
+      }
+    },
+    "password": {
+      "change": "گۆڕینی وشەی نهێنی",
+      "modalTitle": "گۆڕینی وشەی نهێنی",
+      "newLabel": "وشەی نهێنی نوێ",
+      "newPlaceholder": "وشەی نهێنی نوێ بنوسە",
+      "confirmLabel": "دڵنیابوونەوەی وشەی نهێنی",
+      "confirmPlaceholder": "وشەی نهێنی دووبارە بنوسە",
+      "requirements": {
+        "title": "پێداویستیەکانی وشەی نهێنی:",
+        "upper": "لەلایەنی کەمەوە یەک پیتی گەورە",
+        "number": "لەلایەنی کەمەوە یەک ژمارە",
+        "special": "لەلایەنی کەمەوە یەک نیشانی تایبەت",
+        "length": "لەلایەنی کەمەوە 6 پیت"
+      },
+      "errors": {
+        "requirements": "وشەی نهێنی هەموو پێداویستیەکان ناگرێت",
+        "mismatch": "وشە نهێنیەکان یەکسان نین",
+        "changeFailed": "گۆڕینی وشەی نهێنی سەرکەوتوو نەبوو"
+      },
+      "success": "وشەی نهێنی بە سەرکەوتوویی گۆڕدرا"
+    },
+    "details": {
+      "title": "وردەکاری هەژمار",
+      "statusLabel": "دۆخی هەژمار",
+      "statusActive": "چالاک",
+      "statusInactive": "ناچالاک",
+      "memberSince": "ئەندامە لە",
+      "lastUpdated": "دوایین نوێکردنەوە",
+      "emptyDate": "-"
+    },
+    "actions": {
+      "cancelChanges": "هەڵوەشاندنەوەی گۆڕانکارییەکان",
+      "saving": "پاشەکەوت دەکرێت...",
+      "saveChanges": "پاشەکەوتکردنی گۆڕانکارییەکان"
+    },
+    "errors": {
+      "loadFailed": "هێنانی زانیاری هەژمار سەرکەوتوو نەبوو",
+      "updateFailed": "نوێکردنەوەی زانیاری سەرکەوتوو نەبوو"
+    },
+    "success": {
+      "updated": "زانیاری هەژمار بە سەرکەوتوویی نوێکرایەوە"
+    }
+  },
+  "modals": {
+    "addCar": {
+      "title": "زیادکردنی ئۆتۆمبیل",
+      "brand": "HAKIM بۆ کاروبار",
+      "subtitle": "چۆن دەتەوێت ئۆتۆمبیلەکان بۆ فڵیتەکەت زیاد بکەیت:",
+      "single": {
+        "title": "زیادکردنی یەک ئۆتۆمبیل",
+        "description": "یەک ئۆتۆمبیل بە یەک جار زیاد بکە بە زانیاری ورد لە مارکە، مۆدێل، ساڵ و تایبەتمەندییەکان."
+      },
+      "bulk": {
+        "title": "بارکردنی کۆمەڵی ئۆتۆمبیل",
+        "description": "ژمارەیەکی زۆر ئۆتۆمبیل بە یەکجار بار بکە بە فایلێکی CSV."
+      },
+      "continue": "بەردەوامبوون"
+    },
+    "payment": {
+      "brand": "HAKIM بۆ کاروبار",
+      "title": "هەڵبژاردنی شێوازی پارەدان",
+      "subtitle": "شێوازی پارەدانی پەسەندکراوت هەڵبژێرە",
+      "helper": "تەنها یەک هەڵبژاردن دیاری بکە بۆ بەردەوامبوون",
+      "methods": {
+        "fib": "بانکی عێراق یەکەم - گواستنەوەی خێرا",
+        "fastPay": "پارەدانی دیجیتاڵی خێرا و پارێزراو",
+        "cash": "پارەدان بە کاش لە کاتی گەیاندن یان وەرگرتن"
+      },
+      "note": {
+        "label": "تێبینی:",
+        "text": "پارەدانەکەت بە شێوەی پارێزراو پردەگیر دەکرێت. پاش تەواوبوونی مامەڵە پەسەندنامە وەردەگریت."
+      },
+      "processing": "لە پڕۆسەدایە...",
+      "continue": "بەردەوامبوون"
+    },
+    "quotation": {
+      "title": "پێشنیاری نرخ",
+      "subtitle": "هەڵسەنگاندنی خزمەتگوزاری",
+      "status": {
+        "approved": "پەسەندکرا"
+      },
+      "info": {
+        "quotationId": "ژمارەی پێشنیار",
+        "dateIssued": "ڕێکەوتی دەرچوون",
+        "validUntil": "کارامە تا"
+      },
+      "fallback": {
+        "na": "نەبوو"
+      },
+      "fees": {
+        "title": "وردەکارییەکانی تێچوو",
+        "serviceItem": "بابەتی خزمەتگوزاری {index}",
+        "quantity": "دانە: {count}",
+        "discount": "(-{currency} {amount} داشکاندن)",
+        "addOn": "زیادکراو",
+        "replacementPart": "پارچەی گۆڕاو",
+        "qty": "دانە: {count}",
+        "service": "خزمەتگوزاری",
+        "serviceCharges": "تێچووی خزمەتگوزاری",
+        "transportation": "گەیاندن",
+        "transportationFees": "تێچووی وەرگرتن و گەیاندن"
+      },
+      "total": {
+        "title": "کۆی گشتی"
+      },
+      "warranty": {
+        "title": "وردەکارییەکانی گەرەنتی",
+        "standard": "گەرەنتی ستاندارد",
+        "description": "ئەم خزمەتگوزارییە لەخۆگرتووی گەرەنتی دیاریکراوە و قەبوڵی تۆمان."
+      },
+      "actions": {
+        "acceptPayNow": "قبوڵکردن و پارەدان ئێستا",
+        "acceptPayLater": "قبوڵکردن و پارەدان دواتر",
+        "reject": "ڕەتکردنەوە"
+      },
+      "disclaimer": "بە قبوڵکردنی ئەم پێشنیارە ڕێککەوتن لەسەر مەرجەکان دەکەیت. پارەدان بە شێوەی پارێزراو ئەنجام دەدرێت."
+    },
+    "confirmReceipt": {
+      "brand": "HAKIM",
+      "brandSuffix": "بۆ کاروبار",
+      "title": "دڵنیابوونەوە لە وەرگرتنی ئۆتۆمبیل",
+      "message": "ئایا دڵنیایت کە ئۆتۆمبیلەکەت وەرگرتووە؟",
+      "warning": "ئەم کردارە لە دوای پەسەندکردنەوە ناتوانرێت هەڵوەشێنرێتەوە.",
+      "vehicle": {
+        "placeholderTitle": "Toyota Camry 2023",
+        "placeholderLicense": "ABC-1234",
+        "placeholderBooking": "#HB-789456",
+        "license": "پلاک: {value}",
+        "bookingId": "ژمارەی حجز: {value}"
+      },
+      "notice": {
+        "title": "ئاگاداری گرنگ",
+        "message": "تکایە پێش پەسەندکردنەوە، ئۆتۆمبیلەکە بە تەواوی پشکن."
+      },
+      "actions": {
+        "confirm": "پەسەندکردنی وەرگرتن"
+      }
+    },
+    "vehicleDetails": {
+      "sections": {
+        "vehicleInfo": "زانیاری ئۆتۆمبیل",
+        "serviceStatus": "دۆخی خزمەتگوزاری"
+      },
+      "fields": {
+        "licensePlate": "ژمارەی پلاک",
+        "vin": "ژمارەی VIN",
+        "mileage": "مایلەج",
+        "currentStatus": "دۆخی ئێستا",
+        "lastServiceDate": "دوایین ڕۆژی خزمەتگوزاری",
+        "systemId": "ناسنامەی سیستەم",
+        "idLabel": "ID"
+      },
+      "values": {
+        "mileage": "{value} km"
+      },
+      "statuses": {
+        "ongoing": "خزمەتگوزاری بەردەوام",
+        "active": "چالاک"
+      },
+      "fallback": {
+        "na": "نەبوو"
+      }
+    },
+    "collectPayment": {
+      "title": "کۆکردنەوەی پارە",
+      "serviceFallback": "خزمەتگوزاری",
+      "customerLabel": "کڕیار: {name}",
+      "customerUnknown": "نەزانراو",
+      "breakdown": {
+        "serviceFee": "تێچووی خزمەتگوزاری",
+        "parts": "پارچە و مادە",
+        "inspection": "پشکنین",
+        "total": "کۆی گشتی"
+      },
+      "confirmation": {
+        "title": "دڵنیابوونەوەی پارەدان",
+        "message": "تکایە دڵنیابە لە وەرگرتنی پارەکە لە کڕیار پێش بەردەوامبوون."
+      },
+      "actions": {
+        "received": "پارەکە وەرگیرا"
+      }
+    },
+    "photoGallery": {
+      "defaultTitle": "وێنەکانی فحصی لاشە",
+      "photosLabel": "وێنە",
+      "subtitle": "پشکنینی وێنەکانی دۆخی ئۆتۆمبیل",
+      "loading": "وێنەکان دەهێنرێن...",
+      "empty": "هیچ وێنەیەک نییە",
+      "photoAlt": "فحصی لاشە {index}",
+      "actions": {
+        "reject": "ڕەتکردنەوەی وێنەکان",
+        "approve": "پەسەندکردنی وێنەکان"
+      },
+      "lightbox": {
+        "openOriginal": "کردنەوەی ئەصل",
+        "fullViewAlt": "پیشاندانی تەواو {index}",
+        "thumbnailAlt": "وێنۆک"
+      }
+    },
+    "rejectService": {
+      "title": "ڕەتکردنەوەی داواکاری خزمەتگوزاری",
+      "subtitle": "تکایە هۆکارێک هەڵبژێرە بۆ ڕەتکردنەوەی ئەم داواکارییە. ئەم کردارە ناتوانرێت هەڵوەشێنرێتەوە.",
+      "reasonLabel": "هۆکاری ڕەتکردنەوە",
+      "placeholder": "هۆکارێک هەڵبژێرە...",
+      "reasons": {
+        "technician": "تکنیکی بەردەست نییە",
+        "location": "شوێن دەرەوەی سنووری خزمەتگوزاری",
+        "duplicate": "داواکاری دووبارە",
+        "incomplete": "زانیاری تەواو نییە",
+        "other": "هیتر"
+      },
+      "confirm": "پەسەندکردنی ڕەتکردنەوە"
+    },
+    "submitPhotos": {
+      "title": "ناردنی وێنەکان",
+      "subtitle": "بارکردنی وێنەکان",
+      "dragTitle": "وێنەکانت ڕاکێشە و لێرە دابنێ",
+      "or": "یان",
+      "browse": "کلیک بکە بۆ هەڵبژاردن",
+      "fromDevice": "لە ئامێرەکەت",
+      "supported": "پاڵپشتی: JPG, PNG, GIF • زۆرترین 10MB بۆ هەر فایل",
+      "fileCount": "{count, plural, one {# فایل هەڵبژێردرا} other {# فایل هەڵبژێردران}}",
+      "submit": "ناردنی {count, plural, one {# وێنە} other {# وێنە}}"
+    },
+    "quotationBuilder": {
+      "title": "دروستکەری پێشنیار",
+      "header": "حجز #{id} · {category} · {plate}",
+      "serviceFallback": "خزمەتگوزاری",
+      "fallback": {
+        "na": "نەبوو"
+      },
+      "alerts": {
+        "saved": "پێشنیار بە سەرکەوتوویی پاشەکەوتکرا!",
+        "sent": "پێشنیار بۆ کڕیار نێردرا!"
+      },
+      "services": {
+        "title": "خزمەتگوزارییەکان",
+        "add": "زیادکردنی خزمەتگوزاری",
+        "select": "خزمەتگوزاری هەڵبژێرە",
+        "columns": {
+          "service": "خزمەتگوزاری",
+          "qty": "دانە",
+          "price": "نرخ",
+          "discount": "داشکاندن",
+          "cost": "تێچوو",
+          "warranty": "گەرەنتی",
+          "total": "کۆی گشتی"
+        }
+      },
+      "parts": {
+        "title": "پارچە و بەشەکان",
+        "add": "زیادکردنی پارچە",
+        "namePlaceholder": "ناوی پارچە",
+        "columns": {
+          "part": "پارچە",
+          "qty": "دانە",
+          "price": "نرخ",
+          "discount": "داشکاندن",
+          "cost": "تێچوو",
+          "warranty": "گەرەنتی",
+          "total": "کۆی گشتی"
+        }
+      },
+      "warranty": {
+        "none": "بێ گەرەنتی",
+        "oneMonth": "١ مانگ",
+        "threeMonths": "٣ مانگ",
+        "sixMonths": "٦ مانگ",
+        "oneYear": "١ ساڵ"
+      },
+      "summary": {
+        "title": "کورتەی پێشنیار",
+        "servicesSubtotal": "کۆی خزمەتگوزاری",
+        "partsSubtotal": "کۆی پارچەکان",
+        "inspectionFees": "تێچووی پشکنین",
+        "subtotal": "کۆیەکی ناوەندی",
+        "total": "کۆی گشتی"
+      },
+      "actions": {
+        "title": "کردارەکانی پێشنیار",
+        "validUntil": "کارامە تا",
+        "internalNotes": "تێبینی ناوخۆیی",
+        "internalNotesPlaceholder": "تێبینی ناوخۆیی زیاد بکە...",
+        "send": "ناردنی پێشنیار بۆ کڕیار",
+        "saveDraft": "پاشەکەوتکردنی ڕەشنووس"
+      }
+    },
+    "serviceRequestDetail": {
+      "title": "داواکاری خزمەتگوزاری #{id}",
+      "createdLabel": "دروستکرا:",
+      "serviceFallback": "خزمەتگوزاری",
+      "status": {
+        "current": "دۆخی ئێستا",
+        "inProgress": "لە پڕۆسەدایە"
+      },
+      "quoteStatus": {
+        "label": "دۆخی پێشنیار",
+        "pending": "چاوەڕوانی"
+      },
+      "scheduled": {
+        "label": "ڕێکەوت/کاتی کاتژمێر"
+      },
+      "vehicle": {
+        "title": "زانیاری ئۆتۆمبیل",
+        "makeModel": "مارکە و مۆدێل",
+        "vin": "VIN",
+        "plate": "پلاک",
+        "mileage": "مایلەج",
+        "color": "ڕەنگ",
+        "engine": "ئینجین",
+        "mileageValue": "{value} miles"
+      },
+      "service": {
+        "title": "وردەکاری خزمەتگوزاری",
+        "type": "جۆری خزمەتگوزاری",
+        "destination": "مقصد",
+        "requestedDate": "ڕێکەوت/کاتی داواکاری",
+        "distance": "دووری",
+        "autoServiceCenter": "ناوەندی خزمەتگوزاری",
+        "distanceValue": "{value} miles"
+      },
+      "cost": {
+        "title": "وردەکاری تێچوو",
+        "baseTow": "هێنانی سەرەتایی",
+        "addOns": "زیادکراو",
+        "transportation": "تێچووی گواستنەوە",
+        "inspection": "تێچووی پشکنین",
+        "total": "کۆی گشتی"
+      }
+    }
+  },
+  "vehicles": {
+    "title": "ئۆتۆمبیلەکان",
+    "subtitle": "بەڕێوەبردنی ئۆتۆمبیلەکانی فلیت و خزمەتگوزارییەکان",
+    "actions": {
+      "requestService": "داواکاری خزمەتگوزاری",
+      "addCar": "زیادکردنی ئۆتۆمبیل"
+    },
+    "stats": {
+      "numberOfCars": "ژمارەی ئۆتۆمبیلەکان",
+      "activeServices": "ژمارەی خزمەتگوزارییە چالاکەکان",
+      "scheduledThisWeek": "{count} ئەم هەفتەیە"
+    },
+    "fleet": {
+      "title": "فلیتی ئۆتۆمبیلەکان",
+      "searchPlaceholder": "ئۆتۆمبیل بگەڕێ..."
+    },
+    "filters": {
+      "allStatus": "هەموو دۆخەکان",
+      "ongoing": "بەردەوام"
+    },
+    "table": {
+      "vehicleId": "ناسنامەی ئۆتۆمبیل",
+      "makeModelYear": "مارکە/مۆدێل/ساڵ",
+      "plateNumber": "ژمارەی تەختە",
+      "vinNumber": "ژمارەی VIN",
+      "lastServiceDate": "دوایین بەرواری خزمەتگوزاری",
+      "action": "کردار",
+      "empty": "هیچ ئۆتۆمبیلێک نەدۆزرایەوە."
+    },
+    "status": {
+      "ongoing": "بەردەوام"
+    },
+    "pagination": {
+      "showing": "پیشاندانی {start} تا {end} لە کۆی {total} ئۆتۆمبیل",
+      "previous": "پێشوو",
+      "next": "داهاتوو"
+    },
+    "alerts": {
+      "delete": {
+        "title": "دڵنیایت؟",
+        "text": "ناتوانیت بگەڕێیتەوە!",
+        "confirm": "بەڵێ، بسڕەوە"
+      },
+      "deleted": {
+        "title": "سڕایەوە!",
+        "text": "ئۆتۆمبیل سڕایەوە.",
+        "failed": "سڕینەوە سەرکەوتوو نەبوو"
+      },
+      "error": {
+        "title": "هەڵە!",
+        "deleteFailed": "سڕینەوەی ئۆتۆمبیل سەرکەوتوو نەبوو."
+      }
+    },
+    "fallback": {
+      "unknown": "نەناسراو",
+      "na": "نەبوو"
+    }
+  },
+  "addVehicle": {
+    "title": "زیادکردنی ئۆتۆمبیلی نوێ",
+    "subtitle": "ئۆتۆمبیلێک زیاد بکە بۆ فلیتەکەت",
+    "stepper": {
+      "details": "وردەکاری ئۆتۆمبیل",
+      "complete": "تەواو"
+    },
+    "sections": {
+      "vehicleInfo": {
+        "title": "زانیاری ئۆتۆمبیل",
+        "subtitle": "تکایە وردەکاری ئۆتۆمبیلەکە پڕ بکەوە کە دەتەوێت بیفزێنی بۆ فلیتەکەت."
+      }
+    },
+    "fields": {
+      "make": "مارکەی ئۆتۆمبیل",
+      "model": "مۆدێلی ئۆتۆمبیل",
+      "year": "ساڵی ئۆتۆمبیل",
+      "mileage": "مایلەج (کم)",
+      "color": "ڕەنگی ئۆتۆمبیل",
+      "licensePlate": "پلاکەی مۆڵەت",
+      "vin": "ژمارەی VIN"
+    },
+    "placeholders": {
+      "loadingBrands": "مارکەکان بار دەکرێن...",
+      "selectMake": "مارکە هەڵبژێرە",
+      "loadingModels": "مۆدێلەکان بار دەکرێن...",
+      "selectModel": "مۆدێل هەڵبژێرە",
+      "selectMakeFirst": "سەرەتا مارکە هەڵبژێرە",
+      "enterModel": "مۆدێل بنوسە",
+      "selectYear": "ساڵ هەڵبژێرە",
+      "mileage": "وەک: 5000",
+      "color": "وەک: سپی، زیوەیی، ڕەش",
+      "vin": "VIN ـی 17 پیت بنوسە (اختیاری)"
+    },
+    "units": {
+      "km": "کم"
+    },
+    "plate": {
+      "newFormat": "شێوەی نوێ",
+      "oldFormat": "شێوەی کۆن",
+      "code": "کۆد",
+      "letter": "پیت",
+      "number": "ژمارە"
+    },
+    "actions": {
+      "uploadImage": "وێنە بار بکە {label}",
+      "imagePreview": "پێشبینی {label}",
+      "adding": "زیاد دەکرێت...",
+      "addVehicle": "زیادکردنی ئۆتۆمبیل"
+    },
+    "imageLabels": {
+      "front": "پێشەوە",
+      "back": "پشتەوە",
+      "left": "چەپ",
+      "right": "راست"
+    },
+    "validation": {
+      "makeRequired": "مارکە پێویستە",
+      "modelRequired": "مۆدێل پێویستە",
+      "yearRequired": "ساڵ پێویستە",
+      "colorRequired": "ڕەنگ پێویستە",
+      "plateRequired": "ژمارەی پلاک پێویستە",
+      "requiredFields": "تکایە هەموو خانە پێویستەکان پڕ بکەوە"
+    },
+    "errors": {
+      "fileSize": "قەبارەی وێنەی {direction} دەبێت کەمتر بێت لە 5MB.",
+      "fileType": "جۆری وێنەی {direction} دەبێت JPEG/JPG/PNG بێت.",
+      "maxImages": "زۆرترین 4 وێنە دەتوانیت بار بکەیت.",
+      "fileTooLarge": "فایلی {fileName} زۆر گەورەیە (زۆرترین 5MB). تێپەڕاندرا.",
+      "invalidImage": "فایلی {fileName} وێنەی ڕاست نییە. تێپەڕاندرا.",
+      "companyIdMissing": "ناسنامەی کۆمپانیا نەدۆزرایەوە. تکایە دووبارە بچۆ ژوورەوە.",
+      "createFailed": "دروستکردنی ئۆتۆمبیل سەرکەوتوو نەبوو",
+      "unknown": "هەڵەی نەناسراو",
+      "duplicatePlate": "ئۆتۆمبیلێک بە هەمان پلاک هەیە.",
+      "createError": "هەڵە لە دروستکردنی ئۆتۆمبیل"
+    },
+    "success": {
+      "vehicleAdded": "ئۆتۆمبیل بە سەرکەوتوویی زیادکرا"
+    },
+    "helpers": {
+      "vin": "ژمارەی ناساندنی ئۆتۆمبیل (17 پیت)"
+    },
+    "help": {
+      "title": "یارمەتی پێویستە؟",
+      "vinInfo": "VIN لە تۆمارکردنی ئۆتۆمبیل، کارت بیمە، یان لە لای شۆفێر لەسەر داشبۆرد نزیک شیشە دەدۆزرێتەوە.",
+      "imageInfo": "تکایە دڵنیابە لە بارکردنی وێنەی ڕوون لە هەموو 4 لا."
+    }
+  },
+  "editVehicle": {
+    "title": "دەستکاری ئۆتۆمبیل",
+    "subtitle": "وردەکاری ئۆتۆمبیل نوێ بکەوە",
+    "sections": {
+      "vehicleInfo": {
+        "title": "دەستکاری زانیاری ئۆتۆمبیل"
+      }
+    },
+    "fields": {
+      "make": "مارکەی ئۆتۆمبیل",
+      "model": "مۆدێلی ئۆتۆمبیل",
+      "year": "ساڵی ئۆتۆمبیل",
+      "mileage": "مایلەج (کم)",
+      "color": "ڕەنگی ئۆتۆمبیل",
+      "licensePlate": "پلاکەی مۆڵەت",
+      "vin": "ژمارەی VIN"
+    },
+    "placeholders": {
+      "loadingBrands": "مارکەکان بار دەکرێن...",
+      "selectMake": "مارکە هەڵبژێرە",
+      "loadingModels": "مۆدێلەکان بار دەکرێن...",
+      "selectModel": "مۆدێل هەڵبژێرە",
+      "selectMakeFirst": "سەرەتا مارکە هەڵبژێرە",
+      "enterModel": "مۆدێل بنوسە",
+      "selectYear": "ساڵ هەڵبژێرە",
+      "mileage": "وەک: 5000",
+      "color": "وەک: سپی، زیوەیی",
+      "vin": "VIN ـی 17 پیت بنوسە (اختیاری)"
+    },
+    "units": {
+      "km": "کم"
+    },
+    "plate": {
+      "newFormat": "شێوەی نوێ",
+      "oldFormat": "شێوەی کۆن"
+    },
+    "actions": {
+      "updating": "نوێ دەکرێتەوە...",
+      "updateVehicle": "نوێکردنەوەی ئۆتۆمبیل"
+    },
+    "validation": {
+      "makeRequired": "مارکە پێویستە",
+      "modelRequired": "مۆدێل پێویستە",
+      "yearRequired": "ساڵ پێویستە",
+      "colorRequired": "ڕەنگ پێویستە",
+      "plateRequired": "ژمارەی پلاک پێویستە",
+      "requiredFields": "تکایە هەموو خانە پێویستەکان پڕ بکەوە"
+    },
+    "errors": {
+      "vehicleIdMissing": "ناسنامەی ئۆتۆمبیل ندییە",
+      "updateFailed": "نوێکردنەوە سەرکەوتوو نەبوو",
+      "unknown": "هەڵەی نەناسراو",
+      "updateError": "هەڵە لە نوێکردنەوەی ئۆتۆمبیل",
+      "autoSelectModel": "نەتوانرا مۆدێلی '{model}' خۆکارانە هەڵبژێرێت. تکایە دەستی هەڵبژێرە."
+    },
+    "success": {
+      "vehicleUpdated": "ئۆتۆمبیل بە سەرکەوتوویی نوێکرایەوە"
+    }
+  },
+  "finance": {
+    "title": "دارایی",
+    "subtitle": "بەڕێوەبردنی مامەڵە و پارەدان",
+    "stats": {
+      "totalTransactions": "کۆی مامەڵەکان",
+      "totalOutstanding": "کۆی بڕی قەرز",
+      "month": "کانوونی دووەم",
+      "year": "2024",
+      "outstandingPerMonth": "قەرزی مانگانە"
+    },
+    "history": {
+      "title": "مێژووی مامەڵەکان",
+      "exportAll": "هەمووی بنێرە"
+    },
+    "filters": {
+      "searchPlaceholder": "مامەڵە بگەڕێ...",
+      "allStatus": "هەموو دۆخەکان",
+      "allMethods": "هەموو شێوازەکان"
+    },
+    "table": {
+      "transactionId": "ژمارەی مامەڵە",
+      "date": "بەروار",
+      "bookingId": "ژمارەی حجز",
+      "vehicleId": "ناسنامەی ئۆتۆمبیل",
+      "makeModelYear": "مارکە/مۆدێل/ساڵ",
+      "serviceType": "جۆری خزمەتگوزاری",
+      "serviceCost": "تێچووی خزمەتگوزاری",
+      "paymentStatus": "دۆخی پارەدان",
+      "paymentMethod": "شێوازی پارەدان",
+      "action": "کردار",
+      "invoice": "فاکتور"
+    },
+    "pagination": {
+      "showing": "پیشاندانی 1 تا 5 لە 1,247 ئەنجام"
+    }
+  },
+  "login": {
+    "metaTitle": "چوونەژوورەوە - حەکیم بۆ کار",
+    "metaDescription": "بچۆ ژوورەوە بۆ هەژماری حەکیم بۆ کار",
+    "brandTagline": "بۆ کار",
+    "welcomeTitle": "بەخێربێیتەوە",
+    "welcomeSubtitle": "بچۆ ژوورەوە بۆ هەژماری کاروبارت",
+    "emailLabel": "ئیمەیڵ",
+    "emailPlaceholder": "ئیمەیڵەکەت بنوسە",
+    "passwordLabel": "وشەی نهێنی",
+    "passwordPlaceholder": "وشەی نهێنی بنوسە",
+    "forgotPassword": "وشەی نهێنی لەبیرت چووە؟",
+    "signIn": "چوونەژوورەوە",
+    "signingIn": "چوونەژوورەوە...",
+    "noAccount": "هەژمارت نییە؟",
+    "createAccount": "هەژمار دروست بکە",
+    "privacyPolicy": "سیاسەتی تایبەتێتی",
+    "termsOfService": "مەرجەکانی خزمەتگوزاری",
+    "support": "یارمەتیدان",
+    "secureLogin": "چوونەژوورەوەی پارێزراو بۆ کاروبار لەلایەن",
+    "validation": {
+      "emailRequired": "تکایە ئیمەیڵ بنوسە",
+      "emailInvalid": "تکایە ئیمەیڵێکی دروست بنوسە",
+      "passwordRequired": "تکایە وشەی نهێنی بنوسە"
+    },
+    "errors": {
+      "unexpected": "هەڵەیەکی نەچاوەڕوانکراو ڕوویدا. تکایە دووبارە هەوڵ بدە.",
+      "invalidCredentials": "ئیمەیڵ یان وشەی نهێنی هەڵەیە"
+    }
+  },
+  "register": {
+    "metaTitle": "تۆمارکردن - حەکیم بۆ کار",
+    "metaDescription": "کاروبارت لەگەڵ حەکیم تۆمار بکە",
+    "brandTagline": "بۆ کار",
+    "navHelp": "یارمەتی",
+    "navCall": "پەیوەندی",
+    "pageTitle": "کاروبارت تۆمار بکە",
+    "pageSubtitle": "بەشداری حەکیم بۆ کار بکە و پێویستیەکانی گواستنەوەی کۆمپانیاکەت ڕێک بخە. پرۆسەی تۆمارکردن لە سێ هەنگاوی سادەدا تەواو بکە.",
+    "stepper": {
+      "company": "زانیاری کۆمپانیا",
+      "contact": "کەسی پەیوەندی",
+      "fleet": "زانیاری فلیت"
+    },
+    "section": {
+      "companyInfo": "زانیاری کۆمپانیا و مۆڵەتی بازرگانی",
+      "contactPerson": "کەسی پەیوەندی سەرەکی",
+      "fleetInfo": "قەبارە و جۆری فلیت"
+    },
+    "infoBanner": "ئەم زانیاریانە بۆ چوونەژوورەوەی هەژماری کاروبارت بەکاردێن",
+    "fields": {
+      "companyName": "ناوی کۆمپانیا *",
+      "tradeLicenseNumber": "ژمارەی مۆڵەتی بازرگانی *",
+      "companyLocation": "شوێنی کۆمپانیا *",
+      "city": "شار *",
+      "companyAddress": "ناونیشانی کۆمپانیا *",
+      "tradeLicenseDocument": "بەڵگەی مۆڵەتی بازرگانی *",
+      "fullName": "ناوی تەواو *",
+      "jobTitle": "ناونیشانی کار *",
+      "email": "ئیمەیڵ *",
+      "emailHint": "(ناوی چوونەژوورەوە)",
+      "password": "وشەی نهێنی *",
+      "passwordHint": "(وشەی چوونەژوورەوە)",
+      "phoneNumber": "ژمارەی مۆبایل *",
+      "fleetSize": "قەبارەی فلیت (خەمڵاندن) *",
+      "vehicleType": "جۆری سەرەکی ئۆتۆمبیل *"
+    },
+    "placeholders": {
+      "companyName": "ناوی کۆمپانیا بنوسە",
+      "tradeLicenseNumber": "ژمارەی مۆڵەت بنوسە",
+      "companyAddress": "ناونیشانی تەواوی کۆمپانیا بنوسە",
+      "fullName": "ناوی تەواو بنوسە",
+      "jobTitle": "ناونیشانی کار بنوسە",
+      "email": "ئیمەیڵ بنوسە",
+      "password": "وشەی نهێنی دروست بکە",
+      "phoneNumber": "ژمارەی مۆبایل بنوسە",
+      "fleetSize": "قەبارەی فلیت بنوسە",
+      "vehicleType": "جۆری ئۆتۆمبیل هەڵبژێرە",
+      "detectingCity": "شار دەناسێنرێت...",
+      "autoDetectedCity": "لە شوێنەوە خۆکارانە دیاریکراو",
+      "locationSelected": "شوێنی دیاریکراو: {lat}، {lng}"
+    },
+    "vehicleTypes": {
+      "sedan": "سیدان",
+      "suv": "SUV",
+      "van": "ڤان",
+      "truck": "تڕاک",
+      "luxury": "لۆکس"
+    },
+    "upload": {
+      "cta": "بەڵگەی مۆڵەتی بازرگانی بار بکە",
+      "helper": "PDF، JPG یان PNG تا 5MB",
+      "chooseFile": "فایل هەڵبژێرە"
+    },
+    "passwordCriteria": {
+      "length": "6 پیت یان زیاتر",
+      "upper": "پیتی گەورە",
+      "number": "ژمارە",
+      "special": "نیشانی تایبەت (!@#$%^&*)"
+    },
+    "actions": {
+      "back": "گەڕانەوە",
+      "register": "تۆمارکردن",
+      "registering": "تۆمارکردن..."
+    },
+    "footer": {
+      "needHelp": "پێویستت بە یارمەتییە لە تۆمارکردن؟",
+      "callSupport": "پەیوەندی بکە",
+      "emailUs": "ئیمەیڵمان بکە",
+      "liveChat": "گفتوگۆی ڕاستەوخۆ",
+      "copyright": "© 2024 حەکیم بۆ کار. هەموو مافەکان پارێزراون.",
+      "privacyPolicy": "سیاسەتی تایبەتێتی",
+      "termsOfService": "مەرجەکانی خزمەتگوزاری",
+      "support": "یارمەتیدان"
+    },
+    "alerts": {
+      "unsupported": {
+        "title": "پشتگیری ناکرێت",
+        "text": "پێشبینی شوێن لە وێبگەڕەکەت پشتیوانی ناکات"
+      },
+      "permissionDenied": {
+        "title": "ڕێگاپێدان ڕەتکرایەوە",
+        "text": "ناتوانین شوێنەکەت دیاری بکەین چونکە ڕێگاپێدان ڕەتکراوە.",
+        "hint": "تکایە لە ناونیشانی وێبگەڕەکەتەوە ئایکۆنی قفڵ/ڕێکخستن دابگرە و ڕێگای شوێن بەدەستبهێنە، پاشان دووبارە هەوڵ بدە.",
+        "retry": "دووبارە هەوڵدان"
+      },
+      "missingInfo": {
+        "title": "زانیاری ناتەواوە",
+        "text": "تکایە هەموو خانە داواکراوەکان پڕبکەوە و مۆڵەتی بازرگانی بار بکە."
+      },
+      "invalidEmail": {
+        "title": "ئیمەیڵی نادروست",
+        "text": "تکایە ئیمەیڵێکی دروست بنوسە."
+      },
+      "weakPassword": {
+        "title": "وشەی نهێنی لاوازە",
+        "text": "تکایە دڵنیابە کە هەموو پێداویستییەکانی وشەی نهێنی جێبەجێکراون."
+      },
+      "registerSuccess": {
+        "title": "تۆمارکردن سەرکەوتوو بوو!",
+        "text": "کۆمپانیاکەت تۆمارکرا. دەتوانیت ئێستا بچیتە ژوورەوە.",
+        "confirm": "بچۆ بۆ چوونەژوورەوە"
+      },
+      "registerFailed": {
+        "title": "تۆمارکردن سەرکەوتوو نەبوو",
+        "fallback": "هەڵەیەک ڕوویدا. تکایە دووبارە هەوڵ بدە."
+      }
+    }
+  },
+  "errors": {
+    "actions": {
+      "home": "بڕۆ بۆ پەڕەی سەرەکی",
+      "back": "گەڕانەوە"
+    },
+    "notFound": {
+      "title": "پەڕە نەدۆزرایەوە",
+      "description": "پەڕەیەکە کە دەگەڕێیت نەبوونی یان گواستراوە.",
+      "help": "یارمەتی پێویستە؟ پەیوەندی بە تیمی یارمەتیدان بکە."
+    },
+    "serverError": {
+      "title": "هەڵەی سێرڤەر",
+      "description": "هەڵەیەک لە لایەنی ئێمە ڕوویدا. ئێمە لە چاککردنەوەدایین.",
+      "help": "ئەگەر کێشەکە بەردەوام بوو، تکایە پەیوەندی بە یارمەتیدان بکە."
+    },
+    "generic": {
+      "title": "هەڵەیەک ڕوویدا",
+      "withCode": "هەڵە {statusCode}",
+      "description": "هەڵەیەک ڕوویدا. تکایە دواتر هەوڵ بدە.",
+      "notFound": "پەڕەی داواکراو نەدۆزرایەوە."
+    }
+  }
+}

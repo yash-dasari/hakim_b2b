@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { FaMoneyBillWave, FaTimes, FaUniversity, FaBolt, FaBriefcase, FaInfoCircle } from 'react-icons/fa';
+import { useTranslations } from 'next-intl';
 
 interface PaymentModalProps {
     isOpen: boolean;
@@ -11,6 +12,8 @@ interface PaymentModalProps {
 export default function PaymentModal({ isOpen, onClose, onConfirm, amount: _amount }: PaymentModalProps) {
     const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
     const [isProcessing, setIsProcessing] = useState(false);
+    const t = useTranslations('modals.payment');
+    const tCommon = useTranslations('common');
 
     if (!isOpen) return null;
 
@@ -30,21 +33,21 @@ export default function PaymentModal({ isOpen, onClose, onConfirm, amount: _amou
             id: 'FIB',
             name: 'FIB',
             icon: <FaUniversity className="w-6 h-6 text-blue-600" />,
-            description: 'First Iraqi Bank - Instant transfer',
+            description: t('methods.fib'),
             iconBg: 'bg-blue-100'
         },
         {
             id: 'FastPay',
             name: 'FastPay',
             icon: <FaBolt className="w-6 h-6 text-purple-600" />,
-            description: 'Quick and secure digital payment',
+            description: t('methods.fastPay'),
             iconBg: 'bg-purple-100'
         },
         {
             id: 'Cash',
             name: 'Cash',
             icon: <FaMoneyBillWave className="w-6 h-6 text-green-600" />,
-            description: 'Pay with cash on delivery or pickup',
+            description: t('methods.cash'),
             iconBg: 'bg-green-100'
         }
     ];
@@ -60,8 +63,8 @@ export default function PaymentModal({ isOpen, onClose, onConfirm, amount: _amou
                             <FaBriefcase className="text-gray-900 text-lg" />
                         </div>
                         <div>
-                            <h2 className="text-lg font-bold text-gray-900 leading-tight">HAKIM for Business</h2>
-                            <p className="text-xs text-gray-800/80 font-medium">Select Payment Method</p>
+                            <h2 className="text-lg font-bold text-gray-900 leading-tight">{t('brand')}</h2>
+                            <p className="text-xs text-gray-800/80 font-medium">{t('title')}</p>
                         </div>
                     </div>
                     <button
@@ -76,8 +79,8 @@ export default function PaymentModal({ isOpen, onClose, onConfirm, amount: _amou
                 <div className="p-6 bg-white">
 
                     <div className="mb-6">
-                        <h3 className="text-base font-bold text-gray-900 mb-1">Choose your preferred payment method</h3>
-                        <p className="text-sm text-gray-500">Select one option below to continue with your payment</p>
+                        <h3 className="text-base font-bold text-gray-900 mb-1">{t('subtitle')}</h3>
+                        <p className="text-sm text-gray-500">{t('helper')}</p>
                     </div>
 
                     {/* Payment Methods */}
@@ -97,7 +100,7 @@ export default function PaymentModal({ isOpen, onClose, onConfirm, amount: _amou
                                     <div className={`w-12 h-12 rounded-lg ${method.iconBg} flex items-center justify-center`}>
                                         {method.icon}
                                     </div>
-                                    <div className="text-left">
+                                    <div className="text-start">
                                         <h4 className="font-bold text-gray-900">{method.name}</h4>
                                         <p className="text-xs text-gray-500">{method.description}</p>
                                     </div>
@@ -122,7 +125,7 @@ export default function PaymentModal({ isOpen, onClose, onConfirm, amount: _amou
                     <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 flex gap-3 mb-8">
                         <FaInfoCircle className="text-blue-600 mt-0.5 flex-shrink-0" />
                         <p className="text-xs text-blue-700 leading-relaxed">
-                            <span className="font-bold">Note:</span> Your payment will be processed securely. You will receive a confirmation once the transaction is complete.
+                            <span className="font-bold">{t('note.label')}</span> {t('note.text')}
                         </p>
                     </div>
 
@@ -133,7 +136,7 @@ export default function PaymentModal({ isOpen, onClose, onConfirm, amount: _amou
                             className="px-6 py-2.5 border border-gray-300 text-gray-700 font-bold rounded-lg hover:bg-gray-50 transition-colors text-sm"
                             disabled={isProcessing}
                         >
-                            Cancel
+                            {tCommon('actions.cancel')}
                         </button>
                         <button
                             onClick={handlePayment}
@@ -145,7 +148,7 @@ export default function PaymentModal({ isOpen, onClose, onConfirm, amount: _amou
                                 }
               `}
                         >
-                            {isProcessing ? 'Processing...' : 'Continue'}
+                            {isProcessing ? t('processing') : t('continue')}
                         </button>
                     </div>
 
