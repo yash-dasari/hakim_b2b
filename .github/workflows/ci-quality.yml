@@ -1,0 +1,330 @@
+name: CI Quality Pipeline
+
+on:
+  push:
+    branches: [master, dev, staging]
+
+
+env:
+  NODE_VERSION: "22"
+  AWS_REGION: "me-central-1" # Replace with your AWS region
+  ECR_REPOSITORY: "hakim-frontend/hakim-admin-portal"
+
+permissions:
+  contents: read
+  packages: write
+  security-events: write
+  pull-requests: write
+  checks: write
+
+jobs:
+  # Install dependencies and cache them
+  install:
+    name: Install Dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "yarn"
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
+  # Type checking
+  type-check:
+    name: TypeScript Type Check
+    runs-on: ubuntu-latest
+    needs: install
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "yarn"
+
+      - name: Restore dependencies
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+  # Linting
+  lint:
+    name: ESLint
+    runs-on: ubuntu-latest
+    needs: install
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "yarn"
+
+      - name: Restore dependencies
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Run ESLint
+        run: yarn lint
+
+  # Security audit
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    needs: install
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "yarn"
+
+      - name: Run security audit
+        run: yarn audit --level moderate
+
+  dependency-check:
+    name: Check Dependencies
+    runs-on: ubuntu-latest
+    needs: install
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "yarn"
+
+      - name: Check for outdated dependencies
+        run: yarn outdated || true
+
+  # Quality gate
+  quality-gates:
+    name: Quality Gate
+    runs-on: ubuntu-latest
+    needs: [type-check, lint, security-audit, dependency-check]
+    if: always()
+    steps:
+      - name: Check all jobs status
+        run: |
+          if [[ "${{ needs.type-check.result }}" == "failure" ||
+                "${{ needs.lint.result }}" == "failure" ||
+                "${{ needs.build.result }}" == "failure" ||
+                "${{ needs.security-audit.result }}" == "failure" ]]; then
+            echo "Quality gate failed - one or more required checks failed"
+            exit 1
+          else
+            echo "Quality gate passed - all required checks successful"
+          fi
+
+  build-and-push:
+    name: Build & Push Docker Image
+    runs-on: ubuntu-latest
+    needs: [quality-gates]
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+
+    outputs:
+      image-digest: ${{ steps.build.outputs.digest }}
+      image-url: ${{ steps.meta.outputs.tags }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: Download environment file from S3
+        run: |
+          echo "Downloading .env from S3..."
+          aws s3 cp s3://dev-hakim-envs/hakim_amdin_portal_env .env
+          echo "✅ .env file downloaded successfully"
+            
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Determine environment and configuration
+        id: env-config
+        run: |
+          # Determine tag and environment based on branch (works for both push and PR)
+          if [[ "${GITHUB_REF}" == "refs/heads/dev" || "${GITHUB_BASE_REF}" == "dev" ]]; then
+            echo "TAG_NAME=dev" >> $GITHUB_ENV
+            echo "ENVIRONMENT=dev" >> $GITHUB_ENV
+          elif [[ "${GITHUB_REF}" == "refs/heads/staging" || "${GITHUB_BASE_REF}" == "staging" ]]; then
+            echo "TAG_NAME=stg" >> $GITHUB_ENV
+            echo "ENVIRONMENT=staging" >> $GITHUB_ENV
+          elif [[ "${GITHUB_REF}" == "refs/heads/master" || "${GITHUB_BASE_REF}" == "master" ]]; then
+            echo "TAG_NAME=prod" >> $GITHUB_ENV
+            echo "ENVIRONMENT=production" >> $GITHUB_ENV
+          else
+            echo "TAG_NAME=unknown" >> $GITHUB_ENV
+            echo "ENVIRONMENT=unknown" >> $GITHUB_ENV
+          fi
+          
+          echo "🚀 Branch: ${GITHUB_REF:-$GITHUB_BASE_REF}"
+          echo "🚀 Environment: ${ENVIRONMENT}, Tag: ${TAG_NAME}"
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}
+          tags: |
+            type=raw,value=${{ env.TAG_NAME }}-{{sha}}
+            type=raw,value=${{ env.TAG_NAME }}-latest
+
+      - name: Build and push Docker image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            PYTHON_VERSION=${{ env.PYTHON_VERSION }}
+
+      - name: Set image tag for dispatch
+        id: image-tag
+        run: |
+          IMAGE_TAG="${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ env.TAG_NAME }}-${{ github.sha }}"
+          echo "IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_ENV
+          echo "Image tag: ${IMAGE_TAG}"
+          
+          # Set event type based on environment
+          case "${{ env.ENVIRONMENT }}" in
+            "dev")
+              echo "EVENT_TYPE=dev-service-updated" >> $GITHUB_ENV
+              ;;
+            "staging")
+              echo "EVENT_TYPE=staging-service-updated" >> $GITHUB_ENV
+              ;;
+            "production")
+              echo "EVENT_TYPE=prod-service-updated" >> $GITHUB_ENV
+              ;;
+            *)
+              echo "❌ Unknown environment: ${{ env.ENVIRONMENT }}"
+              exit 1
+              ;;
+          esac
+
+      - name: Trigger infrastructure repo deployment
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.INFRA_REPO_PAT }}
+          repository: IBTIKAR-IT-Dubai/hakim-infra-compose
+          event-type: ${{ env.EVENT_TYPE }}
+          client-payload: '{"service": "hakim-admin-portal", "environment": "${{ env.ENVIRONMENT }}", "image": "${{ env.IMAGE_TAG }}"}'
+
+      - name: Install GitHub CLI
+        run: sudo apt-get update && sudo apt-get install -y gh
+
+      - name: Wait for infrastructure deployment to finish
+        env:
+          GITHUB_TOKEN: ${{ secrets.INFRA_REPO_PAT }}
+        run: |
+          REPO="IBTIKAR-IT-Dubai/hakim-infra-compose"
+          ENV="${{ env.ENVIRONMENT }}"
+          SERVICE="${{ env.SERVICE_NAME }}"
+          echo "⏳ Waiting for $ENV deployment in $REPO triggered by repository_dispatch..."
+
+          sleep 20  # Give GitHub a few seconds to start the workflow
+
+          for i in {1..30}; do
+            RUN_ID=$(gh run list -R $REPO --json databaseId,event,status,conclusion \
+              -q '.[] | select(.event=="repository_dispatch") | .databaseId' | head -n1)
+
+            if [[ -z "$RUN_ID" ]]; then
+              echo "No workflow found yet... waiting 15s (attempt $i/30)"
+              sleep 15
+              continue
+            fi
+
+            STATUS=$(gh run view "$RUN_ID" -R "$REPO" --json status,conclusion \
+              -q '.status + ":" + (.conclusion // "none")')
+            echo "[$ENV] Deployment status: $STATUS (Run ID: $RUN_ID)"
+
+            if [[ "$STATUS" == "completed:success" ]]; then
+              echo "✅ Infrastructure deployment to $ENV succeeded!"
+              exit 0
+            elif [[ "$STATUS" == "completed:failure" ]]; then
+              echo ""
+              echo "════════════════════════════════════════════════════════════════"
+              echo "❌ Infrastructure deployment to $ENV failed!"
+              echo "════════════════════════════════════════════════════════════════"
+              echo ""
+              
+              # Get the failed job logs
+              echo "📜 Fetching deployment logs..."
+              gh run view "$RUN_ID" -R "$REPO" --log-failed > /tmp/infra-logs.txt 2>&1 || true
+              
+              # Extract and display the formatted CodeDeploy error from logs
+              if grep -q "DEPLOYMENT FAILED" /tmp/infra-logs.txt; then
+                # Extract everything from "DEPLOYMENT FAILED" to the end of the formatted output
+                sed -n '/════.*DEPLOYMENT FAILED/,/════════════════════════════════════════════════════════════════$/p' /tmp/infra-logs.txt | \
+                  sed 's/^deploy[[:space:]]*Wait for CodeDeploy deployment to finish[[:space:]]*[0-9T:\-\.Z]*//g' | \
+                  sed 's/^[[:space:]]*//' | \
+                  grep -v '^$' || cat /tmp/infra-logs.txt
+              else
+                echo "⚠️  Could not extract formatted error. Showing full logs:"
+                cat /tmp/infra-logs.txt
+              fi
+              
+              echo ""
+              echo "════════════════════════════════════════════════════════════════"
+              echo "🔗 View full logs: https://github.com/$REPO/actions/runs/$RUN_ID"
+              echo "════════════════════════════════════════════════════════════════"
+              
+              exit 1
+            fi
+
+            sleep 30
+          done
+
+          echo "⏰ Timed out waiting for $ENV infrastructure deployment to finish."
+          exit 1

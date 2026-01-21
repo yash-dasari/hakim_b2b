@@ -1,0 +1,49 @@
+{
+  "root": true,
+  "extends": [
+    "next/core-web-vitals",
+    "next/typescript"
+  ],
+  "ignorePatterns": [
+    "node_modules/**",
+    ".next/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts"
+  ],
+  "plugins": [
+    "unused-imports"
+  ],
+  "rules": {
+    "react/no-unescaped-entities": "off",
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": "off",
+    "unused-imports/no-unused-imports": "error",
+    "unused-imports/no-unused-vars": [
+      "warn",
+      {
+        "vars": "all",
+        "varsIgnorePattern": "^_",
+        "args": "after-used",
+        "argsIgnorePattern": "^_"
+      }
+    ],
+    "@next/next/no-html-link-for-pages": "warn",
+    "prefer-const": "warn",
+    "@typescript-eslint/no-var-requires": "warn",
+    "@next/next/no-img-element": "warn",
+    "react-hooks/exhaustive-deps": "warn"
+  },
+  "overrides": [
+    {
+      "files": [
+        "pages/api/**/*"
+      ],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-var-requires": "off",
+        "prefer-const": "off"
+      }
+    }
+  ]
+}

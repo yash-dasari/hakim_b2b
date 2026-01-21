@@ -1,0 +1,16 @@
+<svg width="400" height="200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="400" height="200" fill="#2C3E50"/>
+  
+  <!-- VIN Plate Text -->
+  <text x="200" y="50" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="white" text-anchor="middle">LATAC</text>
+  <text x="200" y="80" font-family="Arial, sans-serif" font-size="14" fill="white" text-anchor="middle">QUALIT6</text>
+  <text x="200" y="110" font-family="Arial, sans-serif" font-size="14" fill="white" text-anchor="middle">TTATE</text>
+  <text x="200" y="140" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white" text-anchor="middle">116524</text>
+  <text x="200" y="170" font-family="Arial, sans-serif" font-size="12" fill="white" text-anchor="middle">VIN 4578 1138</text>
+  
+  <!-- Circular holes on sides -->
+  <circle cx="30" cy="100" r="8" fill="#1A252F"/>
+  <circle cx="370" cy="100" r="8" fill="#1A252F"/>
+</svg>
+

@@ -1,0 +1,54 @@
+name: Update Yarn Lockfile
+
+# This is a one-time workflow to update yarn.lock
+# Run it manually via workflow_dispatch, then delete this file
+
+on:
+  workflow_dispatch:
+
+jobs:
+  update-lockfile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Check for changes
+        id: verify-changed
+        run: |
+          if [ -n "$(git status --porcelain yarn.lock)" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "✅ yarn.lock has been updated"
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "ℹ️  yarn.lock is already up to date"
+          fi
+
+      - name: Commit and push changes
+        if: steps.verify-changed.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add yarn.lock
+          git commit -m "chore: Update yarn.lock to sync with package.json resolutions"
+          git push
+
+      - name: Summary
+        run: |
+          if [ "${{ steps.verify-changed.outputs.changed }}" == "true" ]; then
+            echo "✅ yarn.lock has been updated and committed"
+            echo "You can now delete this workflow file (.github/workflows/update-lockfile.yml)"
+          else
+            echo "ℹ️  yarn.lock was already up to date"
+          fi
+

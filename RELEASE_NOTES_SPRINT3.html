@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Hakim Admin – Sprint 3 Release Notes</title>
+    <style>
+        body {
+            font-family: 'Calibri', 'Arial', sans-serif;
+            line-height: 1.6;
+            margin: 40px;
+            color: #333;
+            max-width: 1000px;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #f39c12;
+            padding-bottom: 10px;
+            font-size: 28px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+            font-size: 22px;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 5px;
+        }
+        h3 {
+            color: #555;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        h4 {
+            color: #666;
+            margin-top: 15px;
+            font-size: 16px;
+        }
+        ul, ol {
+            margin-left: 20px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        .version-info {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            margin: 20px 0;
+        }
+        .overview {
+            background-color: #e8f4f8;
+            padding: 15px;
+            border-left: 4px solid #17a2b8;
+            margin: 20px 0;
+        }
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Hakim Admin – Sprint 3 Release Notes</h1>
+    
+    <div class="version-info">
+        <p><strong>Version:</strong> 3.1</p>
+        <p><strong>Release Date:</strong> November 14, 2025</p>
+        <p><strong>Platforms:</strong> Web (Next.js – Admin Panel)</p>
+    </div>
+
+    <div class="overview">
+        <h2>Overview</h2>
+        <p>Sprint 3.1 brings significant enhancements to the Hakim Admin Panel, focusing on improved service request management, quotation workflow, and technician assignment processes. This release introduces real-time data synchronization, enhanced modal interactions, and comprehensive API integrations for better operational efficiency.</p>
+    </div>
+
+    <div class="section">
+        <h2>1. Service Requests Management Screen</h2>
+        
+        <h3>1.1 Enhanced Data Display</h3>
+        <ul>
+            <li><strong>Price Mode Column:</strong> Added dedicated column displaying price mode with color-coded badges (Fixed Price, Quote Required, Contact Call Center).</li>
+            <li><strong>Address Display:</strong> Fixed to use <code>pickup_address</code> from API response instead of static placeholder text.</li>
+            <li><strong>Address Truncation:</strong> Long addresses are automatically truncated with ellipsis (...) and full address shown in tooltip on hover for better readability.</li>
+            <li><strong>Vehicle Information:</strong> Displays <code>vehicle_info</code> in Vehicle column with proper fallback handling when data is unavailable.</li>
+        </ul>
+
+        <h3>1.2 Status Filtering</h3>
+        <ul>
+            <li><strong>Pending Quotation Filter:</strong> Fixed status filter to correctly handle "Pending quotation" status variations.</li>
+            <li><strong>Multi-Field Support:</strong> Filter now checks both <code>status</code> and <code>overall_status</code> fields for accurate results.</li>
+            <li><strong>Normalized Matching:</strong> Handles underscore and space variations (e.g., "pending_quotation" vs "pending quotation") with case-insensitive matching.</li>
+            <li><strong>Real-Time Counts:</strong> Summary cards and filter tabs show accurate counts based on API data.</li>
+        </ul>
+
+        <h3>1.3 Service Request Details Modal</h3>
+        
+        <h4>1.3.1 Status Queue Management</h4>
+        <ul>
+            <li><strong>Dynamic Status Display:</strong> Shows all statuses from <code>status_queue</code> array in dropdown format.</li>
+            <li><strong>Current Status Highlighting:</strong> Automatically selects and highlights the status where <code>is_current: true</code>.</li>
+            <li><strong>Real-Time Updates:</strong> Status dropdown populated dynamically from API response.</li>
+        </ul>
+
+        <h4>1.3.2 Route Map Integration</h4>
+        <ul>
+            <li><strong>Location Visualization:</strong> Interactive map displaying pickup and dropoff locations from API data.</li>
+            <li><strong>Current Location Tracking:</strong> Shows user's current location (with browser permission) alongside service locations.</li>
+            <li><strong>Distance Calculations:</strong> Real-time distance calculations using Haversine formula:
+                <ul>
+                    <li>Pickup to Dropoff distance</li>
+                    <li>Current location to Pickup distance</li>
+                    <li>Current location to Dropoff distance</li>
+                </ul>
+            </li>
+            <li><strong>Auto-Fit Bounds:</strong> Map automatically adjusts to show all markers with appropriate padding.</li>
+            <li><strong>Color-Coded Markers:</strong> Red (Pickup), Green (Dropoff), Blue (Current Location) with route line connecting locations.</li>
+        </ul>
+
+        <h4>1.3.3 Service Details Section</h4>
+        <ul>
+            <li><strong>Complete Service Catalog Integration:</strong> Loads comprehensive data from <code>service_catalog</code> object.</li>
+            <li><strong>Service Information Display:</strong>
+                <ul>
+                    <li>Service name and icon</li>
+                    <li>Category name</li>
+                    <li>Structured description</li>
+                    <li>Base price</li>
+                    <li>Price mode</li>
+                    <li>Warranty information</li>
+                    <li>Estimated duration (hours)</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h4>1.3.4 Customer Information</h4>
+        <ul>
+            <li><strong>API-Driven Data:</strong> Loads customer details from booking details API response.</li>
+            <li><strong>Comprehensive Display:</strong> Shows full name, email, phone, city, and profile picture.</li>
+            <li><strong>Fallback Handling:</strong> Displays "--" when data is unavailable instead of static placeholders.</li>
+        </ul>
+
+        <h4>1.3.5 Vehicle Information</h4>
+        <ul>
+            <li><strong>Complete Vehicle Data:</strong> Loads from <code>vehicle</code> object in API response.</li>
+            <li><strong>Detailed Display:</strong> Shows Make, Model, Year, License Plate, Color, Vehicle ID, Mileage, and Engine information.</li>
+            <li><strong>UI Optimization:</strong> Removed VIN Document section as per requirements.</li>
+        </ul>
+
+        <h4>1.3.6 Cancel Booking Feature</h4>
+        <ul>
+            <li><strong>Confirmation Modal:</strong> User-friendly confirmation dialog with optional comments field.</li>
+            <li><strong>API Integration:</strong> <code>PUT /bookings/v1/bookings/{booking_id}/status</code> endpoint integration.</li>
+            <li><strong>Success/Error Notifications:</strong> Toast notifications for both success and failure scenarios.</li>
+            <li><strong>Auto-Refresh:</strong> Booking details automatically refresh after successful cancellation.</li>
+            <li><strong>Smart Visibility:</strong> Cancel button always visible except when status is "Cancelled".</li>
+        </ul>
+
+        <h4>1.3.7 Quotation Button</h4>
+        <ul>
+            <li><strong>Conditional Display:</strong> Shows when <code>overall_status</code> is "Pending quotation".</li>
+            <li><strong>Prepopulation:</strong> Automatically loads existing quotation data when available.</li>
+        </ul>
+
+        <h3>1.4 Quotation Builder Modal</h3>
+        
+        <h4>1.4.1 Prepopulation Functionality</h4>
+        <ul>
+            <li><strong>Existing Data Loading:</strong> Automatically loads and maps existing quotation data from API.</li>
+            <li><strong>Service Mapping:</strong> Correctly maps services and parts with proper fallback handling.</li>
+            <li><strong>Addon Support:</strong> Handles service addons properly when prepopulating data.</li>
+        </ul>
+
+        <h4>1.4.2 Dynamic Cost Calculation</h4>
+        <ul>
+            <li><strong>Transportation Cost Updates:</strong> Real-time updates based on location distance selection.</li>
+            <li><strong>Express Service Rate:</strong> "+25%" checkbox dynamically updates transportation cost in Quote Summary.</li>
+            <li><strong>Live Calculations:</strong> Quote Summary updates in real-time as user modifies services, parts, or options.</li>
+        </ul>
+
+        <h4>1.4.3 Layout Improvements</h4>
+        <ul>
+            <li><strong>Optimized Width Distribution:</strong> Services section (65% width) and Quote Summary section (35% width).</li>
+            <li><strong>Improved Alignment:</strong> Better spacing and alignment throughout the modal.</li>
+            <li><strong>Enhanced Design:</strong> Labels above price and discount fields for better clarity.</li>
+            <li><strong>Consistent Styling:</strong> Unified design between Services and Parts sections.</li>
+        </ul>
+
+        <h3>1.5 Technician Assignment</h3>
+        
+        <h4>1.5.1 Assignment Workflow</h4>
+        <ul>
+            <li><strong>Success/Error Feedback:</strong> Clear success or failure messages displayed after assignment attempt.</li>
+            <li><strong>User-Controlled Closure:</strong> Modal remains open until user acknowledges the message by clicking "Close".</li>
+            <li><strong>Automatic Data Refresh:</strong> After successful assignment:
+                <ul>
+                    <li>Booking details are refreshed</li>
+                    <li>Service requests list is updated</li>
+                    <li>Both modals close automatically</li>
+                </ul>
+            </li>
+            <li><strong>Error Handling:</strong> On failure, modal stays open with error message, allowing user to retry or cancel.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>2. Personnel & Service Centers Management Screen</h2>
+        
+        <h3>2.1 Dual-Tab Interface</h3>
+        <ul>
+            <li><strong>Unified Dashboard:</strong> Single screen managing both Personnel and Service Centers with tab-based navigation.</li>
+            <li><strong>Seamless Switching:</strong> Easy toggle between Personnel and Service Centers tabs without page reload.</li>
+            <li><strong>Independent State Management:</strong> Each tab maintains its own filters, search, and pagination state.</li>
+        </ul>
+
+        <h3>2.2 Personnel Management Tab</h3>
+        
+        <h4>2.2.1 Personnel Operations</h4>
+        <ul>
+            <li><strong>View Personnel:</strong> Navigate to detailed personnel view page with complete information.</li>
+            <li><strong>Edit Personnel:</strong> Quick access to edit personnel details and information.</li>
+            <li><strong>Delete Personnel:</strong> Confirmation modal before deletion with success/error feedback.</li>
+            <li><strong>Create Personnel:</strong> Direct navigation to personnel creation form.</li>
+        </ul>
+
+        <h4>2.2.2 Search & Filtering</h4>
+        <ul>
+            <li><strong>Multi-Field Search:</strong> Search across personnel name, driver license number, and email.</li>
+            <li><strong>Role Filter:</strong> Filter personnel by role (Driver, Technician, Manager, Service Advisor, Admin).</li>
+            <li><strong>Availability Filter:</strong> Filter by availability status (Available, Busy).</li>
+            <li><strong>Location Filter:</strong> Filter by city/location for geographic organization.</li>
+            <li><strong>Combined Filters:</strong> Multiple filters can be applied simultaneously for precise results.</li>
+        </ul>
+
+        <h4>2.2.3 Data Display</h4>
+        <ul>
+            <li><strong>Comprehensive Information:</strong> Displays full name, role, city, phone, email, vehicle details, and certifications.</li>
+            <li><strong>Profile Pictures:</strong> Shows personnel profile pictures with fallback to default avatar.</li>
+            <li><strong>Status Indicators:</strong> Visual indicators for availability and active status.</li>
+            <li><strong>Pagination:</strong> Server-side pagination with configurable items per page.</li>
+        </ul>
+
+        <h3>2.3 Service Centers Management Tab</h3>
+        
+        <h4>2.3.1 Service Center Operations</h4>
+        <ul>
+            <li><strong>View Service Center:</strong> Navigate to detailed service center view page.</li>
+            <li><strong>Edit Service Center:</strong> Quick access to edit service center information.</li>
+            <li><strong>Delete Service Center:</strong> Confirmation modal with API integration for safe deletion.</li>
+            <li><strong>Create Service Center:</strong> Direct navigation to service center creation form.</li>
+        </ul>
+
+        <h4>2.3.2 Search & Filtering</h4>
+        <ul>
+            <li><strong>Multi-Field Search:</strong> Search across service center name, address, city, and email.</li>
+            <li><strong>Status Filter:</strong> Filter by status (Active, Inactive, All).</li>
+            <li><strong>Real-Time Filtering:</strong> Client-side filtering for instant results.</li>
+        </ul>
+
+        <h4>2.3.3 Data Display</h4>
+        <ul>
+            <li><strong>Complete Information:</strong> Displays name, address, location, contact details, rating, and operating hours.</li>
+            <li><strong>Specialties Display:</strong> Shows service specialties with color-coded badges.</li>
+            <li><strong>Rating System:</strong> Visual rating display with star indicators.</li>
+            <li><strong>Pagination:</strong> Server-side pagination for efficient data loading.</li>
+        </ul>
+
+        <h3>2.4 Delete Operations</h3>
+        <ul>
+            <li><strong>Confirmation Modals:</strong> User-friendly confirmation dialogs before deletion.</li>
+            <li><strong>Success Feedback:</strong> Toast notifications showing success messages from API.</li>
+            <li><strong>Error Handling:</strong> Clear error messages displayed when deletion fails.</li>
+            <li><strong>Auto-Refresh:</strong> Data automatically refreshes after successful deletion.</li>
+            <li><strong>API Integration:</strong>
+                <ul>
+                    <li><code>DELETE /customers/v1/personnel/{id}</code> - Delete personnel</li>
+                    <li><code>DELETE /customers/v1/service-centers/{id}/services</code> - Delete service center</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h3>2.5 Phone Number Formatting (Personnel Creation)</h3>
+        <ul>
+            <li><strong>Automatic Country Code:</strong> Phone numbers automatically formatted with "+964" prefix before sending to backend.</li>
+            <li><strong>Smart Formatting:</strong> Handles various input formats:
+                <ul>
+                    <li>Adds "+964" if missing</li>
+                    <li>Converts "964" to "+964"</li>
+                    <li>Preserves existing "+964" prefix</li>
+                    <li>Removes spaces for consistent formatting</li>
+                </ul>
+            </li>
+            <li><strong>Backend Compatibility:</strong> Ensures all phone numbers sent to API include proper country code format.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>3. API Integrations</h2>
+        
+        <h3>3.1 Personnel Management APIs</h3>
+        <ul>
+            <li><code>GET /customers/v1/personnel/</code> - Fetch personnel list with pagination</li>
+            <li><code>GET /customers/v1/personnel/{id}</code> - Fetch personnel details</li>
+            <li><code>POST /customers/v1/personnel</code> - Create new personnel</li>
+            <li><code>PUT /customers/v1/personnel/{id}</code> - Update personnel information</li>
+            <li><code>DELETE /customers/v1/personnel/{id}</code> - Delete personnel</li>
+            <li><code>GET /customers/v1/personnel/available</code> - Fetch available technicians for assignment</li>
+        </ul>
+
+        <h3>3.2 Service Centers Management APIs</h3>
+        <ul>
+            <li><code>GET /customers/v1/service-centers</code> - Fetch service centers list with pagination</li>
+            <li><code>GET /customers/v1/service-centers/{id}</code> - Fetch service center details</li>
+            <li><code>POST /customers/v1/service-centers</code> - Create new service center</li>
+            <li><code>PUT /customers/v1/service-centers/{id}</code> - Update service center information</li>
+            <li><code>DELETE /customers/v1/service-centers/{id}/services</code> - Delete service center</li>
+        </ul>
+
+        <h3>3.3 Service Requests APIs</h3>
+        <ul>
+            <li><code>GET /bookings/v1/bookings/{booking_id}</code> - Fetch detailed booking information</li>
+            <li><code>GET /bookings/v1/quotations/?booking_id={booking_id}</code> - Fetch existing quotations</li>
+            <li><code>PUT /bookings/v1/bookings/{booking_id}/status</code> - Update booking status (cancel booking)</li>
+            <li><code>PUT /admin/v1/admin/service-requests/{booking_id}/assign-technician</code> - Assign technician to service request</li>
+            <li><code>GET /admin/v1/admin/service-requests</code> - Fetch service requests list</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>4. General Improvements</h2>
+        
+        <h3>4.1 API Integration</h3>
+        <ul>
+            <li><strong>Centralized API Client:</strong> All API calls use consistent error handling and authentication.</li>
+            <li><strong>Real-Time Data Sync:</strong> Automatic refresh of data after critical operations (assignments, cancellations, deletions).</li>
+            <li><strong>Error Handling:</strong> Comprehensive error messages and fallback mechanisms throughout the application.</li>
+        </ul>
+
+        <h3>4.2 User Experience</h3>
+        <ul>
+            <li><strong>Toast Notifications:</strong> Success and error messages displayed as non-intrusive toast notifications.</li>
+            <li><strong>Loading States:</strong> Clear loading indicators during API operations.</li>
+            <li><strong>Data Validation:</strong> Proper null safety and optional chaining to prevent errors.</li>
+            <li><strong>Consistent Styling:</strong> Unified design language across all modals and components.</li>
+        </ul>
+
+        <h3>4.3 Performance</h3>
+        <ul>
+            <li><strong>Optimized API Calls:</strong> Efficient data fetching with proper caching and cleanup.</li>
+            <li><strong>Modal Management:</strong> Proper cleanup of resources when modals close.</li>
+            <li><strong>Efficient Filtering:</strong> Fast client-side filtering and sorting of service requests, personnel, and service centers.</li>
+        </ul>
+
+        <h3>4.4 Code Quality</h3>
+        <ul>
+            <li><strong>TypeScript Improvements:</strong> Enhanced type safety with proper interfaces and optional properties.</li>
+            <li><strong>Error Boundaries:</strong> Better error handling and user feedback mechanisms.</li>
+            <li><strong>Code Organization:</strong> Improved component structure and separation of concerns.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>5. Technical Details</h2>
+        
+        <h3>5.1 Key Features</h3>
+        <ul>
+            <li><strong>Distance Calculation:</strong> Haversine formula implementation for accurate distance calculations.</li>
+            <li><strong>Map Integration:</strong> Mapbox GL integration for route visualization.</li>
+            <li><strong>State Management:</strong> Improved React state management for modals and data synchronization.</li>
+            <li><strong>Form Validation:</strong> Client-side validation with real-time feedback.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>6. Testing Recommendations</h2>
+        <ol>
+            <li>Verify "Pending quotation" filter works correctly with various status formats.</li>
+            <li>Test cancel booking flow with and without comments.</li>
+            <li>Verify route map displays correctly with different location combinations.</li>
+            <li>Test quotation builder prepopulation with existing data.</li>
+            <li>Verify all API data loads correctly in Service Request modal.</li>
+            <li>Test distance calculations with various location pairs.</li>
+            <li>Test technician assignment workflow with success and failure scenarios.</li>
+            <li>Verify phone number formatting in personnel creation form.</li>
+            <li>Test auto-refresh functionality after assignments, cancellations, and deletions.</li>
+            <li>Verify modal closure behavior after success/error messages.</li>
+            <li>Test personnel and service centers CRUD operations (Create, Read, Update, Delete).</li>
+            <li>Verify search and filtering functionality on personnel and service centers tabs.</li>
+            <li>Test pagination on personnel and service centers lists.</li>
+            <li>Verify delete confirmation modals and success/error feedback.</li>
+        </ol>
+    </div>
+
+    <div class="section">
+        <h2>7. Notes</h2>
+        <ul>
+            <li>All changes maintain backward compatibility with existing functionality.</li>
+            <li>No breaking changes to existing API contracts.</li>
+            <li>Improved error handling throughout the application.</li>
+            <li>Enhanced user experience with better feedback mechanisms.</li>
+            <li>All static values replaced with dynamic API data where applicable.</li>
+        </ul>
+    </div>
+
+    <div style="margin-top: 50px; padding-top: 20px; border-top: 2px solid #ecf0f1; color: #7f8c8d; font-size: 12px;">
+        <p><strong>Note:</strong> This release focuses on enhancing the service request management workflow and improving data accuracy through comprehensive API integrations.</p>
+    </div>
+</body>
+</html>
