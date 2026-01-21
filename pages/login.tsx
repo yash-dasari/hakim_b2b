@@ -85,7 +85,7 @@ export default function AdminLogin() {
 
     // Validate email
     if (!formData.email.trim()) {
-      errors.email = t('validation.emailRequired');
+      errors.email = 'Please enter Email Address';
     } else if (!validateEmail(formData.email)) {
       errors.email = t('validation.emailInvalid');
     }
@@ -201,7 +201,7 @@ export default function AdminLogin() {
     // Validate on blur
     if (name === 'email') {
       if (!value.trim()) {
-        setFieldErrors(prev => ({ ...prev, email: t('validation.emailRequired') }));
+        setFieldErrors(prev => ({ ...prev, email: 'Please enter Email Address' }));
       } else if (!validateEmail(value)) {
         setFieldErrors(prev => ({ ...prev, email: t('validation.emailInvalid') }));
       } else {
