@@ -39,7 +39,7 @@ export default function AdminLayout({ children, title, subtitle, headerActions, 
   const router = useRouter();
   const t = useTranslations('adminLayout');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [admin, setAdmin] = useState<{ id?: string; email?: string; name?: string; firstName?: string; profilePicture?: string; [key: string]: unknown } | null>(null);
+  const [admin, setAdmin] = useState<{ id?: string; email?: string; name?: string; firstName?: string; profilePicture?: string;[key: string]: unknown } | null>(null);
   const [loading, setLoading] = useState(true);
   const hasCheckedRef = useRef(false);
   const redirectingRef = useRef(false);
@@ -66,24 +66,68 @@ export default function AdminLayout({ children, title, subtitle, headerActions, 
       };
 
       ws.onmessage = (event) => {
-        let messageText = event.data;
+        let messageText = '';
         let msgType: 'info' | 'success' | 'warning' | 'error' = 'info';
+        let referenceId = '';
+        const rawData = event.data;
 
         try {
           // Try valid JSON
-          const data = JSON.parse(event.data);
+          const rootData = JSON.parse(rawData);
+
+          console.log('Notification Received:', rootData);
 
           // Handle initial connection message specially
-          // Handle initial connection message specially
-          if (data.type === 'connected') {
-            // Suppress "Connected" notification as per user request
+          if (rootData.type === 'connected') {
             return;
-          } else {
-            if (data.message) messageText = data.message;
-            if (data.type) msgType = data.type;
           }
+
+          // Search for message and reference_id in potential locations
+          // Priority: data.data -> data -> root
+          let targetData: any = null;
+
+          if (rootData.data && rootData.data.data && (rootData.data.data.message || rootData.data.data.reference_id)) {
+            targetData = rootData.data.data;
+          } else if (rootData.data && (rootData.data.message || rootData.data.reference_id)) {
+            targetData = rootData.data;
+          } else {
+            targetData = rootData;
+          }
+
+          if (targetData) {
+            if (targetData.message) messageText = targetData.message;
+            if (targetData.reference_id) referenceId = targetData.reference_id;
+            // Also map type if present
+            if (targetData.type) msgType = targetData.type;
+          }
+
+          // Fallback for type at root if not found in target
+          if (msgType === 'info' && rootData.type) {
+            msgType = rootData.type;
+          }
+
+
+          // If we parsed successfully but have no message, try to construct one
+          if (!messageText && rootData.event_type) {
+            messageText = `New ${rootData.event_type.replace('.', ' ')} event`;
+          }
+
         } catch (e) {
-          // Not JSON, use raw text
+          // Not JSON, use raw text or generic message
+          console.error('Error parsing notification JSON:', e);
+          messageText = String(rawData);
+        }
+
+        // Final safeguard: If message is still the raw JSON object string, forcing a clean message
+        if (messageText && messageText.trim().startsWith('{') && messageText.length > 50) {
+          // It looks like a raw JSON dump
+          if (referenceId) {
+            messageText = "You have a new update";
+          } else {
+            messageText = "New System Notification";
+          }
+        } else if (!messageText) {
+          messageText = "New Notification";
         }
 
         const newNotification: NotificationItem = {
@@ -91,7 +135,8 @@ export default function AdminLayout({ children, title, subtitle, headerActions, 
           message: String(messageText),
           type: msgType,
           timestamp: new Date(),
-          read: false
+          read: false,
+          referenceId: referenceId
         };
 
         setNotifications(prev => [newNotification, ...prev]);
@@ -363,7 +408,7 @@ export default function AdminLayout({ children, title, subtitle, headerActions, 
                     : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
                   }
                 `}
-                        onClick={(_e) => {
+                onClick={(_e) => {
                   // Only close sidebar on mobile
                   if (typeof window !== 'undefined' && window.innerWidth < 1024) {
                     setIsSidebarOpen(false);
