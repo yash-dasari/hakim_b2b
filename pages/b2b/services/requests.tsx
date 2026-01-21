@@ -713,7 +713,7 @@ export default function AdminRequests() {
       );
     }
 
-    if (request.status === 'Approve Estimated Price') {
+    if (request.status === 'Approve Estimated Price' || request.status === 'Approve Quotation Price') {
       return (
         <div className="flex items-center gap-2">
           <button
