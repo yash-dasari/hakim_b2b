@@ -3,8 +3,11 @@ import AdminLayout from '../../components/AdminLayout';
 import { FaBuilding, FaPen, FaFileAlt, FaEye, FaPhoneAlt, FaEnvelope, FaUser, FaInfoCircle, FaCheckCircle, FaFileUpload, FaSave, FaMapMarkerAlt, FaDownload, FaTimes } from 'react-icons/fa';
 import { authAPI } from '../../services/api/auth.api';
 import { toast } from 'react-hot-toast';
+import { useTranslations } from 'next-intl';
 
 export default function AccountPage() {
+    const t = useTranslations('account');
+    const tCommon = useTranslations('common');
     const [isEditing, setIsEditing] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [companyId, setCompanyId] = useState<string | null>(null);
@@ -59,25 +62,25 @@ export default function AccountPage() {
         // Final Validation Check
         const { minLength, hasUpper, hasNumber, hasSpecial } = passwordValidations;
         if (!minLength || !hasUpper || !hasNumber || !hasSpecial) {
-            toast.error('Password does not meet all requirements');
+            toast.error(t('password.errors.requirements'));
             return;
         }
 
         if (passwordData.newPassword !== passwordData.confirmPassword) {
-            toast.error('Passwords do not match');
+            toast.error(t('password.errors.mismatch'));
             return;
         }
 
         try {
             setIsPasswordSaving(true);
             await authAPI.changePassword(companyId, passwordData.newPassword);
-            toast.success('Password changed successfully');
+            toast.success(t('password.success'));
             setIsPasswordModalOpen(false);
             setPasswordData({ newPassword: '', confirmPassword: '' }); // Reset
         } catch (error: unknown) {
             console.error('Failed to change password:', error);
             const errorObj = error as { response?: { data?: { message?: string } } };
-            toast.error(errorObj?.response?.data?.message || 'Failed to change password');
+            toast.error(errorObj?.response?.data?.message || t('password.errors.changeFailed'));
         } finally {
             setIsPasswordSaving(false);
         }
@@ -127,7 +130,7 @@ export default function AccountPage() {
 
         } catch (error) {
             console.error('Error fetching data:', error);
-            toast.error('Failed to load account information');
+            toast.error(t('errors.loadFailed'));
         } finally {
             setIsLoading(false);
         }
@@ -161,13 +164,13 @@ export default function AccountPage() {
                 authAPI.updatePrimaryContact(companyId, contactData)
             ]);
 
-            toast.success('Account information updated successfully');
+            toast.success(t('success.updated'));
             setIsEditing(false);
             setTradeLicenseFile(null);
             fetchInitialData(); // Refresh data
         } catch (error) {
             console.error('Error updating profile:', error);
-            toast.error('Failed to update information');
+            toast.error(t('errors.updateFailed'));
         } finally {
             setIsLoading(false);
         }
@@ -181,8 +184,8 @@ export default function AccountPage() {
 
     return (
         <AdminLayout
-            title="Account Settings"
-            subtitle={isEditing ? "Manage your business account information and settings" : "View and manage your business account information"}
+            title={t('title')}
+            subtitle={isEditing ? t('subtitle.editing') : t('subtitle.viewing')}
             headerActions={
                 <div className="flex items-center gap-3">
                     {/* Header profile or notification icons */}
@@ -196,14 +199,14 @@ export default function AccountPage() {
                     <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-white">
                         <div className="flex items-center gap-3">
                             <span className="text-yellow-500"><FaBuilding /></span>
-                            <h2 className="text-base font-bold text-gray-900">Company Information</h2>
+                            <h2 className="text-base font-bold text-gray-900">{t('company.title')}</h2>
                         </div>
                         {!isEditing && (
                             <button
                                 onClick={() => setIsEditing(true)}
                                 className="flex items-center gap-2 px-4 py-2 bg-[#FCD34D] hover:bg-[#FBBF24] rounded-lg text-xs font-bold text-gray-900 shadow-sm transition-colors"
                             >
-                                <FaPen className="text-[10px]" /> Edit Information
+                                <FaPen className="text-[10px]" /> {t('company.edit')}
                             </button>
                         )}
                     </div>
@@ -211,7 +214,7 @@ export default function AccountPage() {
                     <div className="p-8">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-y-8 gap-x-12 mb-8">
                             <div className="space-y-1.5">
-                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Company Name</p>
+                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">{t('company.fields.name')}</p>
                                 {isEditing ? (
                                     <input
                                         type="text"
@@ -224,7 +227,7 @@ export default function AccountPage() {
                                 )}
                             </div>
                             <div className="space-y-1.5">
-                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Trade License Number</p>
+                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">{t('company.fields.tradeLicense')}</p>
                                 {isEditing ? (
                                     <input
                                         type="text"
@@ -233,11 +236,11 @@ export default function AccountPage() {
                                         className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#FCD34D]"
                                     />
                                 ) : (
-                                    <p className="text-sm font-bold text-gray-900">{formData.tradeLicense || 'Not set'}</p>
+                                    <p className="text-sm font-bold text-gray-900">{formData.tradeLicense || t('company.notSet')}</p>
                                 )}
                             </div>
                             <div className="space-y-1.5">
-                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Current Address</p>
+                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">{t('company.fields.address')}</p>
                                 {isEditing ? (
                                     <div className="relative">
                                         <input
@@ -246,7 +249,7 @@ export default function AccountPage() {
                                             onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                                             className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#FCD34D]"
                                         />
-                                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 bg-gray-100 p-1.5 rounded-md">
+                                        <div className="absolute end-3 top-1/2 -translate-y-1/2 text-gray-400 bg-gray-100 p-1.5 rounded-md">
                                             <FaMapMarkerAlt className="text-gray-500" />
                                         </div>
                                     </div>
@@ -257,7 +260,7 @@ export default function AccountPage() {
                                 )}
                             </div>
                             <div className="space-y-1.5">
-                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">City</p>
+                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">{t('company.fields.city')}</p>
                                 {isEditing ? (
                                     <input
                                         type="text"
@@ -266,7 +269,7 @@ export default function AccountPage() {
                                         className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#FCD34D] bg-gray-100/50"
                                     />
                                 ) : (
-                                    <p className="text-sm font-bold text-gray-900">{formData.city}, United Arab Emirates</p>
+                                    <p className="text-sm font-bold text-gray-900">{t('company.cityValue', { city: formData.city })}</p>
                                 )}
                             </div>
                         </div>
@@ -274,7 +277,7 @@ export default function AccountPage() {
                         <div className="mb-6">
                             {!isEditing && (
                                 <div className="flex justify-between items-center mb-2">
-                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Trade License Document</p>
+                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{t('company.tradeDocument.title')}</p>
                                     {/* {formData.tradeLicenseSignedUrl && (
                                         <a
                                             href={formData.tradeLicenseSignedUrl}
@@ -293,7 +296,7 @@ export default function AccountPage() {
                                 <div className="border border-dashed border-gray-300 rounded-lg p-8 flex flex-col items-center justify-center bg-gray-50/30">
                                     <FaFileAlt className="text-gray-300 text-3xl mb-2" />
                                     <p className="text-xs text-gray-500 mb-4">
-                                        {tradeLicenseFile ? tradeLicenseFile.name : (formData.tradeLicenseUrl ? 'Current Document Uploaded' : 'No document uploaded')}
+                                        {tradeLicenseFile ? tradeLicenseFile.name : (formData.tradeLicenseUrl ? t('company.tradeDocument.current') : t('company.tradeDocument.empty'))}
                                     </p>
                                     <input
                                         type="file"
@@ -306,7 +309,7 @@ export default function AccountPage() {
                                         onClick={() => fileInputRef.current?.click()}
                                         className="px-4 py-2 bg-[#FCD34D] hover:bg-[#FBBF24] rounded-lg text-xs font-bold text-gray-900 shadow-sm flex items-center gap-2"
                                     >
-                                        <FaFileUpload /> {tradeLicenseFile ? 'Change Document' : 'Upload Document'}
+                                        <FaFileUpload /> {tradeLicenseFile ? t('company.tradeDocument.change') : t('company.tradeDocument.upload')}
                                     </button>
                                 </div>
                             ) : (
@@ -317,7 +320,7 @@ export default function AccountPage() {
                                         </div>
                                         <div>
                                             <p className="text-sm font-bold text-gray-900">
-                                                {formData.tradeLicenseUrl ? 'Trade License Document' : 'No Document'}
+                                                {formData.tradeLicenseUrl ? t('company.tradeDocument.title') : t('company.tradeDocument.emptyTitle')}
                                             </p>
                                         </div>
                                     </div>
@@ -326,7 +329,7 @@ export default function AccountPage() {
                                             href={formData.tradeLicenseSignedUrl}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            title="Download License"
+                                            title={t('company.tradeDocument.download')}
                                             className="p-2 text-gray-400 hover:text-gray-600"
                                             download
                                         >
@@ -349,14 +352,14 @@ export default function AccountPage() {
                     <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-white">
                         <div className="flex items-center gap-3">
                             <span className="text-yellow-500"><FaUser /></span>
-                            <h2 className="text-base font-bold text-gray-900">Primary Contact Person</h2>
+                            <h2 className="text-base font-bold text-gray-900">{t('contact.title')}</h2>
                         </div>
                         {!isEditing && (
                             <button
                                 onClick={() => setIsEditing(true)}
                                 className="flex items-center gap-2 px-4 py-2 bg-[#FCD34D] hover:bg-[#FBBF24] rounded-lg text-xs font-bold text-gray-900 shadow-sm transition-colors"
                             >
-                                <FaPen className="text-[10px]" /> Edit Contact
+                                <FaPen className="text-[10px]" /> {t('contact.edit')}
                             </button>
                         )}
                     </div>
@@ -375,7 +378,7 @@ export default function AccountPage() {
                             {isEditing && (
                                 <>
                                     <div className="space-y-1.5">
-                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Full Name</p>
+                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">{t('contact.fields.fullName')}</p>
                                         <input
                                             type="text"
                                             value={formData.contactName}
@@ -384,7 +387,7 @@ export default function AccountPage() {
                                         />
                                     </div>
                                     <div className="space-y-1.5">
-                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Job Title</p>
+                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">{t('contact.fields.jobTitle')}</p>
                                         <input
                                             type="text"
                                             value={formData.jobTitle}
@@ -396,7 +399,7 @@ export default function AccountPage() {
                             )}
 
                             <div className="space-y-1.5">
-                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Email Address</p>
+                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">{t('contact.fields.email')}</p>
                                 {isEditing ? (
                                     <input
                                         type="email"
@@ -411,7 +414,7 @@ export default function AccountPage() {
                                 )}
                             </div>
                             <div className="space-y-1.5">
-                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Phone Number</p>
+                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">{t('contact.fields.phone')}</p>
                                 {isEditing ? (
                                     <input
                                         type="text"
@@ -432,7 +435,7 @@ export default function AccountPage() {
                                 onClick={() => setIsPasswordModalOpen(true)}
                                 className="px-6 bg-[#FCD34D] hover:bg-[#FBBF24] rounded-lg text-sm font-bold text-gray-900 shadow-sm transition-colors whitespace-nowrap h-10"
                             >
-                                Change Password
+                                {t('password.change')}
                             </button>
                         </div>
                     </div>
@@ -444,24 +447,24 @@ export default function AccountPage() {
                         <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-white">
                             <div className="flex items-center gap-3">
                                 <span className="text-yellow-500"><FaInfoCircle /></span>
-                                <h2 className="text-base font-bold text-gray-900">Account Details</h2>
+                                <h2 className="text-base font-bold text-gray-900">{t('details.title')}</h2>
                             </div>
                         </div>
 
                         <div className="p-8 grid grid-cols-1 md:grid-cols-3 gap-8">
                             <div>
-                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Account Status</p>
+                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">{t('details.statusLabel')}</p>
                                 <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${formData.isActive ? 'bg-green-50 text-green-600 border-green-100' : 'bg-red-50 text-red-600 border-red-100'}`}>
-                                    <FaCheckCircle className="text-[10px]" /> {formData.isActive ? 'Active' : 'Inactive'}
+                                    <FaCheckCircle className="text-[10px]" /> {formData.isActive ? t('details.statusActive') : t('details.statusInactive')}
                                 </span>
                             </div>
                             <div>
-                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Member Since</p>
-                                <p className="text-sm font-bold text-gray-900">{formData.createdAt ? new Date(formData.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '-'}</p>
+                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">{t('details.memberSince')}</p>
+                                <p className="text-sm font-bold text-gray-900">{formData.createdAt ? new Date(formData.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : t('details.emptyDate')}</p>
                             </div>
                             <div>
-                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Last Updated</p>
-                                <p className="text-sm font-bold text-gray-900">{formData.updatedAt ? new Date(formData.updatedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '-'}</p>
+                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">{t('details.lastUpdated')}</p>
+                                <p className="text-sm font-bold text-gray-900">{formData.updatedAt ? new Date(formData.updatedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : t('details.emptyDate')}</p>
                             </div>
                         </div>
                     </div>
@@ -474,14 +477,14 @@ export default function AccountPage() {
                             onClick={() => setIsEditing(false)}
                             className="px-6 py-2.5 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors"
                         >
-                            Cancel Changes
+                            {t('actions.cancelChanges')}
                         </button>
                         <button
                             onClick={handleSave}
                             disabled={isLoading}
                             className="px-6 py-2.5 bg-[#FCD34D] hover:bg-[#FBBF24] rounded-lg text-sm font-bold text-gray-900 shadow-sm transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {isLoading ? 'Saving...' : <><FaSave className="text-xs" /> Save Changes</>}
+                            {isLoading ? t('actions.saving') : <><FaSave className="text-xs" /> {t('actions.saveChanges')}</>}
                         </button>
                     </div>
                 )}
@@ -493,7 +496,7 @@ export default function AccountPage() {
                 <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
                     <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
                         <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-                            <h3 className="text-lg font-bold text-gray-900">Change Password</h3>
+                            <h3 className="text-lg font-bold text-gray-900">{t('password.modalTitle')}</h3>
                             <button onClick={() => setIsPasswordModalOpen(false)} className="text-gray-400 hover:text-gray-600">
                                 <FaTimes />
                             </button>
@@ -501,47 +504,47 @@ export default function AccountPage() {
 
                         <div className="p-6 space-y-4">
                             <div className="space-y-1.5">
-                                <label className="text-xs font-bold text-gray-700 block">New Password <span className="text-red-500">*</span></label>
+                                <label className="text-xs font-bold text-gray-700 block">{t('password.newLabel')} <span className="text-red-500">*</span></label>
                                 <input
                                     type="password"
                                     value={passwordData.newPassword}
                                     onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
                                     className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FCD34D] focus:border-transparent"
-                                    placeholder="Enter new password"
+                                    placeholder={t('password.newPlaceholder')}
                                 />
                             </div>
 
                             <div className="bg-gray-50 rounded-lg p-3 space-y-2">
-                                <p className="text-xs font-bold text-gray-500 mb-2">Password Requirements:</p>
+                                <p className="text-xs font-bold text-gray-500 mb-2">{t('password.requirements.title')}</p>
                                 <div className={`flex items-center gap-2 text-xs ${passwordValidations.hasUpper ? 'text-green-600' : 'text-gray-400'}`}>
                                     <FaCheckCircle className={passwordValidations.hasUpper ? 'opacity-100' : 'opacity-0'} />
-                                    <span>At least one capital letter</span>
+                                    <span>{t('password.requirements.upper')}</span>
                                 </div>
                                 <div className={`flex items-center gap-2 text-xs ${passwordValidations.hasNumber ? 'text-green-600' : 'text-gray-400'}`}>
                                     <FaCheckCircle className={passwordValidations.hasNumber ? 'opacity-100' : 'opacity-0'} />
-                                    <span>At least one number</span>
+                                    <span>{t('password.requirements.number')}</span>
                                 </div>
                                 <div className={`flex items-center gap-2 text-xs ${passwordValidations.hasSpecial ? 'text-green-600' : 'text-gray-400'}`}>
                                     <FaCheckCircle className={passwordValidations.hasSpecial ? 'opacity-100' : 'opacity-0'} />
-                                    <span>At least one special character</span>
+                                    <span>{t('password.requirements.special')}</span>
                                 </div>
                                 <div className={`flex items-center gap-2 text-xs ${passwordValidations.minLength ? 'text-green-600' : 'text-gray-400'}`}>
                                     <FaCheckCircle className={passwordValidations.minLength ? 'opacity-100' : 'opacity-0'} />
-                                    <span>Minimum 6 characters</span>
+                                    <span>{t('password.requirements.length')}</span>
                                 </div>
                             </div>
 
                             <div className="space-y-1.5">
-                                <label className="text-xs font-bold text-gray-700 block">Confirm Password <span className="text-red-500">*</span></label>
+                                <label className="text-xs font-bold text-gray-700 block">{t('password.confirmLabel')} <span className="text-red-500">*</span></label>
                                 <input
                                     type="password"
                                     value={passwordData.confirmPassword}
                                     onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
                                     className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FCD34D] focus:border-transparent"
-                                    placeholder="Confirm new password"
+                                    placeholder={t('password.confirmPlaceholder')}
                                 />
                                 {passwordData.confirmPassword && passwordData.newPassword !== passwordData.confirmPassword && (
-                                    <p className="text-xs text-red-500">Passwords do not match</p>
+                                    <p className="text-xs text-red-500">{t('password.errors.mismatch')}</p>
                                 )}
                             </div>
                         </div>
@@ -551,14 +554,14 @@ export default function AccountPage() {
                                 onClick={() => setIsPasswordModalOpen(false)}
                                 className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-bold text-gray-600 hover:bg-white transition-colors"
                             >
-                                Cancel
+                                {tCommon('actions.cancel')}
                             </button>
                             <button
                                 onClick={handlePasswordChange}
                                 disabled={isPasswordSaving || !Object.values(passwordValidations).every(Boolean) || passwordData.newPassword !== passwordData.confirmPassword}
                                 className="px-6 py-2 bg-[#FCD34D] hover:bg-[#FBBF24] rounded-lg text-sm font-bold text-gray-900 shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                             >
-                                {isPasswordSaving ? 'Saving...' : 'Change Password'}
+                                {isPasswordSaving ? t('actions.saving') : t('password.change')}
                             </button>
                         </div>
                     </div>

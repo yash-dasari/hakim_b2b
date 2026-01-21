@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FaTimes, FaCheck, FaInfoCircle, FaTools } from 'react-icons/fa';
+import { useTranslations } from 'next-intl';
 
 interface CollectPaymentModalProps {
     isOpen: boolean;
@@ -15,6 +16,8 @@ export default function CollectPaymentModal({
     request
 }: CollectPaymentModalProps) {
     const [isClosing, setIsClosing] = useState(false);
+    const t = useTranslations('modals.collectPayment');
+    const tCommon = useTranslations('common');
 
     useEffect(() => {
         if (isOpen) {
@@ -49,7 +52,7 @@ export default function CollectPaymentModal({
             <div className={`relative bg-white rounded-2xl shadow-xl w-full max-w-md transform transition-all duration-200 ${isClosing ? 'scale-95' : 'scale-100'}`}>
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-                    <h2 className="text-xl font-bold text-gray-900">Collect Payment</h2>
+                    <h2 className="text-xl font-bold text-gray-900">{t('title')}</h2>
                     <button
                         onClick={handleClose}
                         className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -66,10 +69,10 @@ export default function CollectPaymentModal({
                         </div>
                         <div>
                             <h3 className="text-base font-bold text-gray-900 leading-tight mb-0.5">
-                                {request?.service?.type || 'Service'}
+                                {request?.service?.type || t('serviceFallback')}
                             </h3>
                             <p className="text-sm text-gray-500 leading-tight">
-                                Customer: {request?.customer?.name || 'Unknown'}
+                                {t('customerLabel', { name: request?.customer?.name || t('customerUnknown') })}
                             </p>
                         </div>
                     </div>
@@ -77,19 +80,19 @@ export default function CollectPaymentModal({
                     {/* Bill Breakdown */}
                     <div className="bg-gray-50 rounded-xl p-4 mb-6 space-y-3">
                         <div className="flex justify-between text-sm">
-                            <span className="text-gray-600">Service Fee</span>
+                            <span className="text-gray-600">{t('breakdown.serviceFee')}</span>
                             <span className="font-medium text-gray-900">$120.00</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                            <span className="text-gray-600">Parts & Materials</span>
+                            <span className="text-gray-600">{t('breakdown.parts')}</span>
                             <span className="font-medium text-gray-900">$25.00</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                            <span className="text-gray-600">Inspection</span>
+                            <span className="text-gray-600">{t('breakdown.inspection')}</span>
                             <span className="font-medium text-gray-900">$5.00</span>
                         </div>
                         <div className="pt-3 border-t border-gray-200 flex justify-between items-center">
-                            <span className="font-bold text-gray-900">Total Amount</span>
+                            <span className="font-bold text-gray-900">{t('breakdown.total')}</span>
                             <span className="text-xl font-bold text-gray-900">150.00 IQD</span>
                         </div>
                     </div>
@@ -99,10 +102,10 @@ export default function CollectPaymentModal({
                         <FaInfoCircle className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
                         <div>
                             <p className="text-sm font-semibold text-blue-800 mb-1">
-                                Payment Confirmation
+                                {t('confirmation.title')}
                             </p>
                             <p className="text-xs text-blue-700 leading-relaxed">
-                                Please confirm that you have received the payment from the customer before proceeding.
+                                {t('confirmation.message')}
                             </p>
                         </div>
                     </div>
@@ -113,14 +116,14 @@ export default function CollectPaymentModal({
                             onClick={handleClose}
                             className="flex-1 px-4 py-3 bg-white border border-gray-200 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-50 transition-colors"
                         >
-                            Cancel
+                            {tCommon('actions.cancel')}
                         </button>
                         <button
                             onClick={handleConfirm}
                             className="flex-1 px-4 py-3 bg-yellow-400 text-gray-900 text-sm font-bold rounded-xl hover:bg-yellow-500 transition-colors flex items-center justify-center gap-2"
                         >
                             <FaCheck className="w-3 h-3" />
-                            Payment Received
+                            {t('actions.received')}
                         </button>
                     </div>
                 </div>

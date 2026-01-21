@@ -7,9 +7,12 @@ import { vehiclesAPI, VehicleBrand, VehicleModel } from '../../../services/api/v
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
 import SearchableSelect from '../../../components/common/SearchableSelect';
+import { useTranslations } from 'next-intl';
 
 export default function EditVehiclePage() {
     const router = useRouter();
+    const t = useTranslations('editVehicle');
+    const tCommon = useTranslations('common');
     const { user, company } = useSelector((state: RootState) => state.auth);
     const { id } = router.query;
 
@@ -178,7 +181,7 @@ export default function EditVehiclePage() {
             } else {
                 console.warn('❌ Could not find match for model:', pendingModelName, 'Available options:', modelOptions.map(m => m.model_name));
                 // Toast to help debug visually
-                toast.error(`Could not auto-select model '${pendingModelName}'. Please select manually.`);
+                toast.error(t('errors.autoSelectModel', { model: pendingModelName }));
                 // setPendingModelName(null); // Optional: stop trying
             }
         }
@@ -192,16 +195,16 @@ export default function EditVehiclePage() {
 
     const validateForm = () => {
         const errors: { [key: string]: string } = {};
-        if (!formData.make) errors.make = 'Make is required';
-        if (!formData.model) errors.model = 'Model is required';
-        if (!formData.year) errors.year = 'Year is required';
-        if (!formData.color) errors.color = 'Color is required';
-        if (!formData.plateNumber) errors.plateNumber = 'Plate Number is required';
+        if (!formData.make) errors.make = t('validation.makeRequired');
+        if (!formData.model) errors.model = t('validation.modelRequired');
+        if (!formData.year) errors.year = t('validation.yearRequired');
+        if (!formData.color) errors.color = t('validation.colorRequired');
+        if (!formData.plateNumber) errors.plateNumber = t('validation.plateRequired');
 
         // Image validation removed
 
         setFormErrors(errors);
-        if (Object.keys(errors).length > 0) toast.error('Please fill in all required fields');
+        if (Object.keys(errors).length > 0) toast.error(t('validation.requiredFields'));
         return Object.keys(errors).length === 0;
     };
 
@@ -209,7 +212,7 @@ export default function EditVehiclePage() {
         if (!validateForm()) return;
 
         if (!id) {
-            toast.error('Vehicle ID missing');
+            toast.error(t('errors.vehicleIdMissing'));
             return;
         }
 
@@ -228,17 +231,17 @@ export default function EditVehiclePage() {
             const response = await vehiclesAPI.updateVehicle(id as string, data);
 
             if (response.success || response.id || response.vehicle_id) {
-                toast.success('Vehicle updated successfully');
+                toast.success(t('success.vehicleUpdated'));
                 router.push('/b2b/vehicles');
             } else {
-                toast.error('Failed to update vehicle: ' + (response.message || 'Unknown error'));
+                toast.error(`${t('errors.updateFailed')}: ${response.message || t('errors.unknown')}`);
             }
         } catch (error: unknown) {
             console.error('Failed to update vehicle', error);
             const errorObj = error as { response?: { data?: { detail?: Array<{ msg?: string }> } }; message?: string };
             const errorData = errorObj?.response?.data;
-            const errorMessage = errorObj?.message || 'Unknown error';
-            toast.error('Error updating vehicle: ' + (errorData?.detail?.[0]?.msg || errorMessage));
+            const errorMessage = errorObj?.message || t('errors.unknown');
+            toast.error(`${t('errors.updateError')}: ${errorData?.detail?.[0]?.msg || errorMessage}`);
         } finally {
             setLoading(false);
         }
@@ -246,21 +249,21 @@ export default function EditVehiclePage() {
 
     return (
         <AdminLayout
-            title="Edit Vehicle"
-            subtitle="Update vehicle details"
+            title={t('title')}
+            subtitle={t('subtitle')}
         >
             <div className="max-w-3xl mx-auto pt-8 pb-12">
                 {/* Stepper omitted for Edit mode or kept simple */}
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                     <div className="p-8 border-b border-gray-100">
-                        <h2 className="text-lg font-bold text-gray-900 mb-2">Edit Vehicle Information</h2>
+                        <h2 className="text-lg font-bold text-gray-900 mb-2">{t('sections.vehicleInfo.title')}</h2>
                     </div>
 
                     <div className="p-8 space-y-6">
 
                         {/* Make */}
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-gray-700 block">Vehicle Make <span className="text-red-500">*</span></label>
+                            <label className="text-xs font-bold text-gray-700 block">{t('fields.make')} <span className="text-red-500">*</span></label>
                             <SearchableSelect
                                 name="make"
                                 value={formData.make}
@@ -269,7 +272,7 @@ export default function EditVehiclePage() {
                                     if (formErrors.make) setFormErrors(prev => ({ ...prev, make: '' }));
                                 }}
                                 options={brandOptions.map(brand => ({ value: String(brand.brand_id), label: brand.brand_name }))}
-                                placeholder={isLoadingBrands ? 'Loading Brands...' : 'Select Make'}
+                                placeholder={isLoadingBrands ? t('placeholders.loadingBrands') : t('placeholders.selectMake')}
                                 disabled={isLoadingBrands}
                                 error={formErrors.make}
                             />
@@ -277,7 +280,7 @@ export default function EditVehiclePage() {
 
                         {/* Model */}
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-gray-700 block">Vehicle Model <span className="text-red-500">*</span></label>
+                            <label className="text-xs font-bold text-gray-700 block">{t('fields.model')} <span className="text-red-500">*</span></label>
                             {modelOptions.length > 0 ? (
                                 <SearchableSelect
                                     name="model"
@@ -287,7 +290,7 @@ export default function EditVehiclePage() {
                                         if (formErrors.model) setFormErrors(prev => ({ ...prev, model: '' }));
                                     }}
                                     options={modelOptions.map(model => ({ value: String(model.model_id), label: model.model_name }))}
-                                    placeholder={isLoadingModels ? 'Loading Models...' : 'Select Model'}
+                                    placeholder={isLoadingModels ? t('placeholders.loadingModels') : t('placeholders.selectModel')}
                                     disabled={!formData.make || isLoadingModels}
                                     error={formErrors.model}
                                 />
@@ -297,7 +300,7 @@ export default function EditVehiclePage() {
                                     name="model"
                                     value={formData.model}
                                     onChange={handleChange}
-                                    placeholder={!formData.make ? "Select a make first" : (isLoadingModels ? "Loading models..." : "Enter Model")}
+                                    placeholder={!formData.make ? t('placeholders.selectMakeFirst') : (isLoadingModels ? t('placeholders.loadingModels') : t('placeholders.enterModel'))}
                                     disabled={!formData.make || isLoadingModels}
                                     className={`w-full px-4 py-3 border ${formErrors.model ? 'border-red-500' : 'border-gray-200'} rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#FCD34D] disabled:bg-gray-50`}
                                 />
@@ -307,7 +310,7 @@ export default function EditVehiclePage() {
 
                         {/* Year */}
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-gray-700 block">Vehicle Year <span className="text-red-500">*</span></label>
+                            <label className="text-xs font-bold text-gray-700 block">{t('fields.year')} <span className="text-red-500">*</span></label>
                             <div className="relative">
                                 <select
                                     name="year"
@@ -315,12 +318,12 @@ export default function EditVehiclePage() {
                                     onChange={handleChange}
                                     className={`w-full px-4 py-3 border ${formErrors.year ? 'border-red-500' : 'border-gray-200'} rounded-lg text-sm text-gray-900 bg-white appearance-none focus:outline-none focus:ring-2 focus:ring-[#FCD34D]`}
                                 >
-                                    <option value="">Select Year</option>
+                                    <option value="">{t('placeholders.selectYear')}</option>
                                     {Array.from({ length: 20 }, (_, i) => new Date().getFullYear() - i).map(year => (
                                         <option key={year} value={year}>{year}</option>
                                     ))}
                                 </select>
-                                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                                <div className="absolute end-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </div>
                             </div>
@@ -329,40 +332,40 @@ export default function EditVehiclePage() {
 
                         {/* Mileage */}
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-gray-700 block">Mileage (KMs)</label>
+                            <label className="text-xs font-bold text-gray-700 block">{t('fields.mileage')}</label>
                             <div className="relative">
                                 <input
                                     type="number"
                                     name="mileage"
                                     value={formData.mileage}
                                     onChange={handleChange}
-                                    placeholder="e.g. 5000"
+                                    placeholder={t('placeholders.mileage')}
                                     className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#FCD34D]"
                                 />
-                                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-medium">km</span>
+                                <span className="absolute end-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-medium">{t('units.km')}</span>
                             </div>
                         </div>
 
                         {/* Color */}
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-gray-700 block">Vehicle Color <span className="text-red-500">*</span></label>
+                            <label className="text-xs font-bold text-gray-700 block">{t('fields.color')} <span className="text-red-500">*</span></label>
                             <div className="relative">
                                 <input
                                     type="text"
                                     name="color"
                                     value={formData.color}
                                     onChange={handleChange}
-                                    placeholder="e.g. White, Silver"
+                                    placeholder={t('placeholders.color')}
                                     className={`w-full px-4 py-3 border ${formErrors.color ? 'border-red-500' : 'border-gray-200'} rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#FCD34D]`}
                                 />
-                                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"><FaPalette /></div>
+                                <div className="absolute end-4 top-1/2 -translate-y-1/2 text-gray-400"><FaPalette /></div>
                             </div>
                             {formErrors.color && <p className="text-xs text-red-500">{formErrors.color}</p>}
                         </div>
 
                         {/* Plate Number & Format Selection */}
                         <div className="space-y-4">
-                            <label className="text-xs font-bold text-gray-700 block">License Plate <span className="text-red-500">*</span></label>
+                            <label className="text-xs font-bold text-gray-700 block">{t('fields.licensePlate')} <span className="text-red-500">*</span></label>
 
                             {/* Format Selector */}
                             <div className="grid grid-cols-2 gap-4">
@@ -374,10 +377,10 @@ export default function EditVehiclePage() {
                                         <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${formData.plateFormat === 'new' ? 'border-[#FCD34D]' : 'border-gray-300'}`}>
                                             {formData.plateFormat === 'new' && <div className="w-2 h-2 bg-[#FCD34D] rounded-full" />}
                                         </div>
-                                        <span className="text-xs font-bold text-gray-900">New Format</span>
+                                        <span className="text-xs font-bold text-gray-900">{t('plate.newFormat')}</span>
                                     </div>
                                     <div className="bg-gray-100 rounded-lg overflow-hidden h-16 w-full relative">
-                                        <img src="/assets/plates/new-plate.png" alt="New Format" className="w-full h-full object-contain" />
+                                        <img src="/assets/plates/new-plate.png" alt={t('plate.newFormat')} className="w-full h-full object-contain" />
                                     </div>
                                 </div>
                                 <div
@@ -388,10 +391,10 @@ export default function EditVehiclePage() {
                                         <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${formData.plateFormat === 'old' ? 'border-[#FCD34D]' : 'border-gray-300'}`}>
                                             {formData.plateFormat === 'old' && <div className="w-2 h-2 bg-[#FCD34D] rounded-full" />}
                                         </div>
-                                        <span className="text-xs font-bold text-gray-900">Old Format</span>
+                                        <span className="text-xs font-bold text-gray-900">{t('plate.oldFormat')}</span>
                                     </div>
                                     <div className="bg-gray-100 rounded-lg overflow-hidden h-16 w-full relative">
-                                        <img src="/assets/plates/old-plate.png" alt="Old Format" className="w-full h-full object-contain" />
+                                        <img src="/assets/plates/old-plate.png" alt={t('plate.oldFormat')} className="w-full h-full object-contain" />
                                     </div>
                                 </div>
                             </div>
@@ -491,18 +494,18 @@ export default function EditVehiclePage() {
 
                         {/* VIN */}
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-gray-700 block">VIN Number</label>
+                            <label className="text-xs font-bold text-gray-700 block">{t('fields.vin')}</label>
                             <div className="relative">
                                 <input
                                     type="text"
                                     name="vin"
                                     value={formData.vin}
                                     onChange={handleChange}
-                                    placeholder="Enter 17-character VIN (Optional)"
+                                    placeholder={t('placeholders.vin')}
                                     maxLength={17}
                                     className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#FCD34D] font-mono tracking-wide"
                                 />
-                                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"><FaBarcode className="text-lg" /></div>
+                                <div className="absolute end-4 top-1/2 -translate-y-1/2 text-gray-400"><FaBarcode className="text-lg" /></div>
                             </div>
                         </div>
 
@@ -511,14 +514,14 @@ export default function EditVehiclePage() {
                                 onClick={() => router.back()}
                                 className="px-6 py-2.5 border border-gray-200 rounded-lg text-sm font-bold text-gray-600 hover:bg-gray-50 flex items-center gap-2"
                             >
-                                <FaArrowLeft className="text-xs" /> Cancel
+                                <FaArrowLeft className="text-xs rtl:rotate-180" /> {tCommon('actions.cancel')}
                             </button>
                             <button
                                 onClick={handleSubmit}
                                 disabled={loading}
                                 className="px-8 py-2.5 bg-[#FCD34D] hover:bg-[#FBBF24] text-gray-900 rounded-lg text-sm font-bold shadow-sm flex items-center gap-2 disabled:opacity-50"
                             >
-                                {loading ? 'Updating...' : <><FaEdit className="text-xs" /> Update Vehicle</>}
+                                {loading ? t('actions.updating') : <><FaEdit className="text-xs" /> {t('actions.updateVehicle')}</>}
                             </button>
                         </div>
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import { FaBell, FaInfoCircle, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
+import { useTranslations } from 'next-intl';
 
 export interface NotificationItem {
     id: string;
@@ -20,6 +21,7 @@ import { useRouter } from 'next/router';
 
 export default function NotificationDropdown({ notifications, isOpen, onClose, onClearAll }: NotificationDropdownProps) {
     const router = useRouter();
+    const t = useTranslations('common');
 
     if (!isOpen) return null;
 
@@ -53,15 +55,15 @@ export default function NotificationDropdown({ notifications, isOpen, onClose, o
     };
 
     return (
-        <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-xl shadow-lg border border-gray-100 ring-1 ring-black ring-opacity-5 z-50 overflow-hidden transform origin-top-right transition-all">
+        <div className="absolute end-0 top-full mt-2 w-80 bg-white rounded-xl shadow-lg border border-gray-100 ring-1 ring-black ring-opacity-5 z-50 overflow-hidden transform ltr:origin-top-right rtl:origin-top-left transition-all">
             <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-gray-50">
-                <h3 className="text-sm font-bold text-gray-900">Notifications</h3>
+                <h3 className="text-sm font-bold text-gray-900">{t('notifications.title')}</h3>
                 {notifications.length > 0 && (
                     <button
                         onClick={onClearAll}
                         className="text-xs text-gray-500 hover:text-red-500 transition-colors"
                     >
-                        Clear all
+                        {t('notifications.clearAll')}
                     </button>
                 )}
             </div>
@@ -72,7 +74,7 @@ export default function NotificationDropdown({ notifications, isOpen, onClose, o
                         <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-3">
                             <FaBell className="text-gray-400 text-lg" />
                         </div>
-                        <p className="text-sm">No notifications yet</p>
+                        <p className="text-sm">{t('notifications.empty')}</p>
                     </div>
                 ) : (
                     <div className="divide-y divide-gray-50">

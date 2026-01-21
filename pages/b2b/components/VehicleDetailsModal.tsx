@@ -1,5 +1,6 @@
 import React from 'react';
 import { FaTimes, FaCar, FaBarcode, FaRoad, FaCalendarAlt, FaIdCard } from 'react-icons/fa';
+import { useTranslations } from 'next-intl';
 
 interface VehicleDetailsModalProps {
     isOpen: boolean;
@@ -21,6 +22,8 @@ interface VehicleDetailsModalProps {
 }
 
 export default function VehicleDetailsModal({ isOpen, onClose, vehicle }: VehicleDetailsModalProps) {
+    const t = useTranslations('modals.vehicleDetails');
+    const tCommon = useTranslations('common');
     if (!isOpen || !vehicle) return null;
 
     return (
@@ -34,7 +37,7 @@ export default function VehicleDetailsModal({ isOpen, onClose, vehicle }: Vehicl
                             <FaCar className="text-xl" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-bold text-gray-900">{vehicle.make} {vehicle.model}</h2>
+                        <h2 className="text-xl font-bold text-gray-900">{vehicle.make} {vehicle.model}</h2>
                             <p className="text-sm text-gray-500">{vehicle.year} • {vehicle.color}</p>
                         </div>
                     </div>
@@ -51,13 +54,13 @@ export default function VehicleDetailsModal({ isOpen, onClose, vehicle }: Vehicl
 
                     {/* Basic Info */}
                     <div className="space-y-6">
-                        <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider border-b border-gray-100 pb-2">Vehicle Information</h3>
+                        <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider border-b border-gray-100 pb-2">{t('sections.vehicleInfo')}</h3>
 
                         <div className="space-y-4">
                             <div className="flex items-start gap-3">
                                 <FaIdCard className="text-gray-400 mt-1" />
                                 <div>
-                                    <p className="text-xs text-gray-500">License Plate</p>
+                                    <p className="text-xs text-gray-500">{t('fields.licensePlate')}</p>
                                     <p className="font-bold text-gray-900 text-lg">{vehicle.plateNumber}</p>
                                 </div>
                             </div>
@@ -65,16 +68,16 @@ export default function VehicleDetailsModal({ isOpen, onClose, vehicle }: Vehicl
                             <div className="flex items-start gap-3">
                                 <FaBarcode className="text-gray-400 mt-1" />
                                 <div>
-                                    <p className="text-xs text-gray-500">VIN Number</p>
-                                    <p className="font-medium text-gray-900 font-mono">{vehicle.vin || 'N/A'}</p>
+                                    <p className="text-xs text-gray-500">{t('fields.vin')}</p>
+                                    <p className="font-medium text-gray-900 font-mono">{vehicle.vin || t('fallback.na')}</p>
                                 </div>
                             </div>
 
                             <div className="flex items-start gap-3">
                                 <FaRoad className="text-gray-400 mt-1" />
                                 <div>
-                                    <p className="text-xs text-gray-500">Mileage</p>
-                                    <p className="font-medium text-gray-900">{vehicle.mileage ? `${vehicle.mileage} km` : 'N/A'}</p>
+                                    <p className="text-xs text-gray-500">{t('fields.mileage')}</p>
+                                    <p className="font-medium text-gray-900">{vehicle.mileage ? t('values.mileage', { value: vehicle.mileage }) : t('fallback.na')}</p>
                                 </div>
                             </div>
                         </div>
@@ -82,18 +85,18 @@ export default function VehicleDetailsModal({ isOpen, onClose, vehicle }: Vehicl
 
                     {/* Status & Service */}
                     <div className="space-y-6">
-                        <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider border-b border-gray-100 pb-2">Service Status</h3>
+                        <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider border-b border-gray-100 pb-2">{t('sections.serviceStatus')}</h3>
 
                         <div className="space-y-4">
                             <div className="flex items-start gap-3">
                                 <div className={`w-2 h-2 mt-2 rounded-full ${vehicle.isOngoing ? 'bg-orange-500' : 'bg-green-500'}`} />
                                 <div>
-                                    <p className="text-xs text-gray-500">Current Status</p>
+                                    <p className="text-xs text-gray-500">{t('fields.currentStatus')}</p>
                                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mt-1 ${vehicle.isOngoing
                                             ? 'bg-orange-100 text-orange-800'
                                             : 'bg-green-100 text-green-800'
                                         }`}>
-                                        {vehicle.isOngoing ? 'Ongoing Service' : 'Active'}
+                                        {vehicle.isOngoing ? t('statuses.ongoing') : t('statuses.active')}
                                     </span>
                                 </div>
                             </div>
@@ -101,16 +104,16 @@ export default function VehicleDetailsModal({ isOpen, onClose, vehicle }: Vehicl
                             <div className="flex items-start gap-3">
                                 <FaCalendarAlt className="text-gray-400 mt-1" />
                                 <div>
-                                    <p className="text-xs text-gray-500">Last Service Date</p>
+                                    <p className="text-xs text-gray-500">{t('fields.lastServiceDate')}</p>
                                     <p className="font-medium text-gray-900">{vehicle.lastServiceDate}</p>
                                 </div>
                             </div>
 
                             {/* Internal ID */}
                             <div className="flex items-start gap-3">
-                                <div className="text-xs text-gray-300 font-mono mt-1">ID</div>
+                                <div className="text-xs text-gray-300 font-mono mt-1">{t('fields.idLabel')}</div>
                                 <div>
-                                    <p className="text-xs text-gray-500">System ID</p>
+                                    <p className="text-xs text-gray-500">{t('fields.systemId')}</p>
                                     <p className="text-xs text-gray-400 font-mono">{vehicle.vehicleId || vehicle.id}</p>
                                 </div>
                             </div>
@@ -125,7 +128,7 @@ export default function VehicleDetailsModal({ isOpen, onClose, vehicle }: Vehicl
                         onClick={onClose}
                         className="px-4 py-2 bg-white border border-gray-200 text-gray-700 font-bold rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
                     >
-                        Close
+                        {tCommon('actions.close')}
                     </button>
                 </div>
             </div>

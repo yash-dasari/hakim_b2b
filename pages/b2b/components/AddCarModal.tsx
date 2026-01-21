@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import { FaCar, FaTimes, FaPlus, FaFileUpload } from 'react-icons/fa';
+import { useTranslations } from 'next-intl';
 
 interface AddCarModalProps {
     isOpen: boolean;
@@ -12,6 +13,8 @@ type AddMethod = 'single' | 'bulk';
 export default function AddCarModal({ isOpen, onClose }: AddCarModalProps) {
     const [selectedMethod, setSelectedMethod] = useState<AddMethod>('single');
     const router = useRouter();
+    const t = useTranslations('modals.addCar');
+    const tCommon = useTranslations('common');
 
     const handleContinue = () => {
         if (selectedMethod === 'single') {
@@ -37,8 +40,8 @@ export default function AddCarModal({ isOpen, onClose }: AddCarModalProps) {
                                 <FaCar className="text-xl" />
                             </div>
                             <div>
-                                <h2 className="text-xl font-bold text-gray-900">Add Cars</h2>
-                                <p className="text-sm text-gray-500">HAKIM for Business</p>
+                                <h2 className="text-xl font-bold text-gray-900">{t('title')}</h2>
+                                <p className="text-sm text-gray-500">{t('brand')}</p>
                             </div>
                         </div>
 
@@ -51,7 +54,7 @@ export default function AddCarModal({ isOpen, onClose }: AddCarModalProps) {
                     </div>
 
                     <div className="px-8 pb-4">
-                        <p className="text-sm text-gray-600">Choose how you would like to add cars to your fleet:</p>
+                        <p className="text-sm text-gray-600">{t('subtitle')}</p>
                     </div>
 
                     {/* Options */}
@@ -70,7 +73,7 @@ export default function AddCarModal({ isOpen, onClose }: AddCarModalProps) {
                             </div>
                             <div className="flex-1">
                                 <div className="flex justify-between items-start">
-                                    <h3 className="text-sm font-bold text-gray-900 mb-1">Add Single Car</h3>
+                                    <h3 className="text-sm font-bold text-gray-900 mb-1">{t('single.title')}</h3>
                                     <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${selectedMethod === 'single'
                                         ? 'border-blue-500 text-blue-500'
                                         : 'border-gray-300'
@@ -79,7 +82,7 @@ export default function AddCarModal({ isOpen, onClose }: AddCarModalProps) {
                                     </div>
                                 </div>
                                 <p className="text-xs text-gray-500 leading-relaxed max-w-[90%]">
-                                    Add one car at a time with detailed information including make, model, year, and specifications.
+                                    {t('single.description')}
                                 </p>
                             </div>
                         </div>
@@ -97,7 +100,7 @@ export default function AddCarModal({ isOpen, onClose }: AddCarModalProps) {
                             </div>
                             <div className="flex-1">
                                 <div className="flex justify-between items-start">
-                                    <h3 className="text-sm font-bold text-gray-900 mb-1">Bulk Upload Cars</h3>
+                                    <h3 className="text-sm font-bold text-gray-900 mb-1">{t('bulk.title')}</h3>
                                     <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${selectedMethod === 'bulk'
                                         ? 'border-green-500 text-green-500' // Using green for bulk upload as per icon color, usually blue in figma but let's match icon
                                         : 'border-gray-300'
@@ -106,7 +109,7 @@ export default function AddCarModal({ isOpen, onClose }: AddCarModalProps) {
                                     </div>
                                 </div>
                                 <p className="text-xs text-gray-500 leading-relaxed max-w-[90%]">
-                                    Upload multiple cars at once using a CSV file. Perfect for adding large numbers of vehicles quickly.
+                                    {t('bulk.description')}
                                 </p>
                             </div>
                         </div>
@@ -119,13 +122,13 @@ export default function AddCarModal({ isOpen, onClose }: AddCarModalProps) {
                             onClick={onClose}
                             className="px-6 py-2.5 text-sm font-bold text-gray-500 hover:text-gray-700 transition-colors"
                         >
-                            Cancel
+                            {tCommon('actions.cancel')}
                         </button>
                         <button
                             onClick={handleContinue}
                             className="px-8 py-2.5 bg-[#FCD34D] hover:bg-[#FBBF24] text-gray-900 text-sm font-bold rounded-lg shadow-sm transition-colors"
                         >
-                            Continue
+                            {t('continue')}
                         </button>
                     </div>
 

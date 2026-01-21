@@ -37,6 +37,7 @@ import SubmitPhotosModal from './SubmitPhotosModal';
 import CollectPaymentModal from './CollectPaymentModal';
 import ServiceRequestDetailModal from './ServiceRequestDetailModal';
 import QuotationBuilderModal from './QuotationBuilderModal';
+import { useTranslations } from 'next-intl';
 
 // Interface replaced by alias above
 
@@ -45,6 +46,7 @@ import QuotationBuilderModal from './QuotationBuilderModal';
 
 export default function AdminRequests() {
   const router = useRouter();
+  const t = useTranslations('servicesRequests');
   const company = useSelector((state: RootState) => state.auth.company);
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
   const [requests, setRequests] = useState<BookingListItem[]>([]);
@@ -180,8 +182,8 @@ export default function AdminRequests() {
 
       if (response.success || response.status === 'success') { // Handling potential API variances
         Swal.fire({
-          title: 'Rejected!',
-          text: 'The quotation has been rejected successfully.',
+          title: t('alerts.rejected.title'),
+          text: t('alerts.rejected.quotationSuccess'),
           icon: 'success',
           confirmButtonColor: '#eab308'
         });
@@ -193,11 +195,11 @@ export default function AdminRequests() {
           }
         }
       } else {
-        throw new Error(response.error || 'Failed to reject');
+        throw new Error(response.error || t('alerts.rejected.failed'));
       }
     } catch (error) {
       console.error('Error rejecting:', error);
-      Swal.fire('Error', 'Failed to reject the quotation', 'error');
+      Swal.fire(t('alerts.error.title'), t('alerts.rejected.quotationFailed'), 'error');
     } finally {
       setLoading(false);
       setIsRejectModalOpen(false);
@@ -208,7 +210,7 @@ export default function AdminRequests() {
   const handleApproveBodyCheck = async () => {
     const bookingId = String(viewQuotationData?.booking_id || selectedRequest?.booking_id || '');
     if (!bookingId) {
-      Swal.fire('Error', 'No booking context found', 'error');
+      Swal.fire(t('alerts.error.title'), t('alerts.error.noBookingContext'), 'error');
       return;
     }
 
@@ -220,7 +222,7 @@ export default function AdminRequests() {
       }));
 
       if (approvals.length === 0) {
-        Swal.fire('Warning', 'No photos to approve', 'warning');
+        Swal.fire(t('alerts.warning.title'), t('alerts.warning.noPhotosToApprove'), 'warning');
         return;
       }
 
@@ -228,7 +230,7 @@ export default function AdminRequests() {
       const response = await servicesAPI.respondToBodyCheckPhotos(bookingId, { photo_approvals: approvals });
 
       if (response.success || response.status === 'success') {
-        Swal.fire('Success', 'Body check photos approved', 'success');
+        Swal.fire(t('alerts.success.title'), t('alerts.success.bodyCheckApproved'), 'success');
         setIsPhotoGalleryOpen(false);
         // Refresh
         if (company?.id) {
@@ -236,11 +238,11 @@ export default function AdminRequests() {
           if (res.success && res.data) setRequests(res.data.bookings);
         }
       } else {
-        throw new Error(response.error || 'Failed to approve photos');
+        throw new Error(response.error || t('alerts.error.approvePhotosFailed'));
       }
     } catch (error) {
       console.error('Error approving photos:', error);
-      Swal.fire('Error', 'Failed to approve photos', 'error');
+      Swal.fire(t('alerts.error.title'), t('alerts.error.approvePhotosFailed'), 'error');
     } finally {
       setLoading(false);
     }
@@ -251,13 +253,13 @@ export default function AdminRequests() {
     if (!bookingId) return;
 
     const { value: reason } = await Swal.fire({
-      title: 'Reject Body Check Photos',
+      title: t('alerts.rejectBodyCheck.title'),
       input: 'text',
-      inputLabel: 'Rejection Reason',
-      inputPlaceholder: 'Enter reason for rejection...',
+      inputLabel: t('alerts.rejectBodyCheck.reasonLabel'),
+      inputPlaceholder: t('alerts.rejectBodyCheck.reasonPlaceholder'),
       showCancelButton: true,
       inputValidator: (value) => {
-        if (!value) return 'You need to write a reason!';
+        if (!value) return t('alerts.rejectBodyCheck.reasonRequired');
       }
     });
 
@@ -274,7 +276,7 @@ export default function AdminRequests() {
         const response = await servicesAPI.respondToBodyCheckPhotos(bookingId, { photo_approvals: refusals });
 
         if (response.success || response.status === 'success') {
-          Swal.fire('Rejected', 'Body check photos rejected', 'success');
+        Swal.fire(t('alerts.rejected.title'), t('alerts.rejected.bodyCheckPhotos'), 'success');
           setIsPhotoGalleryOpen(false);
           // Refresh
           if (company?.id) {
@@ -282,11 +284,11 @@ export default function AdminRequests() {
             if (res.success && res.data) setRequests(res.data.bookings);
           }
         } else {
-          throw new Error(response.error || 'Failed to reject photos');
+        throw new Error(response.error || t('alerts.error.rejectPhotosFailed'));
         }
       } catch (error) {
         console.error('Error rejecting photos:', error);
-        Swal.fire('Error', 'Failed to reject photos', 'error');
+      Swal.fire(t('alerts.error.title'), t('alerts.error.rejectPhotosFailed'), 'error');
       } finally {
         setLoading(false);
       }
@@ -296,8 +298,8 @@ export default function AdminRequests() {
   const handleCustomerArrived = async (bookingId: string) => {
     try {
       Swal.fire({
-        title: 'Processing...',
-        text: 'Notifying service center...',
+        title: t('alerts.processing.title'),
+        text: t('alerts.processing.notifying'),
         icon: 'info',
         allowOutsideClick: false,
         didOpen: () => {
@@ -319,17 +321,17 @@ export default function AdminRequests() {
 
       if (response.success) {
         await refreshData();
-        Swal.fire('Success!', 'Service center has been notified of your arrival.', 'success');
+        Swal.fire(t('alerts.success.title'), t('alerts.success.serviceCenterNotified'), 'success');
       } else {
-        throw new Error(response.error || 'Failed to notify service center');
+        throw new Error(response.error || t('alerts.error.notifyServiceCenterFailed'));
       }
     } catch (error: any) {
       console.error('Error notifying arrival:', error);
       Swal.fire({
-        title: 'Error',
-        text: error.message || 'Failed to notify service center.',
+        title: t('alerts.error.title'),
+        text: error.message || t('alerts.error.notifyServiceCenterFailed'),
         icon: 'error',
-        confirmButtonText: 'OK'
+        confirmButtonText: t('alerts.error.confirm')
       });
     }
   };
@@ -338,7 +340,7 @@ export default function AdminRequests() {
     // aggregated approve logic
     const bookingId = String(viewQuotationData?.booking_id || selectedRequest?.booking_id || '');
     if (!bookingId || bookingId === 'undefined' || bookingId === 'null') {
-      Swal.fire('Error', 'No booking context found', 'error');
+      Swal.fire(t('alerts.error.title'), t('alerts.error.noBookingContext'), 'error');
       return;
     }
 
@@ -348,14 +350,14 @@ export default function AdminRequests() {
       // Proceeding with direct call + Loading indicator for speed/smoothness.
 
       const result = await Swal.fire({
-        title: 'Approve Quotation?',
-        text: "Are you sure you want to approve this quotation?",
+        title: t('alerts.approveQuotation.title'),
+        text: t('alerts.approveQuotation.text'),
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#FCD34D',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, Approve',
-        cancelButtonText: 'Cancel'
+        confirmButtonText: t('alerts.approveQuotation.confirm'),
+        cancelButtonText: t('alerts.approveQuotation.cancel')
       });
 
       if (!result.isConfirmed) return;
@@ -369,8 +371,8 @@ export default function AdminRequests() {
 
       if (response.success || response.status === 'success') {
         Swal.fire({
-          title: 'Approved!',
-          text: 'The quotation has been approved successfully.',
+          title: t('alerts.approved.title'),
+          text: t('alerts.approved.quotationSuccess'),
           icon: 'success',
           confirmButtonColor: '#eab308'
         });
@@ -382,12 +384,12 @@ export default function AdminRequests() {
           }
         }
       } else {
-        throw new Error(response.error || 'Failed to approve');
+        throw new Error(response.error || t('alerts.approved.failed'));
       }
 
     } catch (error) {
       console.error('Error approving:', error);
-      Swal.fire('Error', 'Failed to approve the quotation', 'error');
+      Swal.fire(t('alerts.error.title'), t('alerts.approved.quotationFailed'), 'error');
     } finally {
       setLoading(false);
       // Ensure modal is closed if not already
@@ -442,14 +444,14 @@ export default function AdminRequests() {
 
           setIsViewQuotationModalOpen(true);
         } else {
-          Swal.fire('Info', 'No quotation found for this booking', 'info');
+          Swal.fire(t('alerts.info.title'), t('alerts.info.noQuotation'), 'info');
         }
       } else {
-        Swal.fire('Error', 'Could not fetch quotation details', 'error');
+        Swal.fire(t('alerts.error.title'), t('alerts.error.fetchQuotationDetails'), 'error');
       }
     } catch (e) {
       console.error(e);
-      Swal.fire('Error', 'Failed to load quotation', 'error');
+      Swal.fire(t('alerts.error.title'), t('alerts.error.loadQuotation'), 'error');
     }
   };
 
@@ -463,22 +465,22 @@ export default function AdminRequests() {
 
   const handleAcceptClick = (request: ServiceRequest) => {
     Swal.fire({
-      title: 'Accept Request?',
-      text: `Are you sure you want to accept request #${request.booking_id}?`,
+      title: t('alerts.acceptRequest.title'),
+      text: t('alerts.acceptRequest.text', { id: request.booking_id }),
       icon: 'question',
       showCancelButton: true,
       confirmButtonColor: '#22c55e', // green-500
       cancelButtonColor: '#ef4444', // red-500
-      confirmButtonText: 'Yes, accept it!',
-      cancelButtonText: 'Cancel'
+      confirmButtonText: t('alerts.acceptRequest.confirm'),
+      cancelButtonText: t('alerts.acceptRequest.cancel')
     }).then((result) => {
       if (result.isConfirmed) {
         // Here you would typically call an API to accept the request
 
 
         Swal.fire({
-          title: 'Accepted!',
-          text: `Request #${request.booking_id} has been accepted successfully.`,
+          title: t('alerts.accepted.title'),
+          text: t('alerts.accepted.text', { id: request.booking_id }),
           icon: 'success',
           confirmButtonColor: '#eab308' // yellow-400
         });
@@ -502,8 +504,8 @@ export default function AdminRequests() {
     setSelectedRequest(null);
 
     Swal.fire({
-      title: 'Success!',
-      text: `${files.length} photos have been submitted successfully.`,
+      title: t('alerts.success.title'),
+      text: t('alerts.success.photosSubmitted', { count: files.length }),
       icon: 'success',
       confirmButtonColor: '#eab308'
     });
@@ -525,8 +527,8 @@ export default function AdminRequests() {
     setSelectedRequest(null);
 
     Swal.fire({
-      title: 'Payment Recorded!',
-      text: `Payment for request #${selectedRequest?.booking_id} has been recorded successfully.`,
+      title: t('alerts.paymentRecorded.title'),
+      text: t('alerts.paymentRecorded.text', { id: selectedRequest?.booking_id }),
       icon: 'success',
       confirmButtonColor: '#eab308'
     });
@@ -545,8 +547,8 @@ export default function AdminRequests() {
     setIsQuotationModalOpen(false);
     setSelectedRequest(null);
     Swal.fire({
-      title: 'Draft Saved!',
-      text: `Quotation draft for request #${requestId} has been saved.`,
+      title: t('alerts.draftSaved.title'),
+      text: t('alerts.draftSaved.text', { id: requestId }),
       icon: 'success',
       confirmButtonColor: '#eab308'
     });
@@ -557,8 +559,8 @@ export default function AdminRequests() {
     setIsQuotationModalOpen(false);
     setSelectedRequest(null);
     Swal.fire({
-      title: 'Quotation Sent!',
-      text: `Quotation for request #${requestId} has been sent to the customer.`,
+      title: t('alerts.quotationSent.title'),
+      text: t('alerts.quotationSent.text', { id: requestId }),
       icon: 'success',
       confirmButtonColor: '#eab308'
     });
@@ -596,7 +598,7 @@ export default function AdminRequests() {
       }
     } catch (error) {
       console.error('Error fetching body check photos:', error);
-      Swal.fire('Error', 'Failed to fetch body check photos', 'error');
+      Swal.fire(t('alerts.error.title'), t('alerts.error.fetchBodyCheckPhotos'), 'error');
     } finally {
       setIsPhotoGalleryLoading(false);
     }
@@ -636,44 +638,44 @@ export default function AdminRequests() {
     if (!status) return null;
     const s = status.toLowerCase();
 
-    let config = { bg: 'bg-gray-100 text-gray-600', icon: <FaClock className="mr-1.5" />, label: status };
+    let config = { bg: 'bg-gray-100 text-gray-600', icon: <FaClock className="me-1.5" />, label: status };
 
     if (s.includes('quotation price') || s.includes('pending price')) {
       config.bg = 'bg-yellow-50 text-yellow-700 border border-yellow-100';
-      config.icon = <FaClock className="w-3 h-3 mr-2" />;
+      config.icon = <FaClock className="w-3 h-3 me-2" />;
     } else if (s.includes('approve quotation')) {
       config.bg = 'bg-blue-50 text-blue-700 border border-blue-100';
-      config.icon = <FaFileInvoiceDollar className="w-3 h-3 mr-2" />;
+      config.icon = <FaFileInvoiceDollar className="w-3 h-3 me-2" />;
     } else if (s.includes('technician assignment') || s.includes('pending technician')) {
       config.bg = 'bg-purple-50 text-purple-700 border border-purple-100';
-      config.icon = <FaUserCircle className="w-3 h-3 mr-2" />;
+      config.icon = <FaUserCircle className="w-3 h-3 me-2" />;
     } else if (s.includes('technician assigned')) {
       config.bg = 'bg-blue-50 text-blue-700 border border-blue-100';
-      config.icon = <FaCheck className="w-3 h-3 mr-2" />;
+      config.icon = <FaCheck className="w-3 h-3 me-2" />;
     } else if (s.includes('driver will start') || s.includes('driver is on')) {
       config.bg = 'bg-cyan-50 text-cyan-700 border border-cyan-100';
-      config.icon = <FaTruck className="w-3 h-3 mr-2" />;
+      config.icon = <FaTruck className="w-3 h-3 me-2" />;
     } else if (s.includes('driver arrived') || s.includes('body checking')) {
       config.bg = 'bg-purple-50 text-purple-700 border border-purple-100';
-      config.icon = <FaCamera className="w-3 h-3 mr-2" />;
+      config.icon = <FaCamera className="w-3 h-3 me-2" />;
     } else if (s.includes('approve body check')) {
       config.bg = 'bg-orange-50 text-orange-700 border border-orange-100';
-      config.icon = <FaClipboardList className="w-3 h-3 mr-2" />;
+      config.icon = <FaClipboardList className="w-3 h-3 me-2" />;
     } else if (s.includes('body check report approved')) {
       config.bg = 'bg-green-50 text-green-700 border border-green-100';
-      config.icon = <FaCheckDouble className="w-3 h-3 mr-2" />;
+      config.icon = <FaCheckDouble className="w-3 h-3 me-2" />;
     } else if (s.includes('serviced') || s.includes('fixing') || s.includes('start-service')) {
       config.bg = 'bg-indigo-50 text-indigo-700 border border-indigo-100';
-      config.icon = <FaWrench className="w-3 h-3 mr-2" />;
+      config.icon = <FaWrench className="w-3 h-3 me-2" />;
     } else if (s.includes('complete payment') || s.includes('payment')) {
       config.bg = 'bg-pink-50 text-pink-700 border border-pink-100';
-      config.icon = <FaCreditCard className="w-3 h-3 mr-2" />;
+      config.icon = <FaCreditCard className="w-3 h-3 me-2" />;
     } else if (s.includes('car receiving') || s.includes('receiving')) {
       config.bg = 'bg-teal-50 text-teal-700 border border-teal-100';
-      config.icon = <FaCar className="w-3 h-3 mr-2" />;
+      config.icon = <FaCar className="w-3 h-3 me-2" />;
     } else if (s.includes('car delivered') || s.includes('completed')) {
       config.bg = 'bg-green-100 text-green-800 border border-green-200';
-      config.icon = <FaCheckCircle className="w-3 h-3 mr-2" />;
+      config.icon = <FaCheckCircle className="w-3 h-3 me-2" />;
     }
 
     return { ...config, label: status };
@@ -684,7 +686,7 @@ export default function AdminRequests() {
     if (request.status === 'Pending Quotation') {
       return (
         <span className="text-sm font-medium text-gray-400 italic">
-          Waiting for quotation...
+          {t('actions.waitingQuotation')}
         </span>
       );
     }
@@ -700,12 +702,12 @@ export default function AdminRequests() {
             className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-bold rounded-lg shadow-sm transition-colors flex items-center gap-2"
           >
             <FaCheckCircle />
-            Arrived at Service Center
+            {t('actions.arrivedAtServiceCenter')}
           </button>
           <button
             onClick={() => handleViewQuotation(request)}
             className="p-1.5 text-gray-500 hover:text-gray-700 transition-colors"
-            title="View Quotation"
+            title={t('actions.viewQuotation')}
           >
             <FaFileInvoiceDollar className="w-4 h-4" />
           </button>
@@ -721,12 +723,12 @@ export default function AdminRequests() {
             className="px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 text-sm font-medium rounded-lg shadow-sm transition-colors flex items-center gap-2"
           >
             <FaFileInvoiceDollar />
-            View Estimated Price
+            {t('actions.viewEstimatedPrice')}
           </button>
           <button
             onClick={() => handleViewQuotation(request)}
             className="p-1.5 text-gray-500 hover:text-gray-700 transition-colors"
-            title="View Quotation"
+            title={t('actions.viewQuotation')}
           >
             <FaFileInvoiceDollar className="w-4 h-4" />
           </button>
@@ -745,12 +747,12 @@ export default function AdminRequests() {
             className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold rounded-lg shadow-sm transition-colors flex items-center gap-2"
           >
             <FaCamera />
-            View Body Check
+            {t('actions.viewBodyCheck')}
           </button>
           <button
             onClick={() => handleViewQuotation(request)}
             className="p-1.5 text-gray-500 hover:text-gray-700 transition-colors"
-            title="View Quotation"
+            title={t('actions.viewQuotation')}
           >
             <FaFileInvoiceDollar className="w-4 h-4" />
           </button>
@@ -767,19 +769,19 @@ export default function AdminRequests() {
               className="flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white text-sm font-medium rounded-lg hover:bg-green-600 transition-colors"
             >
               <FaCheck className="w-3 h-3" />
-              Accept
+            {t('actions.accept')}
             </button>
             <button
               onClick={() => handleRejectClick(request)}
               className="flex items-center gap-1 px-3 py-1.5 bg-red-500 text-white text-sm font-medium rounded-lg hover:bg-red-600 transition-colors"
             >
               <FaTimes className="w-3 h-3" />
-              Reject
+            {t('actions.reject')}
             </button>
             <button
               onClick={() => handleViewQuotation(request)}
               className="p-1.5 text-gray-500 hover:text-gray-700 transition-colors"
-              title="View Quotation"
+            title={t('actions.viewQuotation')}
             >
               <FaFileInvoiceDollar className="w-4 h-4" />
             </button>
@@ -793,12 +795,12 @@ export default function AdminRequests() {
               className="flex items-center gap-2 px-3 py-1.5 bg-yellow-400 text-gray-900 text-sm font-medium rounded-lg hover:bg-yellow-500 transition-colors"
             >
               <FaFileAlt className="w-3 h-3" />
-              Submit Quotation
+            {t('actions.submitQuotation')}
             </button>
             <button
               onClick={() => handleViewQuotation(request)}
               className="p-1.5 text-gray-500 hover:text-gray-700 transition-colors"
-              title="View Quotation"
+            title={t('actions.viewQuotation')}
             >
               <FaFileInvoiceDollar className="w-4 h-4" />
             </button>
@@ -813,12 +815,12 @@ export default function AdminRequests() {
               className="flex items-center gap-2 px-3 py-1.5 bg-yellow-400 text-gray-900 text-sm font-medium rounded-lg hover:bg-yellow-500 transition-colors"
             >
               <FaCamera className="w-3 h-3" />
-              Submit Photos
+            {t('actions.submitPhotos')}
             </button>
             <button
               onClick={() => handleViewQuotation(request)}
               className="p-1.5 text-gray-500 hover:text-gray-700 transition-colors"
-              title="View Quotation"
+            title={t('actions.viewQuotation')}
             >
               <FaFileInvoiceDollar className="w-4 h-4" />
             </button>
@@ -833,12 +835,12 @@ export default function AdminRequests() {
               className="flex items-center gap-2 px-3 py-1.5 bg-yellow-400 text-gray-900 text-sm font-medium rounded-lg hover:bg-yellow-500 transition-colors"
             >
               <FaEdit className="w-3 h-3" />
-              Edit Quotation
+            {t('actions.editQuotation')}
             </button>
             <button
               onClick={() => handleViewQuotation(request)}
               className="p-1.5 text-gray-500 hover:text-gray-700 transition-colors"
-              title="View Quotation"
+            title={t('actions.viewQuotation')}
             >
               <FaFileInvoiceDollar className="w-4 h-4" />
             </button>
@@ -853,12 +855,12 @@ export default function AdminRequests() {
               className="flex items-center gap-2 px-3 py-1.5 bg-yellow-400 text-gray-900 text-sm font-medium rounded-lg hover:bg-yellow-500 transition-colors"
             >
               <FaEdit className="w-3 h-3" />
-              Edit Quotation
+            {t('actions.editQuotation')}
             </button>
             <button
               onClick={() => handleViewQuotation(request)}
               className="p-1.5 text-gray-500 hover:text-gray-700 transition-colors"
-              title="View Quotation"
+            title={t('actions.viewQuotation')}
             >
               <FaFileInvoiceDollar className="w-4 h-4" />
             </button>
@@ -873,12 +875,12 @@ export default function AdminRequests() {
               className="flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white text-sm font-medium rounded-lg hover:bg-green-600 transition-colors"
             >
               <span className="text-xs">$</span>
-              Collect Payment
+            {t('actions.collectPayment')}
             </button>
             <button
               onClick={() => handleViewQuotation(request)}
               className="p-1.5 text-gray-500 hover:text-gray-700 transition-colors"
-              title="View Quotation"
+            title={t('actions.viewQuotation')}
             >
               <FaFileInvoiceDollar className="w-4 h-4" />
             </button>
@@ -891,7 +893,7 @@ export default function AdminRequests() {
             <button
               onClick={() => handleViewQuotation(request)}
               className="p-1.5 text-gray-500 hover:text-gray-700 transition-colors"
-              title="View Quotation"
+            title={t('actions.viewQuotation')}
             >
               <FaFileInvoiceDollar className="w-4 h-4" />
             </button>
@@ -904,7 +906,7 @@ export default function AdminRequests() {
             <button
               onClick={() => handleViewQuotation(request)}
               className="p-1.5 text-gray-500 hover:text-gray-700 transition-colors"
-              title="View Quotation"
+            title={t('actions.viewQuotation')}
             >
               <FaFileInvoiceDollar className="w-4 h-4" />
             </button>
@@ -918,10 +920,10 @@ export default function AdminRequests() {
     const bookingId = String(viewQuotationData?.booking_id || selectedRequest?.booking_id || '');
     if (!bookingId || bookingId === 'undefined' || bookingId === 'null') return;
 
-    const confirmTitle = action === 'approve_all' ? 'Approve Photos?' : 'Reject Photos?';
+    const confirmTitle = action === 'approve_all' ? t('alerts.photoReview.approveTitle') : t('alerts.photoReview.rejectTitle');
     const confirmText = action === 'approve_all'
-      ? 'Are you sure you want to approve these body check photos?'
-      : 'Are you sure you want to reject these photos?';
+      ? t('alerts.photoReview.approveText')
+      : t('alerts.photoReview.rejectText');
 
     const result = await Swal.fire({
       title: confirmTitle,
@@ -929,7 +931,7 @@ export default function AdminRequests() {
       icon: action === 'approve_all' ? 'question' : 'warning',
       showCancelButton: true,
       confirmButtonColor: action === 'approve_all' ? '#22c55e' : '#ef4444',
-      confirmButtonText: action === 'approve_all' ? 'Yes, Approve' : 'Yes, Reject'
+      confirmButtonText: action === 'approve_all' ? t('alerts.photoReview.approveConfirm') : t('alerts.photoReview.rejectConfirm')
     });
 
     if (!result.isConfirmed) return;
@@ -943,8 +945,8 @@ export default function AdminRequests() {
 
       if (response.success || response.status === 'success') {
         Swal.fire({
-          title: 'Success',
-          text: `Photos have been ${action === 'approve_all' ? 'approved' : 'rejected'} successfully.`,
+          title: t('alerts.success.title'),
+          text: action === 'approve_all' ? t('alerts.photoReview.approved') : t('alerts.photoReview.rejected'),
           icon: 'success',
           confirmButtonColor: '#eab308'
         });
@@ -956,11 +958,11 @@ export default function AdminRequests() {
           }
         }
       } else {
-        throw new Error(response.error || 'Operation failed');
+        throw new Error(response.error || t('alerts.photoReview.failed'));
       }
     } catch (error) {
       console.error('Error reviewing photos:', error);
-      Swal.fire('Error', 'Failed to process photo review', 'error');
+      Swal.fire(t('alerts.error.title'), t('alerts.photoReview.failed'), 'error');
     } finally {
       setLoading(false);
     }
@@ -969,7 +971,7 @@ export default function AdminRequests() {
 
   return (
     <AdminLayout
-      title="Service Requests"
+      title={t('title')}
       subtitle=""
 
       headerActions={
@@ -977,7 +979,7 @@ export default function AdminRequests() {
           onClick={() => router.push('/b2b/services/create')}
           className="flex items-center gap-2 px-4 py-2 bg-[#FCD34D] rounded-lg text-sm font-bold text-gray-900 hover:bg-[#FBBF24] shadow-sm"
         >
-          <FaWrench className="text-gray-900 text-xs" /> Request a Service
+          <FaWrench className="text-gray-900 text-xs" /> {t('actions.requestService')}
         </button>
       }
     >
@@ -988,7 +990,7 @@ export default function AdminRequests() {
           {/* Total Requests */}
           <div className="bg-white p-6 rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-gray-100 flex items-center justify-between">
             <div>
-              <p className="text-xs font-bold text-gray-500 mb-2">Total Requests</p>
+              <p className="text-xs font-bold text-gray-500 mb-2">{t('stats.totalRequests')}</p>
               <h3 className="text-4xl font-black text-gray-900 mb-2">{stats.total_bookings}</h3>
             </div>
             <div className="w-12 h-12 bg-[#FCD34D] rounded-xl flex items-center justify-center text-gray-900 shadow-sm">
@@ -999,7 +1001,7 @@ export default function AdminRequests() {
           {/* Active Requests */}
           <div className="bg-white p-6 rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-gray-100 flex items-center justify-between">
             <div>
-              <p className="text-xs font-bold text-gray-500 mb-2">Active Services</p>
+              <p className="text-xs font-bold text-gray-500 mb-2">{t('stats.activeServices')}</p>
               <h3 className="text-4xl font-black text-gray-900 mb-2">{stats.active_requests}</h3>
             </div>
             <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 shadow-sm">
@@ -1010,7 +1012,7 @@ export default function AdminRequests() {
           {/* Completed Requests */}
           <div className="bg-white p-6 rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-gray-100 flex items-center justify-between">
             <div>
-              <p className="text-xs font-bold text-gray-500 mb-2">Completed</p>
+              <p className="text-xs font-bold text-gray-500 mb-2">{t('stats.completed')}</p>
               <h3 className="text-4xl font-black text-gray-900 mb-2">{stats.completed_requests}</h3>
             </div>
             <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-green-600 shadow-sm">
@@ -1024,13 +1026,13 @@ export default function AdminRequests() {
           <div className="flex items-center gap-4">
             {/* Search Input */}
             <div className="flex-1 relative">
-              <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <FaSearch className="absolute start-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <input
                 type="text"
-                placeholder="Search by Booking ID, Customer, Vehicle, or Plate Number..."
+                placeholder={t('filters.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-yellow-400 focus:border-transparent outline-none transition-all"
+                className="w-full ps-11 pe-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-yellow-400 focus:border-transparent outline-none transition-all"
               />
             </div>
 
@@ -1040,14 +1042,14 @@ export default function AdminRequests() {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="px-4 py-3 border border-gray-200 rounded-xl text-sm text-gray-700 bg-white focus:ring-2 focus:ring-yellow-400 focus:border-transparent outline-none min-w-[160px] cursor-pointer"
             >
-              <option value="all">All Statuses</option>
-              <option value="assigned">Assigned</option>
-              <option value="accepted">Accepted</option>
-              <option value="body_checking">Body Checking</option>
-              <option value="awaiting_approval">Awaiting Approval</option>
-              <option value="fixing">Fixing</option>
-              <option value="pending_payment">Pending Payment</option>
-              <option value="completed">Completed</option>
+              <option value="all">{t('filters.allStatuses')}</option>
+              <option value="assigned">{t('filters.assigned')}</option>
+              <option value="accepted">{t('filters.accepted')}</option>
+              <option value="body_checking">{t('filters.bodyChecking')}</option>
+              <option value="awaiting_approval">{t('filters.awaitingApproval')}</option>
+              <option value="fixing">{t('filters.fixing')}</option>
+              <option value="pending_payment">{t('filters.pendingPayment')}</option>
+              <option value="completed">{t('filters.completed')}</option>
             </select>
 
             {/* Category Filter */}
@@ -1056,7 +1058,7 @@ export default function AdminRequests() {
               onChange={(e) => setCategoryFilter(e.target.value)}
               className="px-4 py-3 border border-gray-200 rounded-xl text-sm text-gray-700 bg-white focus:ring-2 focus:ring-yellow-400 focus:border-transparent outline-none min-w-[160px] cursor-pointer"
             >
-              <option value="all">All Categories</option>
+              <option value="all">{t('filters.allCategories')}</option>
               <option value="Brake Service">Brake Service</option>
               <option value="Oil Change">Oil Change</option>
               <option value="Body Work">Body Work</option>
@@ -1074,32 +1076,32 @@ export default function AdminRequests() {
         {/* Requests Table */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full text-start">
               <thead>
                 <tr className="border-b border-gray-200">
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Booking ID
+                  <th className="px-6 py-4 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    {t('table.bookingId')}
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Customer
+                  <th className="px-6 py-4 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    {t('table.customer')}
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Vehicle
+                  <th className="px-6 py-4 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    {t('table.vehicle')}
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Service
+                  <th className="px-6 py-4 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    {t('table.service')}
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Status
+                  <th className="px-6 py-4 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    {t('table.status')}
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Scheduled
+                  <th className="px-6 py-4 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    {t('table.scheduled')}
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Payment
+                  <th className="px-6 py-4 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    {t('table.payment')}
                   </th>
-                  <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Actions
+                  <th className="px-6 py-4 text-end text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    {t('table.actions')}
                   </th>
                 </tr>
               </thead>
@@ -1118,7 +1120,7 @@ export default function AdminRequests() {
                 ) : paginatedRequests.length === 0 ? (
                   <tr>
                     <td colSpan={8} className="px-6 py-10 text-center text-gray-500">
-                      No requests found.
+                      {t('table.empty')}
                     </td>
                   </tr>
                 ) : (
@@ -1160,7 +1162,7 @@ export default function AdminRequests() {
                               {request.vehicle}
                             </div>
                             <div className="text-xs text-gray-400">
-                              Plate: {request.plate_number}
+                              {t('table.plateLabel')} {request.plate_number}
                             </div>
                           </div>
                         </td>
@@ -1224,7 +1226,11 @@ export default function AdminRequests() {
           {/* Pagination */}
           <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
             <div className="text-sm text-gray-500">
-              Showing {filteredRequests.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0} to {Math.min(currentPage * itemsPerPage, filteredRequests.length)} of {filteredRequests.length} requests
+              {t('pagination.showing', {
+                start: filteredRequests.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0,
+                end: Math.min(currentPage * itemsPerPage, filteredRequests.length),
+                total: filteredRequests.length
+              })}
             </div>
             <div className="flex items-center gap-2">
               <button
@@ -1232,7 +1238,7 @@ export default function AdminRequests() {
                 disabled={currentPage === 1}
                 className="p-2 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                <FaChevronLeft className="w-3 h-3" />
+                <FaChevronLeft className="w-3 h-3 rtl:rotate-180" />
               </button>
 
               {[1, 2, 3].map((page) => (
@@ -1253,7 +1259,7 @@ export default function AdminRequests() {
                 disabled={currentPage === totalPages}
                 className="p-2 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                <FaChevronRight className="w-3 h-3" />
+                <FaChevronRight className="w-3 h-3 rtl:rotate-180" />
               </button>
             </div>
           </div>
@@ -1264,7 +1270,7 @@ export default function AdminRequests() {
         isOpen={isPhotoGalleryOpen}
         onClose={() => setIsPhotoGalleryOpen(false)}
         photos={viewBodyCheckPhotos.map(p => p.url)}
-        title={`Body Check - ${selectedRequest?.vehicle || 'Vehicle'}`}
+        title={t('modals.bodyCheckTitle', { vehicle: selectedRequest?.vehicle || t('modals.vehicleFallback') })}
         onApprove={handleApproveBodyCheck}
         onReject={handleRejectBodyCheck}
       />
@@ -1336,8 +1342,8 @@ export default function AdminRequests() {
               setIsViewQuotationModalOpen(false);
               setIsRejectModalOpen(true);
             } : undefined)}
-            acceptLabel={isBodyCheckReview ? "Approve Photos" : (canApprove ? "Approve Quotation" : undefined)}
-            rejectLabel={isBodyCheckReview ? "Reject Photos" : (canApprove ? "Reject Quotation" : undefined)}
+            acceptLabel={isBodyCheckReview ? t('actions.approvePhotos') : (canApprove ? t('actions.approveQuotation') : undefined)}
+            rejectLabel={isBodyCheckReview ? t('actions.rejectPhotos') : (canApprove ? t('actions.rejectQuotation') : undefined)}
           />
         );
       })()}
@@ -1349,7 +1355,7 @@ export default function AdminRequests() {
         isOpen={isPhotoGalleryOpen}
         onClose={() => setIsPhotoGalleryOpen(false)}
         photos={viewBodyCheckPhotos.map(p => p.url)}
-        title={`Body Check - ${selectedRequest?.vehicle || 'Vehicle'}`}
+        title={t('modals.bodyCheckTitle', { vehicle: selectedRequest?.vehicle || t('modals.vehicleFallback') })}
         onApprove={handleApproveBodyCheck}
         onReject={handleRejectBodyCheck}
         isLoading={isPhotoGalleryLoading}

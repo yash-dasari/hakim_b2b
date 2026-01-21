@@ -5,6 +5,7 @@ import { RootState } from '../../store/store';
 import AdminLayout from '../../components/AdminLayout';
 import { servicesAPI, BookingListItem } from '../../services/api/services.api';
 import Swal from 'sweetalert2';
+import { useTranslations } from 'next-intl';
 
 // Modals
 import QuotationModal from './components/QuotationModal'; // Correct path based on original dashboard.tsx
@@ -50,6 +51,7 @@ type ServiceRequest = BookingListItem;
 
 export default function B2BDashboard() {
   const router = useRouter();
+  const t = useTranslations('dashboard');
   const company = useSelector((state: RootState) => state.auth.company);
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
 
@@ -235,14 +237,14 @@ export default function B2BDashboard() {
         reason: reason
       });
       if (response.success || response.status === 'success') {
-        Swal.fire('Rejected!', 'The quotation has been rejected successfully.', 'success');
+        Swal.fire(t('alerts.rejected.title'), t('alerts.rejected.quotationSuccess'), 'success');
         refreshData();
       } else {
-        throw new Error(response.error || 'Failed to reject');
+        throw new Error(response.error || t('alerts.rejected.failed'));
       }
     } catch (error) {
       console.error('Error rejecting:', error);
-      Swal.fire('Error', 'Failed to reject the quotation', 'error');
+      Swal.fire(t('alerts.error.title'), t('alerts.rejected.quotationFailed'), 'error');
     } finally {
       setLoading(false);
       setIsRejectModalOpen(false);
@@ -253,7 +255,7 @@ export default function B2BDashboard() {
   const handleApproveBodyCheck = async () => {
     const bookingId = String(viewQuotationData?.booking_id || selectedRequest?.booking_id || '');
     if (!bookingId) {
-      Swal.fire('Error', 'No booking context found', 'error');
+      Swal.fire(t('alerts.error.title'), t('alerts.error.noBookingContext'), 'error');
       return;
     }
 
@@ -264,7 +266,7 @@ export default function B2BDashboard() {
       }));
 
       if (approvals.length === 0) {
-        Swal.fire('Warning', 'No photos to approve', 'warning');
+        Swal.fire(t('alerts.warning.title'), t('alerts.warning.noPhotosToApprove'), 'warning');
         return;
       }
 
@@ -272,15 +274,15 @@ export default function B2BDashboard() {
       const response = await servicesAPI.respondToBodyCheckPhotos(bookingId, { photo_approvals: approvals });
 
       if (response.success || response.status === 'success') {
-        Swal.fire('Success', 'Body check photos approved', 'success');
+        Swal.fire(t('alerts.success.title'), t('alerts.success.bodyCheckApproved'), 'success');
         setIsPhotoGalleryOpen(false);
         refreshData();
       } else {
-        throw new Error(response.error || 'Failed to approve photos');
+        throw new Error(response.error || t('alerts.error.approvePhotosFailed'));
       }
     } catch (error) {
       console.error('Error approving photos:', error);
-      Swal.fire('Error', 'Failed to approve photos', 'error');
+      Swal.fire(t('alerts.error.title'), t('alerts.error.approvePhotosFailed'), 'error');
     } finally {
       setLoading(false);
     }
@@ -291,13 +293,13 @@ export default function B2BDashboard() {
     if (!bookingId) return;
 
     const { value: reason } = await Swal.fire({
-      title: 'Reject Body Check Photos',
+      title: t('alerts.rejectBodyCheck.title'),
       input: 'text',
-      inputLabel: 'Rejection Reason',
-      inputPlaceholder: 'Enter reason for rejection...',
+      inputLabel: t('alerts.rejectBodyCheck.reasonLabel'),
+      inputPlaceholder: t('alerts.rejectBodyCheck.reasonPlaceholder'),
       showCancelButton: true,
       inputValidator: (value) => {
-        if (!value) return 'You need to write a reason!';
+        if (!value) return t('alerts.rejectBodyCheck.reasonRequired');
       }
     });
 
@@ -313,15 +315,15 @@ export default function B2BDashboard() {
         const response = await servicesAPI.respondToBodyCheckPhotos(bookingId, { photo_approvals: refusals });
 
         if (response.success || response.status === 'success') {
-          Swal.fire('Rejected', 'Body check photos rejected', 'success');
+        Swal.fire(t('alerts.rejected.title'), t('alerts.rejected.bodyCheckPhotos'), 'success');
           setIsPhotoGalleryOpen(false);
           refreshData();
         } else {
-          throw new Error(response.error || 'Failed to reject photos');
+        throw new Error(response.error || t('alerts.error.rejectPhotosFailed'));
         }
       } catch (error) {
         console.error('Error rejecting photos:', error);
-        Swal.fire('Error', 'Failed to reject photos', 'error');
+      Swal.fire(t('alerts.error.title'), t('alerts.error.rejectPhotosFailed'), 'error');
       } finally {
         setLoading(false);
       }
@@ -331,18 +333,18 @@ export default function B2BDashboard() {
   const handleApproveQuotation = async () => {
     const bookingId = String(viewQuotationData?.booking_id || selectedRequest?.booking_id || '');
     if (!bookingId || bookingId === 'undefined' || bookingId === 'null') {
-      Swal.fire('Error', 'No booking context found', 'error');
+      Swal.fire(t('alerts.error.title'), t('alerts.error.noBookingContext'), 'error');
       return;
     }
     try {
       const result = await Swal.fire({
-        title: 'Approve Quotation?',
-        text: "Are you sure you want to approve this quotation?",
+        title: t('alerts.approveQuotation.title'),
+        text: t('alerts.approveQuotation.text'),
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#FCD34D',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, Approve'
+        confirmButtonText: t('alerts.approveQuotation.confirm')
       });
 
       if (!result.isConfirmed) return;
@@ -353,14 +355,14 @@ export default function B2BDashboard() {
       const response = await servicesAPI.approveQuotations({ booking_ids: [String(bookingId)] });
 
       if (response.success || response.status === 'success') {
-        Swal.fire('Approved!', 'The quotation has been approved successfully.', 'success');
+        Swal.fire(t('alerts.approved.title'), t('alerts.approved.quotationSuccess'), 'success');
         refreshData();
       } else {
-        throw new Error(response.error || 'Failed to approve');
+        throw new Error(response.error || t('alerts.approved.failed'));
       }
     } catch (error) {
       console.error('Error approving:', error);
-      Swal.fire('Error', 'Failed to approve the quotation', 'error');
+      Swal.fire(t('alerts.error.title'), t('alerts.approved.quotationFailed'), 'error');
     } finally {
       setLoading(false);
       setViewQuotationData(null);
@@ -410,14 +412,14 @@ export default function B2BDashboard() {
 
           setIsViewQuotationModalOpen(true);
         } else {
-          Swal.fire('Info', 'No quotation found for this booking', 'info');
+          Swal.fire(t('alerts.info.title'), t('alerts.info.noQuotation'), 'info');
         }
       } else {
-        Swal.fire('Error', 'Could not fetch quotation details', 'error');
+        Swal.fire(t('alerts.error.title'), t('alerts.error.fetchQuotationDetails'), 'error');
       }
     } catch (e) {
       console.error(e);
-      Swal.fire('Error', 'Failed to load quotation', 'error');
+      Swal.fire(t('alerts.error.title'), t('alerts.error.loadQuotation'), 'error');
     }
   };
 
@@ -426,15 +428,15 @@ export default function B2BDashboard() {
     // In requests.tsx: handleAcceptClick -> Swal "Accept Request?".
     // Assuming this moves to next step.
     Swal.fire({
-      title: 'Accept Request?',
-      text: `Are you sure you want to accept request #${request.booking_id}?`,
+      title: t('alerts.acceptRequest.title'),
+      text: t('alerts.acceptRequest.text', { id: request.booking_id }),
       icon: 'question',
       showCancelButton: true,
-      confirmButtonText: 'Yes, accept it!'
+      confirmButtonText: t('alerts.acceptRequest.confirm')
     }).then((result) => {
       if (result.isConfirmed) {
         // API call missing in requests.tsx reference, but we simulate success
-        Swal.fire('Accepted!', `Request #${request.booking_id} has been accepted.`, 'success');
+        Swal.fire(t('alerts.accepted.title'), t('alerts.accepted.text', { id: request.booking_id }), 'success');
       }
     });
   };
@@ -447,13 +449,13 @@ export default function B2BDashboard() {
   const handleBuilderSave = () => {
     setIsBuilderModalOpen(false);
     setSelectedRequest(null);
-    Swal.fire('Draft Saved!', 'Quotation draft saved.', 'success');
+    Swal.fire(t('alerts.draftSaved.title'), t('alerts.draftSaved.text'), 'success');
   };
 
   const handleBuilderSend = () => {
     setIsBuilderModalOpen(false);
     setSelectedRequest(null);
-    Swal.fire('Quotation Sent!', 'Quotation sent to customer.', 'success');
+    Swal.fire(t('alerts.quotationSent.title'), t('alerts.quotationSent.text'), 'success');
   };
 
   const handleModalReject = () => {
@@ -485,7 +487,7 @@ export default function B2BDashboard() {
       }
     } catch (error) {
       console.error('Error fetching body check photos:', error);
-      Swal.fire('Error', 'Failed to fetch body check photos', 'error');
+      Swal.fire(t('alerts.error.title'), t('alerts.error.fetchBodyCheckPhotos'), 'error');
     } finally {
       setIsPhotoGalleryLoading(false);
     }
@@ -500,8 +502,8 @@ export default function B2BDashboard() {
   const handleCustomerArrived = async (bookingId: string) => {
     try {
       Swal.fire({
-        title: 'Processing...',
-        text: 'Notifying service center...',
+        title: t('alerts.processing.title'),
+        text: t('alerts.processing.notifying'),
         icon: 'info',
         allowOutsideClick: false,
         didOpen: () => {
@@ -513,17 +515,17 @@ export default function B2BDashboard() {
 
       if (response.success) {
         await refreshData();
-        Swal.fire('Success!', 'Service center has been notified of your arrival.', 'success');
+        Swal.fire(t('alerts.success.title'), t('alerts.success.serviceCenterNotified'), 'success');
       } else {
-        throw new Error(response.error || 'Failed to notify service center');
+        throw new Error(response.error || t('alerts.error.notifyServiceCenterFailed'));
       }
     } catch (error: any) {
       console.error('Error notifiying arrival:', error);
       Swal.fire({
-        title: 'Error',
-        text: error.message || 'Failed to notify service center.',
+        title: t('alerts.error.title'),
+        text: error.message || t('alerts.error.notifyServiceCenterFailed'),
         icon: 'error',
-        confirmButtonText: 'OK'
+        confirmButtonText: t('alerts.error.confirm')
       });
     }
   };
@@ -531,7 +533,7 @@ export default function B2BDashboard() {
   const handleSubmitPhotosConfirm = (files: File[]) => {
     setIsSubmitPhotosModalOpen(false);
     setSelectedRequest(null);
-    Swal.fire('Success!', `${files.length} photos have been submitted successfully.`, 'success');
+    Swal.fire(t('alerts.success.title'), t('alerts.success.photosSubmitted', { count: files.length }), 'success');
   };
 
   const handleCollectPaymentClick = (request: ServiceRequest) => {
@@ -542,7 +544,7 @@ export default function B2BDashboard() {
   const handleCollectPaymentConfirm = () => {
     setIsCollectPaymentModalOpen(false);
     setSelectedRequest(null);
-    Swal.fire('Payment Recorded!', `Payment recorded successfully.`, 'success');
+    Swal.fire(t('alerts.paymentRecorded.title'), t('alerts.paymentRecorded.text'), 'success');
   };
 
 
@@ -571,19 +573,19 @@ export default function B2BDashboard() {
 
     if (type.toLowerCase().includes('van')) {
       bg = 'bg-blue-50 text-blue-600 border border-blue-100';
-      icon = <FaCar className="mr-1.5 text-[10px]" />;
+      icon = <FaCar className="me-1.5 text-[10px]" />;
     } else if (type.toLowerCase().includes('emergency')) {
       bg = 'bg-red-50 text-red-600 border border-red-100';
-      icon = <FaPlus className="mr-1.5 text-[10px]" />;
+      icon = <FaPlus className="me-1.5 text-[10px]" />;
     } else if (type.toLowerCase().includes('valet')) {
       bg = 'bg-purple-50 text-purple-600 border border-purple-100';
-      icon = <FaKey className="mr-1.5 text-[10px]" />;
+      icon = <FaKey className="me-1.5 text-[10px]" />;
     } else if (type.toLowerCase().includes('towing')) {
       bg = 'bg-green-50 text-green-600 border border-green-100';
-      icon = <FaTruck className="mr-1.5 text-[10px]" />;
+      icon = <FaTruck className="me-1.5 text-[10px]" />;
     } else {
       bg = 'bg-gray-50 text-gray-600';
-      icon = <FaTools className="mr-1.5 text-[10px]" />;
+      icon = <FaTools className="me-1.5 text-[10px]" />;
     }
 
     return (
@@ -597,45 +599,45 @@ export default function B2BDashboard() {
     if (!status) return null;
     const s = status.toLowerCase();
 
-    let config = { bg: 'bg-gray-100 text-gray-600', icon: <FaClock className="mr-1.5" />, label: status };
+    let config = { bg: 'bg-gray-100 text-gray-600', icon: <FaClock className="me-1.5" />, label: status };
 
     // Determine colors based on status keywords
     if (s.includes('quotation price') || s.includes('pending price')) {
       config.bg = 'bg-yellow-50 text-yellow-700 border border-yellow-100';
-      config.icon = <FaClock className="mr-1.5" />;
+      config.icon = <FaClock className="me-1.5" />;
     } else if (s.includes('approve quotation')) {
       config.bg = 'bg-blue-50 text-blue-700 border border-blue-100';
-      config.icon = <FaFileInvoiceDollar className="mr-1.5" />;
+      config.icon = <FaFileInvoiceDollar className="me-1.5" />;
     } else if (s.includes('technician assignment') || s.includes('pending technician')) {
       config.bg = 'bg-purple-50 text-purple-700 border border-purple-100';
-      config.icon = <FaUserCircle className="mr-1.5" />;
+      config.icon = <FaUserCircle className="me-1.5" />;
     } else if (s.includes('technician assigned')) {
       config.bg = 'bg-blue-50 text-blue-700 border border-blue-100';
-      config.icon = <FaCheck className="mr-1.5" />;
+      config.icon = <FaCheck className="me-1.5" />;
     } else if (s.includes('driver will start') || s.includes('driver is on')) {
       config.bg = 'bg-cyan-50 text-cyan-700 border border-cyan-100';
-      config.icon = <FaTruck className="mr-1.5" />;
+      config.icon = <FaTruck className="me-1.5" />;
     } else if (s.includes('driver arrived') || s.includes('body checking')) {
       config.bg = 'bg-purple-50 text-purple-700 border border-purple-100';
-      config.icon = <FaCamera className="mr-1.5" />;
+      config.icon = <FaCamera className="me-1.5" />;
     } else if (s.includes('approve body check')) {
       config.bg = 'bg-orange-50 text-orange-700 border border-orange-100';
-      config.icon = <FaClipboardList className="mr-1.5" />;
+      config.icon = <FaClipboardList className="me-1.5" />;
     } else if (s.includes('body check report approved')) {
       config.bg = 'bg-green-50 text-green-700 border border-green-100';
-      config.icon = <FaCheckDouble className="mr-1.5" />;
+      config.icon = <FaCheckDouble className="me-1.5" />;
     } else if (s.includes('serviced') || s.includes('fixing') || s.includes('start-service')) {
       config.bg = 'bg-indigo-50 text-indigo-700 border border-indigo-100';
-      config.icon = <FaWrench className="mr-1.5" />;
+      config.icon = <FaWrench className="me-1.5" />;
     } else if (s.includes('complete payment') || s.includes('payment')) {
       config.bg = 'bg-pink-50 text-pink-700 border border-pink-100';
-      config.icon = <FaCreditCard className="mr-1.5" />;
+      config.icon = <FaCreditCard className="me-1.5" />;
     } else if (s.includes('car receiving') || s.includes('receiving')) {
       config.bg = 'bg-teal-50 text-teal-700 border border-teal-100';
-      config.icon = <FaCar className="mr-1.5" />;
+      config.icon = <FaCar className="me-1.5" />;
     } else if (s.includes('car delivered') || s.includes('completed')) {
       config.bg = 'bg-green-100 text-green-800 border border-green-200';
-      config.icon = <FaCheckCircle className="mr-1.5" />;
+      config.icon = <FaCheckCircle className="me-1.5" />;
     }
 
     return (
@@ -658,12 +660,12 @@ export default function B2BDashboard() {
             className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-bold rounded-lg shadow-sm transition-colors flex items-center gap-2"
           >
             <FaCheckCircle />
-            Arrived at Service Center
+            {t('actions.arrivedAtServiceCenter')}
           </button>
           <button
             onClick={() => handleViewQuotation(request)}
             className="p-1.5 text-gray-500 hover:text-gray-700 transition-colors"
-            title="View Quotation"
+            title={t('actions.viewQuotation')}
           >
             <FaFileInvoiceDollar className="w-4 h-4" />
           </button>
@@ -679,12 +681,12 @@ export default function B2BDashboard() {
             className="px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 text-sm font-medium rounded-lg shadow-sm transition-colors flex items-center gap-2"
           >
             <FaFileInvoiceDollar />
-            View Estimated Price
+            {t('actions.viewEstimatedPrice')}
           </button>
           <button
             onClick={() => handleViewQuotation(request)}
             className="p-1.5 text-gray-500 hover:text-gray-700 transition-colors"
-            title="View Quotation"
+            title={t('actions.viewQuotation')}
           >
             <FaFileInvoiceDollar className="w-4 h-4" />
           </button>
@@ -703,12 +705,12 @@ export default function B2BDashboard() {
             className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold rounded-lg shadow-sm transition-colors flex items-center gap-2"
           >
             <FaCamera />
-            View Body Check
+            {t('actions.viewBodyCheck')}
           </button>
           <button
             onClick={() => handleViewQuotation(request)}
             className="p-1.5 text-gray-500 hover:text-gray-700 transition-colors"
-            title="View Quotation"
+            title={t('actions.viewQuotation')}
           >
             <FaFileInvoiceDollar className="w-4 h-4" />
           </button>
@@ -720,8 +722,8 @@ export default function B2BDashboard() {
       case 'assigned':
         return (
           <div className="flex justify-end gap-2">
-            <button onClick={() => handleAcceptClick(request)} className="px-3 py-1.5 bg-green-500 text-white text-[10px] font-bold rounded">Accept</button>
-            <button onClick={() => handleRejectClick(request)} className="px-3 py-1.5 bg-red-500 text-white text-[10px] font-bold rounded">Reject</button>
+            <button onClick={() => handleAcceptClick(request)} className="px-3 py-1.5 bg-green-500 text-white text-[10px] font-bold rounded">{t('actions.accept')}</button>
+            <button onClick={() => handleRejectClick(request)} className="px-3 py-1.5 bg-red-500 text-white text-[10px] font-bold rounded">{t('actions.reject')}</button>
             <button onClick={() => handleViewQuotation(request)} className="p-1.5 text-gray-500 hover:text-gray-700"><FaFileInvoiceDollar /></button>
           </div>
         );
@@ -730,21 +732,21 @@ export default function B2BDashboard() {
       case 'fixing':
         return (
           <div className="flex justify-end gap-2">
-            <button onClick={() => handleBuilderClick(request)} className="px-3 py-1.5 bg-yellow-400 text-gray-900 text-[10px] font-bold rounded flex items-center gap-1"><FaEdit /> {request.status === 'accepted' ? 'Submit Quote' : 'Edit Quote'}</button>
+            <button onClick={() => handleBuilderClick(request)} className="px-3 py-1.5 bg-yellow-400 text-gray-900 text-[10px] font-bold rounded flex items-center gap-1"><FaEdit /> {request.status === 'accepted' ? t('actions.submitQuote') : t('actions.editQuote')}</button>
             <button onClick={() => handleViewQuotation(request)} className="p-1.5 text-gray-500 hover:text-gray-700"><FaFileInvoiceDollar /></button>
           </div>
         );
       case 'body_checking':
         return (
           <div className="flex justify-end gap-2">
-            <button onClick={() => handleSubmitPhotosClick(request)} className="px-3 py-1.5 bg-yellow-400 text-gray-900 text-[10px] font-bold rounded flex items-center gap-1"><FaCamera /> Photos</button>
+            <button onClick={() => handleSubmitPhotosClick(request)} className="px-3 py-1.5 bg-yellow-400 text-gray-900 text-[10px] font-bold rounded flex items-center gap-1"><FaCamera /> {t('actions.photos')}</button>
             <button onClick={() => handleViewQuotation(request)} className="p-1.5 text-gray-500 hover:text-gray-700"><FaFileInvoiceDollar /></button>
           </div>
         );
       case 'pending_payment':
         return (
           <div className="flex justify-end gap-2">
-            <button onClick={() => handleCollectPaymentClick(request)} className="px-3 py-1.5 bg-green-500 text-white text-[10px] font-bold rounded flex items-center gap-1"><FaCreditCard /> Collect</button>
+            <button onClick={() => handleCollectPaymentClick(request)} className="px-3 py-1.5 bg-green-500 text-white text-[10px] font-bold rounded flex items-center gap-1"><FaCreditCard /> {t('actions.collect')}</button>
             <button onClick={() => handleViewQuotation(request)} className="p-1.5 text-gray-500 hover:text-gray-700"><FaFileInvoiceDollar /></button>
           </div>
         );
@@ -760,18 +762,18 @@ export default function B2BDashboard() {
 
   return (
     <AdminLayout
-      title="Dashboard"
-      subtitle="Manage your vehicles and service requests"
+      title={t('title')}
+      subtitle={t('subtitle')}
       headerActions={
         <div className="flex gap-3">
           <button className="flex items-center gap-2 px-4 py-2 border border-gray-200 bg-white rounded-lg text-sm font-bold text-gray-700 hover:bg-gray-50">
-            <FaPlus className="text-gray-400 text-xs" /> Add Cars
+            <FaPlus className="text-gray-400 text-xs" /> {t('actions.addCars')}
           </button>
           <button
             onClick={() => router.push('/b2b/services/create')}
             className="flex items-center gap-2 px-4 py-2 bg-[#FCD34D] rounded-lg text-sm font-bold text-gray-900 hover:bg-[#FBBF24]"
           >
-            <span className="text-lg leading-none">+</span> Create Request
+            <span className="text-lg leading-none">+</span> {t('actions.createRequest')}
           </button>
         </div>
       }
@@ -782,7 +784,7 @@ export default function B2BDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white p-6 rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex items-center justify-between">
             <div>
-              <p className="text-xs font-bold text-gray-500 mb-1">Total Cars</p>
+              <p className="text-xs font-bold text-gray-500 mb-1">{t('stats.totalCars')}</p>
               <h3 className="text-3xl font-black text-gray-900">{stats.totalCars}</h3>
             </div>
             <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-500">
@@ -792,7 +794,7 @@ export default function B2BDashboard() {
 
           <div className="bg-white p-6 rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex items-center justify-between">
             <div>
-              <p className="text-xs font-bold text-gray-500 mb-1">Active Requests</p>
+              <p className="text-xs font-bold text-gray-500 mb-1">{t('stats.activeRequests')}</p>
               <h3 className="text-3xl font-black text-gray-900">{stats.activeRequests}</h3>
             </div>
             <div className="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center text-orange-500">
@@ -802,7 +804,7 @@ export default function B2BDashboard() {
 
           <div className="bg-white p-6 rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex items-center justify-between">
             <div>
-              <p className="text-xs font-bold text-gray-500 mb-1">Completed Requests</p>
+              <p className="text-xs font-bold text-gray-500 mb-1">{t('stats.completedRequests')}</p>
               <h3 className="text-3xl font-black text-gray-900">{stats.completedRequests}</h3>
             </div>
             <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center text-green-500">
@@ -814,18 +816,18 @@ export default function B2BDashboard() {
         {/* Active Requests Section */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="px-6 pt-6 pb-3 flex justify-between items-center">
-            <h2 className="text-lg font-bold text-gray-900">Active Requests</h2>
+            <h2 className="text-lg font-bold text-gray-900">{t('activeRequests.title')}</h2>
           </div>
 
           <div className="px-6 pb-6 pt-0 border-b border-gray-100 flex flex-col md:flex-row gap-4">
             <div className="relative flex-1">
-              <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
+              <FaSearch className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search requests..."
-                className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FCD34D] focus:border-transparent"
+                placeholder={t('activeRequests.searchPlaceholder')}
+                className="w-full ps-9 pe-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FCD34D] focus:border-transparent"
               />
             </div>
             <div className="flex gap-3">
@@ -834,29 +836,29 @@ export default function B2BDashboard() {
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 bg-white hover:bg-gray-50 font-medium min-w-[140px]"
               >
-                <option value="all">All Statuses</option>
-                <option value="assigned">Assigned</option>
-                <option value="accepted">Accepted</option>
-                <option value="body_checking">Body Checking</option>
-                <option value="fixing">Fixing</option>
-                <option value="completed">Completed</option>
+                <option value="all">{t('filters.allStatuses')}</option>
+                <option value="assigned">{t('filters.assigned')}</option>
+                <option value="accepted">{t('filters.accepted')}</option>
+                <option value="body_checking">{t('filters.bodyChecking')}</option>
+                <option value="fixing">{t('filters.fixing')}</option>
+                <option value="completed">{t('filters.completed')}</option>
               </select>
             </div>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-start border-collapse">
               <thead>
                 <tr className="border-b border-gray-100 text-[10px] font-bold text-gray-500 uppercase tracking-wider bg-gray-50/50">
-                  <th className="px-6 py-4">Booking ID</th>
-                  <th className="px-6 py-4">Plate Number</th>
-                  <th className="px-6 py-4">Vehicle</th>
-                  <th className="px-6 py-4">Service Type</th>
-                  <th className="px-6 py-4">Category</th>
-                  <th className="px-6 py-4">Service Cost</th>
-                  <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4">Time</th>
-                  <th className="px-6 py-4 text-right">Actions</th>
+                  <th className="px-6 py-4">{t('table.bookingId')}</th>
+                  <th className="px-6 py-4">{t('table.plateNumber')}</th>
+                  <th className="px-6 py-4">{t('table.vehicle')}</th>
+                  <th className="px-6 py-4">{t('table.serviceType')}</th>
+                  <th className="px-6 py-4">{t('table.category')}</th>
+                  <th className="px-6 py-4">{t('table.serviceCost')}</th>
+                  <th className="px-6 py-4">{t('table.status')}</th>
+                  <th className="px-6 py-4">{t('table.time')}</th>
+                  <th className="px-6 py-4 text-end">{t('table.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -872,7 +874,7 @@ export default function B2BDashboard() {
                     </td>
                   </tr>
                 ) : filteredRequests.length === 0 ? (
-                  <tr><td colSpan={9} className="text-center py-8 text-gray-500">No requests found.</td></tr>
+                  <tr><td colSpan={9} className="text-center py-8 text-gray-500">{t('table.empty')}</td></tr>
                 ) : filteredRequests.map((request) => (
                   <tr key={request.booking_id} className="hover:bg-gray-50/50 transition-colors">
                     <td className="px-6 py-4 text-xs font-bold text-gray-700">{request.reference_id || request.booking_id}</td>
@@ -891,12 +893,12 @@ export default function B2BDashboard() {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-xs font-bold text-gray-900">
-                      {request.service_cost || 'Pending'}
+                      {request.service_cost || t('table.pending')}
                     </td>
                     <td className="px-6 py-4">
                       {renderStatusBadge(request.status)}
                     </td>
-                    <td className="px-6 py-4 text-xs text-gray-500">{request.time || 'N/A'}</td>
+                    <td className="px-6 py-4 text-xs text-gray-500">{request.time || t('table.na')}</td>
                     <td className="px-6 py-4">
                       <div className="flex justify-end">
                         {renderActions(request)}
@@ -933,12 +935,12 @@ export default function B2BDashboard() {
         }
         acceptLabel={
           (viewQuotationData?.status === 'Awaiting Body Check Response' || viewQuotationData?.status === 'Approve Body Check' || (selectedRequest?.status || '').includes('Body Check'))
-            ? "Approve Photos"
-            : "Accept"
+            ? t('actions.approvePhotos')
+            : t('actions.accept')
         }
         rejectLabel={
           (viewQuotationData?.status === 'Awaiting Body Check Response' || viewQuotationData?.status === 'Approve Body Check' || (selectedRequest?.status || '').includes('Body Check'))
-            ? "Reject Photos"
+            ? t('actions.rejectPhotos')
             : undefined
         }
       />
@@ -974,7 +976,7 @@ export default function B2BDashboard() {
         isOpen={isPhotoGalleryOpen}
         onClose={() => setIsPhotoGalleryOpen(false)}
         photos={viewBodyCheckPhotos.map(p => p.url)}
-        title={`Body Check - ${selectedRequest?.vehicle || 'Vehicle'}`}
+        title={t('modals.bodyCheckTitle', { vehicle: selectedRequest?.vehicle || t('modals.vehicleFallback') })}
         onApprove={handleApproveBodyCheck}
         onReject={handleRejectBodyCheck}
         isLoading={isPhotoGalleryLoading}
