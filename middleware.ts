@@ -7,9 +7,15 @@ export function middleware(request: NextRequest) {
   const isServiceCenterRoute = request.nextUrl.pathname.startsWith('/serviceCenter');
   const isAuthRoute = request.nextUrl.pathname.startsWith('/auth');
   const isAdminLoginRoute = request.nextUrl.pathname === '/login';
+  const isB2BLoginRoute = request.nextUrl.pathname === '/b2b/login';
   const isCustomerLoginRoute = request.nextUrl.pathname === '/customers/v1/auth/login';
   const isCustomerRegisterRoute = request.nextUrl.pathname.startsWith('/auth/register');
   const isRootRoute = request.nextUrl.pathname === '/';
+
+  // If accessing legacy b2b login, redirect to login
+  if (isB2BLoginRoute) {
+    return NextResponse.redirect(new URL('/login', request.url));
+  }
 
   // If accessing root path, redirect to admin login
   if (isRootRoute) {
@@ -23,7 +29,7 @@ export function middleware(request: NextRequest) {
 
   // If trying to access admin login with token, redirect to admin dashboard
   if (isAdminLoginRoute && token) {
-    return NextResponse.redirect(new URL('/serviceCenter/dashboard', request.url));
+    return NextResponse.redirect(new URL('/b2b/dashboard', request.url));
   }
 
   // If trying to access customer auth routes with token, redirect to customer dashboard

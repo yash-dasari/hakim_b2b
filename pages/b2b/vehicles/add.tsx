@@ -8,9 +8,12 @@ import { vehiclesAPI, VehicleBrand, VehicleModel } from '../../../services/api/v
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
 import SearchableSelect from '../../../components/common/SearchableSelect';
+import { useTranslations } from 'next-intl';
 
 export default function AddVehiclePage() {
     const router = useRouter();
+    const t = useTranslations('addVehicle');
+    const tCommon = useTranslations('common');
     const { user, company } = useSelector((state: RootState) => state.auth);
     const [vehicleImages, setVehicleImages] = useState<{ [key: string]: File | null }>({
         front: null,
@@ -43,6 +46,8 @@ export default function AddVehiclePage() {
         plateFormat: 'new', // Default to new
     });
     const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
+
+    const getDirectionLabel = (direction: string) => t(`imageLabels.${direction}` as any);
 
     // Dynamic Options State
     const [brandOptions, setBrandOptions] = useState<VehicleBrand[]>([]);
@@ -104,13 +109,13 @@ export default function AddVehiclePage() {
 
             // Validate size (< 5MB)
             if (file.size > 5 * 1024 * 1024) {
-                toast.error(`File size for ${direction} image must be less than 5MB.`);
+                toast.error(t('errors.fileSize', { direction: getDirectionLabel(direction) }));
                 return;
             }
 
             // Validate type
             if (!['image/jpeg', 'image/png', 'image/jpg'].includes(file.type)) {
-                toast.error(`File type for ${direction} image must be JPEG, JPG, or PNG.`);
+                toast.error(t('errors.fileType', { direction: getDirectionLabel(direction) }));
                 return;
             }
 
@@ -139,7 +144,7 @@ export default function AddVehiclePage() {
             const files = Array.from(e.target.files);
 
             if (files.length > 4) {
-                toast.error("You can only upload a maximum of 4 images.");
+                toast.error(t('errors.maxImages'));
                 return;
             }
 
@@ -154,13 +159,13 @@ export default function AddVehiclePage() {
 
                 // Validate size
                 if (file.size > 5 * 1024 * 1024) {
-                    toast.error(`File ${file.name} is too large (max 5MB). Skipped.`);
+                    toast.error(t('errors.fileTooLarge', { fileName: file.name }));
                     return;
                 }
 
                 // Validate type
                 if (!['image/jpeg', 'image/png', 'image/jpg'].includes(file.type)) {
-                    toast.error(`File ${file.name} is not a valid image. Skipped.`);
+                    toast.error(t('errors.invalidImage', { fileName: file.name }));
                     return;
                 }
 
@@ -187,17 +192,17 @@ export default function AddVehiclePage() {
         const errors: { [key: string]: string } = {};
         console.log('Validating form, current data:', formData);
 
-        if (!formData.make) errors.make = 'Make is required';
-        if (!formData.model) errors.model = 'Model is required';
-        if (!formData.year) errors.year = 'Year is required';
-        if (!formData.color) errors.color = 'Color is required';
-        if (!formData.plateNumber) errors.plateNumber = 'Plate Number is required';
+        if (!formData.make) errors.make = t('validation.makeRequired');
+        if (!formData.model) errors.model = t('validation.modelRequired');
+        if (!formData.year) errors.year = t('validation.yearRequired');
+        if (!formData.color) errors.color = t('validation.colorRequired');
+        if (!formData.plateNumber) errors.plateNumber = t('validation.plateRequired');
 
         console.log('Validation errors:', errors);
         setFormErrors(errors);
 
         if (Object.keys(errors).length > 0) {
-            toast.error('Please fill in all required fields');
+            toast.error(t('validation.requiredFields'));
         }
 
         return Object.keys(errors).length === 0;
@@ -227,7 +232,7 @@ export default function AddVehiclePage() {
         }
 
         if (!companyId) {
-            toast.error('Company ID not found. Please log in again.');
+            toast.error(t('errors.companyIdMissing'));
             return;
         }
 
@@ -259,10 +264,10 @@ export default function AddVehiclePage() {
 
             if (response.success || response.id || response.vehicle_id) {
                 // Assuming success if we get a response object
-                toast.success('Vehicle added successfully');
+                toast.success(t('success.vehicleAdded'));
                 router.push('/b2b/vehicles');
             } else {
-                toast.error('Failed to create vehicle: ' + (response.message || 'Unknown error'));
+                toast.error(`${t('errors.createFailed')}: ${response.message || t('errors.unknown')}`);
             }
 
         } catch (error: unknown) {
@@ -271,11 +276,11 @@ export default function AddVehiclePage() {
             const errorObj = error as { response?: { data?: { error?: { code?: string; message?: string }; detail?: Array<{ msg?: string }> } } };
             const errorData = errorObj?.response?.data;
             if (errorData?.error?.code === 'HTTP_409') {
-                toast.error(errorData.error.message || 'A vehicle with this license plate already exists.');
+                toast.error(errorData.error.message || t('errors.duplicatePlate'));
             } else {
                 const detailMsg = errorData?.detail?.[0]?.msg;
-                const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-                toast.error('Error creating vehicle: ' + (detailMsg || errorMessage));
+                const errorMessage = error instanceof Error ? error.message : t('errors.unknown');
+                toast.error(`${t('errors.createError')}: ${detailMsg || errorMessage}`);
             }
         } finally {
             setLoading(false);
@@ -299,10 +304,10 @@ export default function AddVehiclePage() {
 
                 {previewUrls[direction] ? (
                     <>
-                        <img src={previewUrls[direction]!} alt={`${direction} Preview`} className="w-full h-full object-cover rounded-md" />
+                        <img src={previewUrls[direction]!} alt={t('actions.imagePreview', { label })} className="w-full h-full object-cover rounded-md" />
                         <button
                             onClick={(e) => { e.stopPropagation(); removeImage(direction); }}
-                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600 z-10"
+                            className="absolute -top-2 -end-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600 z-10"
                         >
                             <FaTimes className="text-xs" />
                         </button>
@@ -312,7 +317,7 @@ export default function AddVehiclePage() {
                         <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center mb-2 shadow-sm text-gray-400">
                             <FaImage />
                         </div>
-                        <p className="text-[10px] font-medium text-gray-600 text-center">Upload {label}</p>
+                        <p className="text-[10px] font-medium text-gray-600 text-center">{t('actions.uploadImage', { label })}</p>
                     </>
                 )}
             </div>
@@ -322,8 +327,8 @@ export default function AddVehiclePage() {
 
     return (
         <AdminLayout
-            title="Add New Vehicle"
-            subtitle="Add a vehicle to your fleet"
+            title={t('title')}
+            subtitle={t('subtitle')}
         >
             <div className="max-w-3xl mx-auto pt-8 pb-12">
 
@@ -334,7 +339,7 @@ export default function AddVehiclePage() {
                             <div className="w-8 h-8 rounded-full bg-[#FCD34D] flex items-center justify-center text-gray-900 shadow-sm z-10">
                                 <FaCar className="text-sm" />
                             </div>
-                            <span className="text-sm font-bold text-gray-900">Vehicle Details</span>
+                            <span className="text-sm font-bold text-gray-900">{t('stepper.details')}</span>
                         </div>
 
                         <div className="w-24 h-0.5 bg-gray-200" />
@@ -343,7 +348,7 @@ export default function AddVehiclePage() {
                             <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
                                 <FaCheck className="text-sm" />
                             </div>
-                            <span className="text-sm font-bold text-gray-500">Complete</span>
+                            <span className="text-sm font-bold text-gray-500">{t('stepper.complete')}</span>
                         </div>
                     </div>
                 </div>
@@ -351,8 +356,8 @@ export default function AddVehiclePage() {
                 {/* Main Form Card */}
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                     <div className="p-8 border-b border-gray-100">
-                        <h2 className="text-lg font-bold text-gray-900 mb-2">Vehicle Information</h2>
-                        <p className="text-sm text-gray-500">Please fill in the details of the vehicle you want to add to your fleet.</p>
+                        <h2 className="text-lg font-bold text-gray-900 mb-2">{t('sections.vehicleInfo.title')}</h2>
+                        <p className="text-sm text-gray-500">{t('sections.vehicleInfo.subtitle')}</p>
                     </div>
 
                     <div className="p-8 space-y-6">
@@ -361,7 +366,7 @@ export default function AddVehiclePage() {
 
                         {/* Make */}
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-gray-700 block">Vehicle Make <span className="text-red-500">*</span></label>
+                            <label className="text-xs font-bold text-gray-700 block">{t('fields.make')} <span className="text-red-500">*</span></label>
                             <div className="relative">
                                 <SearchableSelect
                                     name="make"
@@ -381,7 +386,7 @@ export default function AddVehiclePage() {
                                         value: brand.brand_id,
                                         label: brand.brand_name
                                     }))}
-                                    placeholder={isLoadingBrands ? 'Loading Brands...' : 'Select Make'}
+                                    placeholder={isLoadingBrands ? t('placeholders.loadingBrands') : t('placeholders.selectMake')}
                                     disabled={isLoadingBrands}
                                     error={formErrors.make}
                                 />
@@ -390,7 +395,7 @@ export default function AddVehiclePage() {
 
                         {/* Model */}
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-gray-700 block">Vehicle Model <span className="text-red-500">*</span></label>
+                            <label className="text-xs font-bold text-gray-700 block">{t('fields.model')} <span className="text-red-500">*</span></label>
                             <div className="relative">
                                 {modelOptions.length > 0 ? (
                                     <SearchableSelect
@@ -406,7 +411,7 @@ export default function AddVehiclePage() {
                                             value: model.model_id,
                                             label: model.model_name
                                         }))}
-                                        placeholder={isLoadingModels ? 'Loading Models...' : 'Select Model'}
+                                        placeholder={isLoadingModels ? t('placeholders.loadingModels') : t('placeholders.selectModel')}
                                         disabled={!formData.make || isLoadingModels}
                                         error={formErrors.model}
                                     />
@@ -416,7 +421,7 @@ export default function AddVehiclePage() {
                                         name="model"
                                         value={formData.model}
                                         onChange={handleChange}
-                                        placeholder={!formData.make ? "Select a make first" : (isLoadingModels ? "Loading models..." : "Enter Model")}
+                                        placeholder={!formData.make ? t('placeholders.selectMakeFirst') : (isLoadingModels ? t('placeholders.loadingModels') : t('placeholders.enterModel'))}
                                         disabled={!formData.make || isLoadingModels}
                                         className={`w-full px-4 py-3 border ${formErrors.model ? 'border-red-500' : 'border-gray-200'} rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#FCD34D] focus:border-transparent disabled:bg-gray-50 disabled:text-gray-400`}
                                     />
@@ -427,7 +432,7 @@ export default function AddVehiclePage() {
 
                         {/* Year */}
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-gray-700 block">Vehicle Year <span className="text-red-500">*</span></label>
+                            <label className="text-xs font-bold text-gray-700 block">{t('fields.year')} <span className="text-red-500">*</span></label>
                             <div className="relative">
                                 <select
                                     name="year"
@@ -435,12 +440,12 @@ export default function AddVehiclePage() {
                                     onChange={handleChange}
                                     className={`w-full px-4 py-3 border ${formErrors.year ? 'border-red-500' : 'border-gray-200'} rounded-lg text-sm text-gray-900 bg-white appearance-none focus:outline-none focus:ring-2 focus:ring-[#FCD34D] focus:border-transparent`}
                                 >
-                                    <option value="">Select Year</option>
+                                    <option value="">{t('placeholders.selectYear')}</option>
                                     {Array.from({ length: 20 }, (_, i) => new Date().getFullYear() - i).map(year => (
                                         <option key={year} value={year}>{year}</option>
                                     ))}
                                 </select>
-                                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                                <div className="absolute end-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </div>
                             </div>
@@ -449,34 +454,34 @@ export default function AddVehiclePage() {
 
                         {/* Mileage */}
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-gray-700 block">Mileage (KMs)</label>
+                            <label className="text-xs font-bold text-gray-700 block">{t('fields.mileage')}</label>
                             <div className="relative">
                                 <input
                                     type="number"
                                     name="mileage"
                                     value={formData.mileage}
                                     onChange={handleChange}
-                                    placeholder="e.g. 5000"
+                                    placeholder={t('placeholders.mileage')}
                                     min="0"
                                     className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#FCD34D] focus:border-transparent"
                                 />
-                                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-medium">km</span>
+                                <span className="absolute end-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-medium">{t('units.km')}</span>
                             </div>
                         </div>
 
                         {/* Color - New Field */}
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-gray-700 block">Vehicle Color <span className="text-red-500">*</span></label>
+                            <label className="text-xs font-bold text-gray-700 block">{t('fields.color')} <span className="text-red-500">*</span></label>
                             <div className="relative">
                                 <input
                                     type="text"
                                     name="color"
                                     value={formData.color}
                                     onChange={handleChange}
-                                    placeholder="e.g. White, Silver, Black"
+                                    placeholder={t('placeholders.color')}
                                     className={`w-full px-4 py-3 border ${formErrors.color ? 'border-red-500' : 'border-gray-200'} rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#FCD34D] focus:border-transparent`}
                                 />
-                                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+                                <div className="absolute end-4 top-1/2 -translate-y-1/2 text-gray-400">
                                     <FaPalette />
                                 </div>
                             </div>
@@ -485,7 +490,7 @@ export default function AddVehiclePage() {
 
                         {/* Plate Number & Format Selection */}
                         <div className="space-y-4">
-                            <label className="text-xs font-bold text-gray-700 block">License Plate <span className="text-red-500">*</span></label>
+                            <label className="text-xs font-bold text-gray-700 block">{t('fields.licensePlate')} <span className="text-red-500">*</span></label>
 
                             {/* Format Selector */}
                             <div className="grid grid-cols-2 gap-4">
@@ -500,10 +505,10 @@ export default function AddVehiclePage() {
                                         <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${formData.plateFormat === 'new' ? 'border-[#FCD34D]' : 'border-gray-300'}`}>
                                             {formData.plateFormat === 'new' && <div className="w-2 h-2 bg-[#FCD34D] rounded-full" />}
                                         </div>
-                                        <span className="text-xs font-bold text-gray-900">New Format</span>
+                                        <span className="text-xs font-bold text-gray-900">{t('plate.newFormat')}</span>
                                     </div>
                                     <div className="bg-gray-100 rounded-lg overflow-hidden h-16 w-full relative">
-                                        <img src="/assets/plates/new-plate.png" alt="New Format" className="w-full h-full object-contain" />
+                                        <img src="/assets/plates/new-plate.png" alt={t('plate.newFormat')} className="w-full h-full object-contain" />
                                     </div>
                                 </div>
 
@@ -518,10 +523,10 @@ export default function AddVehiclePage() {
                                         <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${formData.plateFormat === 'old' ? 'border-[#FCD34D]' : 'border-gray-300'}`}>
                                             {formData.plateFormat === 'old' && <div className="w-2 h-2 bg-[#FCD34D] rounded-full" />}
                                         </div>
-                                        <span className="text-xs font-bold text-gray-900">Old Format</span>
+                                        <span className="text-xs font-bold text-gray-900">{t('plate.oldFormat')}</span>
                                     </div>
                                     <div className="bg-gray-100 rounded-lg overflow-hidden h-16 w-full relative">
-                                        <img src="/assets/plates/old-plate.png" alt="Old Format" className="w-full h-full object-contain" />
+                                        <img src="/assets/plates/old-plate.png" alt={t('plate.oldFormat')} className="w-full h-full object-contain" />
                                     </div>
                                 </div>
                             </div>
@@ -531,7 +536,7 @@ export default function AddVehiclePage() {
                                 {formData.plateFormat === 'new' ? (
                                     <div className="flex gap-2 items-center">
                                         <div className="flex-1 max-w-[80px]">
-                                            <label className="text-[10px] font-bold text-gray-500 mb-1 block">Code</label>
+                                            <label className="text-[10px] font-bold text-gray-500 mb-1 block">{t('plate.code')}</label>
                                             <input
                                                 type="text"
                                                 maxLength={2}
@@ -547,7 +552,7 @@ export default function AddVehiclePage() {
                                             />
                                         </div>
                                         <div className="flex-1 max-w-[80px]">
-                                            <label className="text-[10px] font-bold text-gray-500 mb-1 block">Letter</label>
+                                            <label className="text-[10px] font-bold text-gray-500 mb-1 block">{t('plate.letter')}</label>
                                             <input
                                                 type="text"
                                                 maxLength={2}
@@ -564,7 +569,7 @@ export default function AddVehiclePage() {
                                             />
                                         </div>
                                         <div className="flex-[2]">
-                                            <label className="text-[10px] font-bold text-gray-500 mb-1 block">Number</label>
+                                            <label className="text-[10px] font-bold text-gray-500 mb-1 block">{t('plate.number')}</label>
                                             <input
                                                 type="text"
                                                 maxLength={5}
@@ -583,7 +588,7 @@ export default function AddVehiclePage() {
                                 ) : (
                                     <div className="flex gap-2 items-center">
                                         <div className="flex-1 max-w-[100px]">
-                                            <label className="text-[10px] font-bold text-gray-500 mb-1 block">Code</label>
+                                            <label className="text-[10px] font-bold text-gray-500 mb-1 block">{t('plate.code')}</label>
                                             <input
                                                 type="text"
                                                 maxLength={2}
@@ -605,7 +610,7 @@ export default function AddVehiclePage() {
                                             />
                                         </div>
                                         <div className="flex-[2]">
-                                            <label className="text-[10px] font-bold text-gray-500 mb-1 block">Number</label>
+                                            <label className="text-[10px] font-bold text-gray-500 mb-1 block">{t('plate.number')}</label>
                                             <input
                                                 type="text"
                                                 maxLength={6}
@@ -627,22 +632,22 @@ export default function AddVehiclePage() {
 
                         {/* VIN Number */}
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-gray-700 block">VIN Number</label>
+                            <label className="text-xs font-bold text-gray-700 block">{t('fields.vin')}</label>
                             <div className="relative">
                                 <input
                                     type="text"
                                     name="vin"
                                     value={formData.vin}
                                     onChange={handleChange}
-                                    placeholder="Enter 17-character VIN (Optional)"
+                                    placeholder={t('placeholders.vin')}
                                     maxLength={17}
                                     className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#FCD34D] focus:border-transparent font-mono tracking-wide"
                                 />
-                                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+                                <div className="absolute end-4 top-1/2 -translate-y-1/2 text-gray-400">
                                     <FaBarcode className="text-lg" />
                                 </div>
                             </div>
-                            <p className="text-[10px] text-gray-400">Vehicle Identification Number (17 characters)</p>
+                            <p className="text-[10px] text-gray-400">{t('helpers.vin')}</p>
                         </div>
 
                         <div className="pt-6 mt-6 border-t border-gray-100 flex items-center justify-between">
@@ -650,7 +655,7 @@ export default function AddVehiclePage() {
                                 onClick={() => router.back()}
                                 className="px-6 py-2.5 border border-gray-200 rounded-lg text-sm font-bold text-gray-600 hover:bg-gray-50 flex items-center gap-2"
                             >
-                                <FaArrowLeft className="text-xs" /> Cancel
+                                <FaArrowLeft className="text-xs rtl:rotate-180" /> {tCommon('actions.cancel')}
                             </button>
                             <button
                                 onClick={handleSubmit}
@@ -663,11 +668,11 @@ export default function AddVehiclePage() {
                                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                         </svg>
-                                        Adding...
+                                        {t('actions.adding')}
                                     </>
                                 ) : (
                                     <>
-                                        <FaPlus className="text-xs" /> Add Vehicle
+                                        <FaPlus className="text-xs" /> {t('actions.addVehicle')}
                                     </>
                                 )}
                             </button>
@@ -682,10 +687,10 @@ export default function AddVehiclePage() {
                         <FaInfoCircle className="text-sm" />
                     </div>
                     <div>
-                        <h4 className="text-sm font-bold text-blue-900 mb-1">Need Help?</h4>
+                        <h4 className="text-sm font-bold text-blue-900 mb-1">{t('help.title')}</h4>
                         <p className="text-xs text-blue-700 leading-relaxed">
-                            VIN can be found on your vehicle registration, insurance card, or on the driver's side dashboard near the windshield. <br />
-                            Please ensure strictly clear images from all 4 sides are uploaded.
+                            {t('help.vinInfo')} <br />
+                            {t('help.imageInfo')}
                         </p>
                     </div>
                 </div>

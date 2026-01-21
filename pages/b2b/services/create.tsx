@@ -8,6 +8,7 @@ import { vehiclesAPI, Vehicle as ApiVehicle } from '../../../services/api/vehicl
 import { servicesAPI, ServiceCategory, Service, ServiceProviderInfo, NearbyServiceCenterPayload, BatchBookingPayload } from '../../../services/api/services.api';
 import LocationPicker from '../../../components/common/LocationPicker';
 import { toast } from 'react-hot-toast';
+import { useTranslations } from 'next-intl';
 
 // Use interface from vehicles.api or define UI specific one if needed
 interface Vehicle extends ApiVehicle {
@@ -18,6 +19,8 @@ interface Vehicle extends ApiVehicle {
 
 export default function CreateServiceRequestPage() {
     const router = useRouter();
+    const t = useTranslations('servicesCreate');
+    const tCommon = useTranslations('common');
     const { company } = useSelector((state: RootState) => state.auth);
 
     // Multi-select state
@@ -47,7 +50,7 @@ export default function CreateServiceRequestPage() {
                         ...v,
                         id: v.id || v.vehicle_id || v.vehicle_reference_id || '', // Ensure we have an ID using all possible fields
                         makeModelYear: `${v.make} ${v.model} ${v.year}`,
-                        lastService: v.last_service_date ? new Date(v.last_service_date).toLocaleDateString() : 'N/A'
+                        lastService: v.last_service_date ? new Date(v.last_service_date).toLocaleDateString() : t('fallback.na')
                     }))
                     .filter((v): v is Vehicle => !!v.id); // Filter out vehicles without IDs
                 console.log('Mapped Vehicles:', mapped);
@@ -55,7 +58,7 @@ export default function CreateServiceRequestPage() {
             }
         } catch (error) {
             console.error('Error fetching vehicles:', error);
-            toast.error('Failed to load vehicles');
+            toast.error(t('errors.loadVehicles'));
         } finally {
             setIsLoadingVehicles(false);
         }
@@ -215,7 +218,7 @@ export default function CreateServiceRequestPage() {
         }
 
         setPermissionDenied(false); // Reset
-        toast.loading('Detecting your location...', { id: 'loc-detect' });
+        toast.loading(t('location.detecting'), { id: 'loc-detect' });
 
         navigator.geolocation.getCurrentPosition(
             async (position) => {
@@ -251,16 +254,16 @@ export default function CreateServiceRequestPage() {
                         setPickupAddress(address);
                         setSelectedCoords({ latitude: locationObj.lat, longitude: locationObj.lng });
 
-                        toast.success('Location detected', { id: 'loc-detect' });
+                        toast.success(t('location.detected'), { id: 'loc-detect' });
                     }
                 } catch (error) {
                     console.error('Reverse geocoding failed', error);
-                    toast.error('Failed to get address details', { id: 'loc-detect' });
+                    toast.error(t('location.addressFailed'), { id: 'loc-detect' });
                 }
             },
             (error) => {
                 console.error('Geolocation error', error);
-                toast.error('Location access denied', { id: 'loc-detect' });
+                toast.error(t('location.accessDenied'), { id: 'loc-detect' });
                 setPermissionDenied(true);
             }
         );
@@ -292,7 +295,7 @@ export default function CreateServiceRequestPage() {
                 setServiceCenters(centers as Array<Service & { [key: string]: unknown }>);
 
                 // Fallback: If data is just strings, use it. If objects, map .name
-                const newLocations = centers.map((item: { name?: string; location?: string }) => item.name || item.location || "Nearby Center");
+                const newLocations = centers.map((item: { name?: string; location?: string }) => item.name || item.location || t('location.nearbyCenter'));
                 setAvailableLocations(newLocations);
 
                 // Auto-select the first one if available to be helpful
@@ -306,13 +309,13 @@ export default function CreateServiceRequestPage() {
 
 
             } else {
-                toast.error('No service centers found nearby.');
+                toast.error(t('errors.noServiceCenters'));
                 setAvailableLocations([]);
                 setServiceCenters([]);
             }
         } catch (error) {
             console.error('Error fetching nearby centers:', error);
-            toast.error('Failed to find nearby centers');
+            toast.error(t('errors.nearbyCentersFailed'));
         } finally {
             setIsLoadingNearby(false);
         }
@@ -325,11 +328,11 @@ export default function CreateServiceRequestPage() {
             if (response.success) {
                 setCategories(response.data);
             } else {
-                toast.error('Failed to load service categories');
+                toast.error(t('errors.categoriesFailed'));
             }
         } catch (error) {
             console.error('Error fetching categories:', error);
-            toast.error('Error loading service categories');
+            toast.error(t('errors.categoriesFailed'));
         } finally {
             setIsLoadingCategories(false);
         }
@@ -342,11 +345,11 @@ export default function CreateServiceRequestPage() {
             if (response.success) {
                 setServices(response.data);
             } else {
-                toast.error('Failed to load services');
+                toast.error(t('errors.servicesFailed'));
             }
         } catch (error) {
             console.error('Error fetching services:', error);
-            toast.error('Error loading services');
+            toast.error(t('errors.servicesFailed'));
         } finally {
             setIsLoadingServices(false);
         }
@@ -384,45 +387,45 @@ export default function CreateServiceRequestPage() {
 
     const handleSubmit = async () => {
         if (!company?.id) {
-            toast.error('Company information missing');
+            toast.error(t('errors.companyMissing'));
             return;
         }
         if (selectedVehicleIds.size === 0) {
-            toast.error('Please select at least one vehicle');
+            toast.error(t('errors.selectVehicle'));
             return;
         }
         if (!selectedServiceId || !selectedProviderId) {
-            toast.error('Please select a service and provider');
+            toast.error(t('errors.selectServiceProvider'));
             return;
         }
 
         if (scheduleOptions.length > 1 && !selectedSchedule) {
-            toast.error('Please select a schedule type');
+            toast.error(t('errors.selectScheduleType'));
             return;
         }
 
         if (selectedSchedule === 'Scheduled' && (!scheduledDate || !scheduledHour || !scheduledMinute)) {
-            toast.error('Please select date and time for scheduled service');
+            toast.error(t('errors.selectScheduleTime'));
             return;
         }
 
         if (isMobileProvider && !pickupAddress) {
-            toast.error('Please pin a pickup location');
+            toast.error(t('errors.pickupLocation'));
             return;
         }
 
         if (isTowService && !dropOffAddress) {
-            toast.error('Please pin a drop off location');
+            toast.error(t('errors.dropoffLocation'));
             return;
         }
 
         if (!selectedLocation && !isLoadingNearby && !isVanService && !isTowService) {
-            toast.error('Please select a service center location');
+            toast.error(t('errors.selectServiceCenter'));
             return;
         }
 
         setIsSubmitting(true);
-        const toastId = toast.loading('Submitting booking request...');
+        const toastId = toast.loading(t('submission.submitting'));
 
         try {
             // Calculate scheduled_at
@@ -443,7 +446,7 @@ export default function CreateServiceRequestPage() {
 
                 if (diffMs < thirtyMinsMs) {
                     toast.dismiss(toastId);
-                    toast.error('Scheduled time must be at least 30 minutes in the future');
+                    toast.error(t('errors.scheduleFuture'));
                     setIsSubmitting(false); // Enable button if validation fails
                     return;
                 }
@@ -525,11 +528,11 @@ export default function CreateServiceRequestPage() {
             };
 
             await servicesAPI.createBatchBooking(bookingsPayload);
-            toast.success('Bookings created successfully', { id: toastId });
+            toast.success(t('submission.success'), { id: toastId });
             router.push('/b2b/services/requests');
         } catch (error) {
             console.error('Booking submission failed', error);
-            toast.error('Failed to create bookings', { id: toastId });
+            toast.error(t('submission.failed'), { id: toastId });
         } finally {
             setIsSubmitting(false); // Always re-enable button
         }
@@ -537,8 +540,8 @@ export default function CreateServiceRequestPage() {
 
     return (
         <AdminLayout
-            title="Service Request"
-            subtitle="Submit a new service request for your vehicles"
+            title={t('title')}
+            subtitle={t('subtitle')}
             headerActions={
                 <div className="flex items-center gap-3 text-gray-400">
                     <FaCog className="hover:text-gray-600 cursor-pointer" />
@@ -549,12 +552,12 @@ export default function CreateServiceRequestPage() {
 
                 {/* Service Details Card */}
                 <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-                    <h2 className="text-base font-bold text-gray-900 mb-6">Service Details</h2>
+                    <h2 className="text-base font-bold text-gray-900 mb-6">{t('serviceDetails.title')}</h2>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Category */}
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-gray-700 block">Select Category</label>
+                            <label className="text-xs font-bold text-gray-700 block">{t('serviceDetails.selectCategory')}</label>
                             <div className="relative">
                                 <select
                                     value={selectedCategoryId}
@@ -562,7 +565,7 @@ export default function CreateServiceRequestPage() {
                                     className="w-full px-4 py-3 bg-gray-100 border-none rounded-lg text-sm text-gray-900 appearance-none focus:outline-none focus:ring-2 focus:ring-[#FCD34D]"
                                     disabled={isLoadingCategories}
                                 >
-                                    <option value="">{isLoadingCategories ? 'Loading...' : 'Choose a category'}</option>
+                                    <option value="">{isLoadingCategories ? t('serviceDetails.loading') : t('serviceDetails.chooseCategory')}</option>
                                     {categories.map(category => (
                                         <option key={category.category_id} value={category.category_id}>
                                             {category.name}
@@ -574,7 +577,7 @@ export default function CreateServiceRequestPage() {
 
                         {/* Service */}
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-gray-700 block">Select Service</label>
+                            <label className="text-xs font-bold text-gray-700 block">{t('serviceDetails.selectService')}</label>
                             <div className="relative">
                                 <select
                                     value={selectedServiceId}
@@ -582,7 +585,7 @@ export default function CreateServiceRequestPage() {
                                     className={`w-full px-4 py-3 bg-gray-100 border-none rounded-lg text-sm text-gray-900 appearance-none focus:outline-none focus:ring-2 focus:ring-[#FCD34D] ${(isLoadingServices || !selectedCategoryId) ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     disabled={isLoadingServices || !selectedCategoryId}
                                 >
-                                    <option value="">{isLoadingServices ? 'Loading...' : 'Choose a service'}</option>
+                                    <option value="">{isLoadingServices ? t('serviceDetails.loading') : t('serviceDetails.chooseService')}</option>
                                     {services.map(service => (
                                         <option key={service.service_catalog_id} value={service.service_catalog_id}>
                                             {service.name}
@@ -595,7 +598,7 @@ export default function CreateServiceRequestPage() {
                         {/* Schedule Type - Only if multiple options exist */}
                         {scheduleOptions.length > 1 && (
                             <div className="space-y-1.5 animate-fadeIn">
-                                <label className="text-xs font-bold text-gray-700 block">Schedule Type</label>
+                                <label className="text-xs font-bold text-gray-700 block">{t('serviceDetails.scheduleType')}</label>
                                 <div className="flex gap-4">
                                     {scheduleOptions.map(option => (
                                         <label key={option} className="flex items-center gap-2 cursor-pointer group">
@@ -618,7 +621,7 @@ export default function CreateServiceRequestPage() {
                         {selectedSchedule === 'Scheduled' && (
                             <div className="grid grid-cols-2 gap-4 animate-fadeIn">
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-700 block">Preferred Date</label>
+                                    <label className="text-xs font-bold text-gray-700 block">{t('serviceDetails.preferredDate')}</label>
                                     <input
                                         type="date"
                                         value={scheduledDate}
@@ -628,7 +631,7 @@ export default function CreateServiceRequestPage() {
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-gray-700 block">Preferred Time</label>
+                                    <label className="text-xs font-bold text-gray-700 block">{t('serviceDetails.preferredTime')}</label>
                                     <div className="flex gap-2">
                                         {/* Hour */}
                                         <div className="relative flex-1">
@@ -666,8 +669,8 @@ export default function CreateServiceRequestPage() {
                                                 onChange={(e) => setScheduledAmPm(e.target.value)}
                                                 className="w-full px-4 py-3 bg-gray-100 border-none rounded-lg text-sm text-gray-900 appearance-none focus:outline-none focus:ring-2 focus:ring-[#FCD34D]"
                                             >
-                                                <option value="AM">AM</option>
-                                                <option value="PM">PM</option>
+                                                <option value="AM">{t('serviceDetails.am')}</option>
+                                                <option value="PM">{t('serviceDetails.pm')}</option>
                                             </select>
                                         </div>
                                     </div>
@@ -677,7 +680,7 @@ export default function CreateServiceRequestPage() {
 
                         {/* Provider */}
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-gray-700 block">Service Provider</label>
+                            <label className="text-xs font-bold text-gray-700 block">{t('serviceDetails.serviceProvider')}</label>
                             <div className="relative">
                                 <select
                                     value={selectedProviderId}
@@ -685,7 +688,7 @@ export default function CreateServiceRequestPage() {
                                     className={`w-full px-4 py-3 bg-gray-100 border-none rounded-lg text-sm text-gray-900 appearance-none focus:outline-none focus:ring-2 focus:ring-[#FCD34D] ${(!selectedServiceId || availableProviders.length === 0) ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     disabled={!selectedServiceId || availableProviders.length === 0}
                                 >
-                                    <option value="">Choose a provider</option>
+                                    <option value="">{t('serviceDetails.chooseProvider')}</option>
                                     {availableProviders.map(provider => (
                                         <option key={String(provider.provider_id)} value={String(provider.provider_id)}>
                                             {provider.name}
@@ -700,8 +703,8 @@ export default function CreateServiceRequestPage() {
                             <div className="md:col-span-2 space-y-1.5 animate-fadeIn">
                                 <label className="text-xs font-bold text-gray-700 block">
                                     {isMobileProvider
-                                        ? (pickupAddress ? 'Pickup Location Selected' : 'Pin your pickup location')
-                                        : 'Pin location to find nearby centers'
+                                        ? (pickupAddress ? t('map.pickupSelected') : t('map.pinPickup'))
+                                        : t('map.pinLocation')
                                     }
                                 </label>
                                 {permissionDenied ? (
@@ -709,19 +712,19 @@ export default function CreateServiceRequestPage() {
                                         <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-3">
                                             <FaTimesCircle className="text-red-500 text-xl" />
                                         </div>
-                                        <h3 className="text-sm font-bold text-red-800 mb-1">Permission Denied</h3>
+                                        <h3 className="text-sm font-bold text-red-800 mb-1">{t('map.permissionDenied.title')}</h3>
                                         <p className="text-xs text-red-600 mb-2 max-w-xs">
-                                            We cannot detect your location because permission was denied.
+                                            {t('map.permissionDenied.message')}
                                         </p>
                                         <p className="text-[10px] text-red-500 mb-4 max-w-xs">
-                                            Please allow location access in your browser settings and try again.
+                                            {t('map.permissionDenied.hint')}
                                         </p>
                                         <button
                                             type="button"
                                             onClick={detectLocation}
                                             className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-md transition-colors shadow-sm"
                                         >
-                                            Retry Detection
+                                            {t('map.permissionDenied.retry')}
                                         </button>
                                     </div>
                                 ) : (
@@ -739,7 +742,7 @@ export default function CreateServiceRequestPage() {
                                             </svg>
                                         </div>
                                         <div>
-                                            <p className="text-xs font-bold text-gray-900">Selected Pickup Address:</p>
+                                            <p className="text-xs font-bold text-gray-900">{t('map.selectedPickup')}</p>
                                             <p className="text-sm text-gray-700">{pickupAddress}</p>
                                         </div>
                                     </div>
@@ -751,7 +754,7 @@ export default function CreateServiceRequestPage() {
                         {isTowService && (
                             <div className="md:col-span-2 space-y-1.5 animate-fadeIn mt-4 border-t border-gray-100 pt-4">
                                 <label className="text-xs font-bold text-gray-700 block">
-                                    {dropOffAddress ? 'Drop Off Location Selected' : 'Pin your drop off location'}
+                                    {dropOffAddress ? t('map.dropoffSelected') : t('map.pinDropoff')}
                                 </label>
                                 <LocationPicker
                                     onLocationSelect={(loc) => {
@@ -770,7 +773,7 @@ export default function CreateServiceRequestPage() {
                                             </svg>
                                         </div>
                                         <div>
-                                            <p className="text-xs font-bold text-gray-900">Selected Drop Off Address:</p>
+                                            <p className="text-xs font-bold text-gray-900">{t('map.selectedDropoff')}</p>
                                             <p className="text-sm text-gray-700">{dropOffAddress}</p>
                                         </div>
                                     </div>
@@ -782,7 +785,7 @@ export default function CreateServiceRequestPage() {
                         {(!isVanService && !isTowService) && (
                             <div className="space-y-1.5 animate-fadeIn">
                                 <label className="text-xs font-bold text-gray-700 block">
-                                    {isMobileProvider ? 'Destination Center' : 'Service Center Location'}
+                                    {isMobileProvider ? t('location.destinationCenter') : t('location.serviceCenter')}
                                 </label>
                                 <div className="relative">
                                     <select
@@ -792,14 +795,14 @@ export default function CreateServiceRequestPage() {
                                         disabled={(!selectedProviderId && !isMobileProvider) || (availableLocations.length === 0 && !isLoadingNearby && !isMobileProvider)}
                                     >
                                         <option value="">
-                                            {isLoadingNearby ? 'Searching nearby...' : (availableLocations.length === 0 ? (isMobileProvider ? 'No centers available' : 'Select on map') : 'Choose a location')}
+                                            {isLoadingNearby ? t('location.searchingNearby') : (availableLocations.length === 0 ? (isMobileProvider ? t('location.noCenters') : t('location.selectOnMap')) : t('location.chooseLocation'))}
                                         </option>
                                         {serviceCenters.length > 0 ? (
                                             serviceCenters.map((center, index) => {
                                                 const id = center.id || center.service_center_id || center.uuid || center.name;
                                                 return (
                                                     <option key={id || index} value={id}>
-                                                        {center.name || center.location || "Center " + (index + 1)}
+                                                        {center.name || center.location || `${t('location.center')} ${index + 1}`}
                                                     </option>
                                                 );
                                             })
@@ -821,26 +824,26 @@ export default function CreateServiceRequestPage() {
                 {/* Select Vehicle Card */}
                 <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
                     <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-base font-bold text-gray-900">Select Vehicle</h2>
-                        <span className="text-xs text-gray-500">{filteredVehicles.length} vehicles available</span>
+                        <h2 className="text-base font-bold text-gray-900">{t('vehicles.title')}</h2>
+                        <span className="text-xs text-gray-500">{t('vehicles.available', { count: filteredVehicles.length })}</span>
                     </div>
 
                     {/* Search Bar */}
                     <div className="mb-6 relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
                             <FaSearch className="text-gray-400 text-xs" />
                         </div>
                         <input
                             type="text"
-                            placeholder="Search by make, model, or plate number..."
-                            className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FCD34D] bg-white transition-all"
+                            placeholder={t('vehicles.searchPlaceholder')}
+                            className="w-full ps-10 pe-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FCD34D] bg-white transition-all"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
 
                     <div className="overflow-x-auto">
-                        <table className="w-full text-left">
+                        <table className="w-full text-start">
                             <thead>
                                 <tr className="border-b border-gray-100 text-[10px] uppercase font-bold text-gray-500 tracking-wider">
                                     <th className="px-4 py-3 w-16">
@@ -851,10 +854,10 @@ export default function CreateServiceRequestPage() {
                                             {selectedVehicleIds.size === filteredVehicles.length && filteredVehicles.length > 0 && <FaCheck className="text-gray-900 text-[10px]" />}
                                         </div>
                                     </th>
-                                    <th className="px-4 py-3">Car Make/Model/Year</th>
-                                    <th className="px-4 py-3">Plate Number</th>
-                                    <th className="px-4 py-3">Last Service Date/Time</th>
-                                    <th className="px-4 py-3">Note</th>
+                                    <th className="px-4 py-3">{t('vehicles.table.makeModelYear')}</th>
+                                    <th className="px-4 py-3">{t('vehicles.table.plateNumber')}</th>
+                                    <th className="px-4 py-3">{t('vehicles.table.lastService')}</th>
+                                    <th className="px-4 py-3">{t('vehicles.table.note')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">
@@ -889,7 +892,7 @@ export default function CreateServiceRequestPage() {
                                             <td className="px-4 py-4" onClick={(e) => e.stopPropagation()}>
                                                 <input
                                                     type="text"
-                                                    placeholder="Add a note..."
+                                                    placeholder={t('vehicles.notePlaceholder')}
                                                     className="w-full px-3 py-2 bg-gray-50 border border-gray-100 rounded-lg text-xs text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#FCD34D]"
                                                     value={notes[vehicle.id] || ''}
                                                     onChange={(e) => handleNoteChange(vehicle.id, e.target.value)}
@@ -909,7 +912,7 @@ export default function CreateServiceRequestPage() {
                         onClick={() => router.back()}
                         className="px-6 py-2.5 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-700 hover:bg-gray-50"
                     >
-                        Cancel
+                        {tCommon('actions.cancel')}
                     </button>
                     <button
                         type="button"
@@ -920,7 +923,7 @@ export default function CreateServiceRequestPage() {
                             : 'bg-[#FCD34D] hover:bg-[#FBBF24] text-gray-900'
                             }`}
                     >
-                        {isSubmitting ? 'Processing...' : `Submit Request (${selectedVehicleIds.size})`}
+                        {isSubmitting ? t('submission.processing') : t('submission.submit', { count: selectedVehicleIds.size })}
                     </button>
                 </div>
 

@@ -8,6 +8,7 @@ import {
 } from 'react-icons/fa';
 import apiClient from '../../../config/api.config';
 import { BookingListItem, ServiceCategory } from '../../../services/api/services.api';
+import { useTranslations } from 'next-intl';
 
 interface ServiceItem {
     id: number;
@@ -60,6 +61,8 @@ export default function QuotationBuilderModal({
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [_errorMessage, _setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
+    const t = useTranslations('modals.quotationBuilder');
+    const tCommon = useTranslations('common');
 
     // Fetch service categories
     useEffect(() => {
@@ -155,7 +158,7 @@ export default function QuotationBuilderModal({
         setIsSubmitting(true);
         // Simulate API call
         setTimeout(() => {
-            setSuccessMessage('Quotation saved successfully!');
+            setSuccessMessage(t('alerts.saved'));
             setIsSubmitting(false);
             if (onSave) onSave({ services, parts, totals, validUntil, internalNotes });
         }, 1000);
@@ -165,7 +168,7 @@ export default function QuotationBuilderModal({
         setIsSubmitting(true);
         // Simulate API call
         setTimeout(() => {
-            setSuccessMessage('Quotation sent to customer!');
+            setSuccessMessage(t('alerts.sent'));
             setIsSubmitting(false);
             if (onSend) onSend({ services, parts, totals, validUntil, internalNotes });
         }, 1000);
@@ -181,9 +184,13 @@ export default function QuotationBuilderModal({
                 {/* Header - Yellow */}
                 <div className="bg-yellow-400 px-6 py-4 flex items-center justify-between flex-shrink-0">
                     <div>
-                        <h2 className="text-xl font-bold text-gray-900">Quotation Builder</h2>
+                        <h2 className="text-xl font-bold text-gray-900">{t('title')}</h2>
                         <div className="text-sm font-medium text-gray-800 mt-1 opacity-90">
-                            Booking #{serviceRequest?.booking_id || serviceRequest?.reference_id || 'SR-2024-001'} · {serviceRequest?.category || 'Service'} · {serviceRequest?.plate_number || 'N/A'}
+                            {t('header', {
+                                id: serviceRequest?.booking_id || serviceRequest?.reference_id || 'SR-2024-001',
+                                category: serviceRequest?.category || t('serviceFallback'),
+                                plate: serviceRequest?.plate_number || t('fallback.na')
+                            })}
                         </div>
                     </div>
                     <button onClick={onClose} className="p-2 hover:bg-yellow-500 rounded-lg transition-colors text-gray-900">
@@ -198,21 +205,21 @@ export default function QuotationBuilderModal({
                         {/* Services Section */}
                         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                             <div className="flex items-center justify-between mb-6">
-                                <h3 className="text-lg font-bold text-gray-900">Services</h3>
+                                <h3 className="text-lg font-bold text-gray-900">{t('services.title')}</h3>
                                 <button onClick={addService} className="px-4 py-2 bg-yellow-400 text-gray-900 font-bold rounded-lg hover:bg-yellow-500 transition-colors text-sm flex items-center gap-2">
-                                    <FaPlus className="w-3 h-3" /> Add Service
+                                    <FaPlus className="w-3 h-3" /> {t('services.add')}
                                 </button>
                             </div>
 
                             {/* Table Header */}
                             <div className="grid grid-cols-12 gap-4 mb-2 px-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                                <div className="col-span-4">Service</div>
-                                <div className="col-span-1">Qty</div>
-                                <div className="col-span-1">Price</div>
-                                <div className="col-span-1">Discount</div>
-                                <div className="col-span-1">Cost</div>
-                                <div className="col-span-2">Warranty</div>
-                                <div className="col-span-1">Total</div>
+                                <div className="col-span-4">{t('services.columns.service')}</div>
+                                <div className="col-span-1">{t('services.columns.qty')}</div>
+                                <div className="col-span-1">{t('services.columns.price')}</div>
+                                <div className="col-span-1">{t('services.columns.discount')}</div>
+                                <div className="col-span-1">{t('services.columns.cost')}</div>
+                                <div className="col-span-2">{t('services.columns.warranty')}</div>
+                                <div className="col-span-1">{t('services.columns.total')}</div>
                                 <div className="col-span-1"></div>
                             </div>
 
@@ -225,7 +232,7 @@ export default function QuotationBuilderModal({
                                                 onChange={(e) => updateService(service.id, 'type', e.target.value)}
                                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
                                             >
-                                                <option value="">Select Service</option>
+                                                <option value="">{t('services.select')}</option>
                                                 {serviceCategories.map((cat) => (
                                                     <option key={cat.category_id || cat.name} value={cat.name}>{cat.name}</option>
                                                 ))}
@@ -264,11 +271,11 @@ export default function QuotationBuilderModal({
                                                 onChange={(e) => updateService(service.id, 'warranty', e.target.value)}
                                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white"
                                             >
-                                                <option>No Warranty</option>
-                                                <option>1 Month</option>
-                                                <option>3 Months</option>
-                                                <option>6 Months</option>
-                                                <option>1 Year</option>
+                                                <option value="No Warranty">{t('warranty.none')}</option>
+                                                <option value="1 Month">{t('warranty.oneMonth')}</option>
+                                                <option value="3 Months">{t('warranty.threeMonths')}</option>
+                                                <option value="6 Months">{t('warranty.sixMonths')}</option>
+                                                <option value="1 Year">{t('warranty.oneYear')}</option>
                                             </select>
                                         </div>
                                         <div className="col-span-1 text-center font-bold text-gray-900 text-sm">
@@ -287,21 +294,21 @@ export default function QuotationBuilderModal({
                         {/* Parts Section */}
                         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                             <div className="flex items-center justify-between mb-6">
-                                <h3 className="text-lg font-bold text-gray-900">Parts & Components</h3>
+                                <h3 className="text-lg font-bold text-gray-900">{t('parts.title')}</h3>
                                 <button onClick={addPart} className="px-4 py-2 bg-yellow-400 text-gray-900 font-bold rounded-lg hover:bg-yellow-500 transition-colors text-sm flex items-center gap-2">
-                                    <FaPlus className="w-3 h-3" /> Add Part
+                                    <FaPlus className="w-3 h-3" /> {t('parts.add')}
                                 </button>
                             </div>
 
                             {/* Table Header */}
                             <div className="grid grid-cols-12 gap-4 mb-2 px-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                                <div className="col-span-4">Part</div>
-                                <div className="col-span-1">Qty</div>
-                                <div className="col-span-1">Price</div>
-                                <div className="col-span-1">Discount</div>
-                                <div className="col-span-1">Cost</div>
-                                <div className="col-span-2">Warranty</div>
-                                <div className="col-span-1">Total</div>
+                                <div className="col-span-4">{t('parts.columns.part')}</div>
+                                <div className="col-span-1">{t('parts.columns.qty')}</div>
+                                <div className="col-span-1">{t('parts.columns.price')}</div>
+                                <div className="col-span-1">{t('parts.columns.discount')}</div>
+                                <div className="col-span-1">{t('parts.columns.cost')}</div>
+                                <div className="col-span-2">{t('parts.columns.warranty')}</div>
+                                <div className="col-span-1">{t('parts.columns.total')}</div>
                                 <div className="col-span-1"></div>
                             </div>
 
@@ -313,7 +320,7 @@ export default function QuotationBuilderModal({
                                                 type="text"
                                                 value={part.name}
                                                 onChange={(e) => updatePart(part.id, 'name', e.target.value)}
-                                                placeholder="Part Name"
+                                                placeholder={t('parts.namePlaceholder')}
                                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                                             />
                                         </div>
@@ -350,11 +357,11 @@ export default function QuotationBuilderModal({
                                                 onChange={(e) => updatePart(part.id, 'warranty', e.target.value)}
                                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white"
                                             >
-                                                <option>No Warranty</option>
-                                                <option>1 Month</option>
-                                                <option>3 Months</option>
-                                                <option>6 Months</option>
-                                                <option>1 Year</option>
+                                                <option value="No Warranty">{t('warranty.none')}</option>
+                                                <option value="1 Month">{t('warranty.oneMonth')}</option>
+                                                <option value="3 Months">{t('warranty.threeMonths')}</option>
+                                                <option value="6 Months">{t('warranty.sixMonths')}</option>
+                                                <option value="1 Year">{t('warranty.oneYear')}</option>
                                             </select>
                                         </div>
                                         <div className="col-span-1 text-center font-bold text-gray-900 text-sm">
@@ -377,26 +384,26 @@ export default function QuotationBuilderModal({
 
                         {/* Quote Summary */}
                         <div className="bg-gray-50 rounded-xl p-6 border border-gray-100">
-                            <h3 className="text-lg font-bold text-gray-900 mb-4">Quote Summary</h3>
+                            <h3 className="text-lg font-bold text-gray-900 mb-4">{t('summary.title')}</h3>
                             <div className="space-y-3">
                                 <div className="flex justify-between text-sm text-gray-600">
-                                    <span>Services Subtotal</span>
+                                    <span>{t('summary.servicesSubtotal')}</span>
                                     <span className="font-bold text-gray-900">{totals.servicesSubtotal} IQD</span>
                                 </div>
                                 <div className="flex justify-between text-sm text-gray-600">
-                                    <span>Parts Subtotal</span>
+                                    <span>{t('summary.partsSubtotal')}</span>
                                     <span className="font-bold text-gray-900">{totals.partsSubtotal} IQD</span>
                                 </div>
                                 <div className="flex justify-between text-sm text-gray-600">
-                                    <span>Inspection Fees</span>
+                                    <span>{t('summary.inspectionFees')}</span>
                                     <span className="font-bold text-gray-900">{totals.inspectionFees} IQD</span>
                                 </div>
                                 <div className="flex justify-between text-sm text-gray-600 pt-3 border-t border-gray-200">
-                                    <span>Subtotal</span>
+                                    <span>{t('summary.subtotal')}</span>
                                     <span className="font-bold text-gray-900">{totals.subtotal} IQD</span>
                                 </div>
                                 <div className="flex justify-between items-center pt-3 border-t border-gray-200 mt-2">
-                                    <span className="font-extrabold text-gray-900 text-lg">Total Amount</span>
+                                    <span className="font-extrabold text-gray-900 text-lg">{t('summary.total')}</span>
                                     <span className="font-extrabold text-gray-900 text-xl">{totals.totalAmount} IQD</span>
                                 </div>
                             </div>
@@ -427,10 +434,10 @@ export default function QuotationBuilderModal({
 
                         {/* Quote Actions */}
                         <div className="bg-white rounded-xl border border-gray-200 p-6">
-                            <h3 className="text-lg font-bold text-gray-900 mb-4">Quote Actions</h3>
+                            <h3 className="text-lg font-bold text-gray-900 mb-4">{t('actions.title')}</h3>
                             <div className="space-y-4">
                                 <div>
-                                    <label className="block text-xs font-semibold text-gray-600 mb-1">Valid Until</label>
+                                    <label className="block text-xs font-semibold text-gray-600 mb-1">{t('actions.validUntil')}</label>
                                     <div className="relative">
                                         <input
                                             type="date"
@@ -441,12 +448,12 @@ export default function QuotationBuilderModal({
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-semibold text-gray-600 mb-1">Internal Notes</label>
+                                    <label className="block text-xs font-semibold text-gray-600 mb-1">{t('actions.internalNotes')}</label>
                                     <textarea
                                         value={internalNotes}
                                         onChange={(e) => setInternalNotes(e.target.value)}
                                         rows={3}
-                                        placeholder="Add internal notes..."
+                                        placeholder={t('actions.internalNotesPlaceholder')}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:border-yellow-400 resize-none"
                                     />
                                 </div>
@@ -457,20 +464,20 @@ export default function QuotationBuilderModal({
                                         disabled={isSubmitting}
                                         className="w-full py-3 bg-yellow-400 text-gray-900 font-bold rounded-lg hover:bg-yellow-500 transition-colors flex items-center justify-center gap-2"
                                     >
-                                        <FaPaperPlane className="w-4 h-4" /> Send Quote to Customer
+                                        <FaPaperPlane className="w-4 h-4" /> {t('actions.send')}
                                     </button>
                                     <button
                                         onClick={handleSave}
                                         disabled={isSubmitting}
                                         className="w-full py-3 bg-gray-100 text-gray-700 font-bold rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
                                     >
-                                        <FaSave className="w-4 h-4" /> Save as Draft
+                                        <FaSave className="w-4 h-4" /> {t('actions.saveDraft')}
                                     </button>
                                     <button
                                         onClick={onClose}
                                         className="w-full py-3 border border-gray-200 text-gray-700 font-bold rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
                                     >
-                                        <FaTimes className="w-4 h-4" /> Cancel
+                                        <FaTimes className="w-4 h-4" /> {tCommon('actions.cancel')}
                                     </button>
                                 </div>
                             </div>

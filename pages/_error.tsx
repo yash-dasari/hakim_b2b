@@ -1,11 +1,14 @@
 import { NextPageContext } from 'next';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 interface ErrorProps {
   statusCode?: number;
 }
 
 function Error({ statusCode }: ErrorProps) {
+  const t = useTranslations('errors');
+
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
@@ -18,13 +21,13 @@ function Error({ statusCode }: ErrorProps) {
         </div>
         
         <h1 className="text-2xl font-bold text-gray-900 mb-2">
-          {statusCode ? `Error ${statusCode}` : 'An error occurred'}
+          {statusCode ? t('generic.withCode', { statusCode }) : t('generic.title')}
         </h1>
         
         <p className="text-gray-600 mb-6">
           {statusCode === 404
-            ? 'The page you are looking for could not be found.'
-            : 'Something went wrong. Please try again later.'}
+            ? t('generic.notFound')
+            : t('generic.description')}
         </p>
         
         <div className="space-y-3">
@@ -32,14 +35,14 @@ function Error({ statusCode }: ErrorProps) {
             href="/"
             className="block w-full bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600 transition duration-200"
           >
-            Go to Homepage
+            {t('actions.home')}
           </Link>
           
           <button
             onClick={() => window.history.back()}
             className="block w-full bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition duration-200"
           >
-            Go Back
+            {t('actions.back')}
           </button>
         </div>
       </div>

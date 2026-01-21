@@ -7,6 +7,7 @@ import Cookies from 'js-cookie';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import { performLogout, isLogoutInProgress } from '../lib/logout-utils';
+import { useTranslations } from 'next-intl';
 import {
   FaArrowLeft,
   FaBars,
@@ -20,6 +21,7 @@ import {
   FaTools
 } from 'react-icons/fa';
 import NotificationDropdown, { NotificationItem } from './common/NotificationDropdown';
+import LanguageSwitcher from './common/LanguageSwitcher';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -35,6 +37,7 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children, title, subtitle, headerActions, showWelcomeMessage = false, showBackButton = false, onBackClick, breadcrumbs, hideDefaultHeaderIcons = false }: AdminLayoutProps) {
   const router = useRouter();
+  const t = useTranslations('adminLayout');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [admin, setAdmin] = useState<{ id?: string; email?: string; name?: string; firstName?: string; profilePicture?: string; [key: string]: unknown } | null>(null);
   const [loading, setLoading] = useState(true);
@@ -254,7 +257,7 @@ export default function AdminLayout({ children, title, subtitle, headerActions, 
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-400 mx-auto mb-4"></div>
-          <p className="text-gray-800">Loading...</p>
+          <p className="text-gray-800">{t('loading')}</p>
         </div>
       </div>
     );
@@ -267,34 +270,34 @@ export default function AdminLayout({ children, title, subtitle, headerActions, 
   // UPDATED MENU ITEMS FOR B2B DASHBOARD
   const menuItems = [
     {
-      title: 'Dashboard',
+      title: t('menu.dashboard.title'),
       icon: <FaChartLine className="h-5 w-5" />,
       path: '/b2b/dashboard',
-      description: 'Overview & KPIs'
+      description: t('menu.dashboard.description')
     },
     {
-      title: 'Services',
+      title: t('menu.services.title'),
       icon: <FaTools className="h-5 w-5" />,
       path: '/b2b/services/requests',
-      description: 'Service Requests'
+      description: t('menu.services.description')
     },
     {
-      title: 'Vehicles',
+      title: t('menu.vehicles.title'),
       icon: <FaCar className="h-5 w-5" />,
       path: '/b2b/vehicles',
-      description: 'Manage fleets'
+      description: t('menu.vehicles.description')
     },
     {
-      title: 'Account',
+      title: t('menu.account.title'),
       icon: <FaUserCircle className="h-5 w-5" />,
       path: '/b2b/account',
-      description: 'Business details'
+      description: t('menu.account.description')
     },
     {
-      title: 'Finance',
+      title: t('menu.finance.title'),
       icon: <FaCreditCard className="h-5 w-5" />,
       path: '/b2b/finance',
-      description: 'Payments & Invoices'
+      description: t('menu.finance.description')
     }
   ];
 
@@ -322,8 +325,8 @@ export default function AdminLayout({ children, title, subtitle, headerActions, 
 
         {/* Sidebar */}
         <aside className={`
-          fixed lg:static inset-y-0 left-0 z-50 w-64 lg:w-64 bg-white shadow-sm transform transition-transform duration-300 ease-in-out flex-shrink-0
-          ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+          fixed lg:static inset-y-0 start-0 z-50 w-64 lg:w-64 bg-white shadow-sm transform transition-transform duration-300 ease-in-out flex-shrink-0
+          ${isSidebarOpen ? 'translate-x-0' : 'ltr:-translate-x-full rtl:translate-x-full lg:ltr:translate-x-0 lg:rtl:translate-x-0'}
         `} style={{ width: '256px' }}>
           {/* Sidebar Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-100">
@@ -336,7 +339,7 @@ export default function AdminLayout({ children, title, subtitle, headerActions, 
               </div>
               <div className="flex flex-col justify-center">
                 <h1 className="text-xl font-black tracking-tight text-[#0F172A] leading-none mb-0.5">HAKIM</h1>
-                <div className="text-[10px] font-bold tracking-wide uppercase text-[#64748B] leading-none">for Business</div>
+                <div className="text-[10px] font-bold tracking-wide uppercase text-[#64748B] leading-none">{t('brand.forBusiness')}</div>
               </div>
             </div>
             <button
@@ -387,7 +390,7 @@ export default function AdminLayout({ children, title, subtitle, headerActions, 
                     onClick={onBackClick}
                     className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                   >
-                    <FaArrowLeft className="h-5 w-5" />
+                    <FaArrowLeft className="h-5 w-5 rtl:rotate-180" />
                   </button>
                 )}
                 <button
@@ -411,16 +414,17 @@ export default function AdminLayout({ children, title, subtitle, headerActions, 
               </div>
               <div className="flex items-center gap-4">
                 {headerActions}
+                <LanguageSwitcher />
                 {!hideDefaultHeaderIcons && (
                   <>
                     <button
                       className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors relative"
-                      title="Notifications"
+                      title={t('notifications')}
                       onClick={handleNotificationClick}
                     >
                       <FaBell className="h-5 w-5" />
                       {notificationCount > 0 && (
-                        <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center font-bold">
+                        <span className="absolute top-1 end-1 w-4 h-4 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center font-bold">
                           {notificationCount > 99 ? '99+' : notificationCount}
                         </span>
                       )}
@@ -436,7 +440,7 @@ export default function AdminLayout({ children, title, subtitle, headerActions, 
                       {admin.profilePicture && typeof admin.profilePicture === 'string' ? (
                         <img
                           src={admin.profilePicture}
-                          alt={typeof admin.firstName === 'string' ? admin.firstName : (typeof admin.name === 'string' ? admin.name : 'Admin')}
+                          alt={typeof admin.firstName === 'string' ? admin.firstName : (typeof admin.name === 'string' ? admin.name : t('adminLabel'))}
                           className="w-full h-full object-cover"
                         />
                       ) : (
@@ -447,9 +451,9 @@ export default function AdminLayout({ children, title, subtitle, headerActions, 
                 )}
                 {showWelcomeMessage && (
                   <div className="hidden md:flex items-center gap-2 text-sm text-gray-500">
-                    <span>Welcome back,</span>
+                    <span>{t('welcomeBack')}</span>
                     <span className="font-semibold text-gray-800">
-                      {(typeof admin.firstName === 'string' ? admin.firstName : null) || (typeof admin.name === 'string' ? admin.name : null) || (typeof admin.email === 'string' ? admin.email : null) || 'Admin'}
+                      {(typeof admin.firstName === 'string' ? admin.firstName : null) || (typeof admin.name === 'string' ? admin.name : null) || (typeof admin.email === 'string' ? admin.email : null) || t('adminLabel')}
                     </span>
                   </div>
                 )}
@@ -458,7 +462,7 @@ export default function AdminLayout({ children, title, subtitle, headerActions, 
                   className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                 >
                   <FaSignOutAlt className="h-4 w-4" />
-                  <span className="hidden md:inline">Logout</span>
+                  <span className="hidden md:inline">{t('logout')}</span>
                 </button>
               </div>
             </div>
