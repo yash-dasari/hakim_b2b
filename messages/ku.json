@@ -267,6 +267,14 @@
       "failed": "دروستکردنی حجزەکان سەرکەوتوو نەبوو",
       "processing": "لە پڕۆسەدایە...",
       "submit": "ناردنی داواکاری ({count})"
+    },
+    "serviceInfo": {
+      "title": "زانیاری خزمەتگوزاری بۆ {count} ئۆتۆمبیل",
+      "serviceCost": "تێچووی خزمەتگوزاری",
+      "estimatedDuration": "ماوەی خەمڵێنراو",
+      "warranty": "گەرەنتی",
+      "transportationFees": "تێچووی گواستنەوە",
+      "totalCost": "کۆی گشتی:"
     }
   },
   "servicesRequests": {

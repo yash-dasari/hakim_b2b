@@ -12,6 +12,7 @@ import QuotationModal from './components/QuotationModal'; // Correct path based 
 // Provide fallback imports if these don't exist in ./components, they might be in ./services/components or just ./services
 // Based on requests.tsx: import QuotationModal from '../components/QuotationModal'; (from services folder) -> so ./components/QuotationModal from dashboard folder.
 import PaymentModal from './components/PaymentModal';
+import AddCarModal from './components/AddCarModal';
 import ConfirmCarReceiptModal from './components/ConfirmCarReceiptModal';
 
 // Service Modals (from services folder)
@@ -167,6 +168,7 @@ export default function B2BDashboard() {
 
 
   // Modal States
+  const [isAddCarModalOpen, setIsAddCarModalOpen] = useState(false);
   // const [selectedRequest, setSelectedRequest] = useState<ServiceRequest | null>(null); // This was moved up
 
   const [isQuotationModalOpen, setIsQuotationModalOpen] = useState(false); // For Viewing Quote (legacy name in dashboard) or Builder?
@@ -315,15 +317,15 @@ export default function B2BDashboard() {
         const response = await servicesAPI.respondToBodyCheckPhotos(bookingId, { photo_approvals: refusals });
 
         if (response.success || response.status === 'success') {
-        Swal.fire(t('alerts.rejected.title'), t('alerts.rejected.bodyCheckPhotos'), 'success');
+          Swal.fire(t('alerts.rejected.title'), t('alerts.rejected.bodyCheckPhotos'), 'success');
           setIsPhotoGalleryOpen(false);
           refreshData();
         } else {
-        throw new Error(response.error || t('alerts.error.rejectPhotosFailed'));
+          throw new Error(response.error || t('alerts.error.rejectPhotosFailed'));
         }
       } catch (error) {
         console.error('Error rejecting photos:', error);
-      Swal.fire(t('alerts.error.title'), t('alerts.error.rejectPhotosFailed'), 'error');
+        Swal.fire(t('alerts.error.title'), t('alerts.error.rejectPhotosFailed'), 'error');
       } finally {
         setLoading(false);
       }
@@ -766,7 +768,10 @@ export default function B2BDashboard() {
       subtitle={t('subtitle')}
       headerActions={
         <div className="flex gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 border border-gray-200 bg-white rounded-lg text-sm font-bold text-gray-700 hover:bg-gray-50">
+          <button
+            onClick={() => setIsAddCarModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 border border-gray-200 bg-white rounded-lg text-sm font-bold text-gray-700 hover:bg-gray-50"
+          >
             <FaPlus className="text-gray-400 text-xs" /> {t('actions.addCars')}
           </button>
           <button
@@ -980,6 +985,11 @@ export default function B2BDashboard() {
         onApprove={handleApproveBodyCheck}
         onReject={handleRejectBodyCheck}
         isLoading={isPhotoGalleryLoading}
+      />
+
+      <AddCarModal
+        isOpen={isAddCarModalOpen}
+        onClose={() => setIsAddCarModalOpen(false)}
       />
     </AdminLayout>
   );

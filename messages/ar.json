@@ -267,6 +267,14 @@
       "failed": "فشل إنشاء الحجوزات",
       "processing": "جارٍ المعالجة...",
       "submit": "إرسال الطلب ({count})"
+    },
+    "serviceInfo": {
+      "title": "معلومات الخدمة لـ {count} مركبة",
+      "serviceCost": "تكلفة الخدمة",
+      "estimatedDuration": "المدة المقدرة",
+      "warranty": "الضمان",
+      "transportationFees": "رسوم النقل",
+      "totalCost": "التكلفة الإجمالية:"
     }
   },
   "servicesRequests": {

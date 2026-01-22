@@ -6,6 +6,7 @@ export interface ServiceCategory {
     description: string;
     icon_url: string;
     icon_signed_url: string;
+    price_mode?: string;
 }
 
 export interface ServiceCategoriesResponse {
@@ -273,6 +274,7 @@ export interface Service {
     pricing_attributes: string[];
     icon_url: string;
     icon_signed_url: string;
+    price_mode?: string;
 }
 
 export interface ServiceResponse {
