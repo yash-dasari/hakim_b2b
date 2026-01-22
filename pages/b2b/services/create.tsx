@@ -7,6 +7,7 @@ import { RootState } from '../../../store/store';
 import { vehiclesAPI, Vehicle as ApiVehicle } from '../../../services/api/vehicles.api';
 import { servicesAPI, ServiceCategory, Service, ServiceProviderInfo, NearbyServiceCenterPayload, BatchBookingPayload } from '../../../services/api/services.api';
 import LocationPicker from '../../../components/common/LocationPicker';
+import PaymentModal from '../components/PaymentModal';
 import { toast } from 'react-hot-toast';
 import { useTranslations } from 'next-intl';
 
@@ -98,7 +99,13 @@ export default function CreateServiceRequestPage() {
     const [dropOffAddress, setDropOffAddress] = useState('');
     const [dropOffCoords, setDropOffCoords] = useState<{ latitude: number; longitude: number } | null>(null);
     const [isLoadingNearby, setIsLoadingNearby] = useState(false);
+
+    // Payment Modal State
+    const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Derived State
+    const selectedService = services.find(s => s.service_catalog_id === selectedServiceId);
 
     useEffect(() => {
         fetchCategories();
@@ -394,11 +401,36 @@ export default function CreateServiceRequestPage() {
             toast.error(t('errors.selectVehicle'));
             return;
         }
-        if (!selectedServiceId || !selectedProviderId) {
+        if (!selectedCategoryId || !selectedServiceId) {
+            toast.error(t('errors.selectService'));
+            return;
+        }
+        if (!selectedProviderId) {
             toast.error(t('errors.selectServiceProvider'));
             return;
         }
 
+        // Check for 'Show Price' mode
+        if (selectedService?.price_mode === 'Show Price') {
+            setIsPaymentModalOpen(true);
+            return;
+        }
+
+        await processBookingSubmission();
+    };
+
+    const handlePaymentConfirm = async (method: string) => {
+        setIsPaymentModalOpen(false);
+        // In a real app, you might pass the payment method to the API
+        // For now, we just proceed with the booking creation
+        await processBookingSubmission();
+    };
+
+    const processBookingSubmission = async () => {
+        if (!company?.id) {
+            toast.error(tCommon('errors.companyMissing'));
+            return;
+        }
         if (scheduleOptions.length > 1 && !selectedSchedule) {
             toast.error(t('errors.selectScheduleType'));
             return;
@@ -906,6 +938,89 @@ export default function CreateServiceRequestPage() {
                     </div>
                 </div>
 
+                {/* Service Information Summary */}
+                {selectedService?.price_mode === 'Show Price' && (
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div className="p-8 pb-6">
+                            <h2 className="text-base font-bold text-gray-900 mb-6">
+                                {t('serviceInfo.title', { count: selectedVehicleIds.size, defaultValue: `Service Information for ${selectedVehicleIds.size} Vehicle${selectedVehicleIds.size !== 1 ? 's' : ''}` })}
+                            </h2>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* Service Cost */}
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-bold text-gray-700 block">
+                                        {t('serviceInfo.serviceCost', { defaultValue: 'Service Cost' })}
+                                    </label>
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            readOnly
+                                            value="0"
+                                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Estimated Duration */}
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-bold text-gray-700 block">
+                                        {t('serviceInfo.estimatedDuration', { defaultValue: 'Estimated Duration' })}
+                                    </label>
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            readOnly
+                                            value="0 Hours"
+                                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Warranty */}
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-bold text-gray-700 block">
+                                        {t('serviceInfo.warranty', { defaultValue: 'Warranty' })}
+                                    </label>
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            readOnly
+                                            value="0 Months"
+                                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Transportation Fees */}
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-bold text-gray-700 block">
+                                        {t('serviceInfo.transportationFees', { defaultValue: 'Transportation Fees' })}
+                                    </label>
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            readOnly
+                                            value="0 IQD"
+                                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Total Cost Bar */}
+                        <div className="bg-[#FCD34D] px-8 py-4 flex justify-between items-center">
+                            <span className="text-sm font-bold text-gray-900">
+                                {t('serviceInfo.totalCost', { defaultValue: 'Total Cost:' })}
+                            </span>
+                            <span className="text-lg font-black text-gray-900">
+                                0 IQD
+                            </span>
+                        </div>
+                    </div>
+                )}
+
                 {/* Footer Actions */}
                 <div className="flex justify-end gap-3 pt-4">
                     <button
@@ -926,6 +1041,14 @@ export default function CreateServiceRequestPage() {
                         {isSubmitting ? t('submission.processing') : t('submission.submit', { count: selectedVehicleIds.size })}
                     </button>
                 </div>
+
+                {/* Payment Modal */}
+                <PaymentModal
+                    isOpen={isPaymentModalOpen}
+                    onClose={() => setIsPaymentModalOpen(false)}
+                    onConfirm={handlePaymentConfirm}
+                    amount="0 IQD" // Placeholder for now
+                />
 
             </div>
         </AdminLayout>

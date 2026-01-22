@@ -267,6 +267,14 @@
       "failed": "Failed to create bookings",
       "processing": "Processing...",
       "submit": "Submit Request ({count})"
+    },
+    "serviceInfo": {
+      "title": "Service Information for {count} Vehicle{count, plural, one {} other {s}}",
+      "serviceCost": "Service Cost",
+      "estimatedDuration": "Estimated Duration",
+      "warranty": "Warranty",
+      "transportationFees": "Transportation Fees",
+      "totalCost": "Total Cost:"
     }
   },
   "servicesRequests": {
