@@ -3,9 +3,10 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from '../store/store';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import '../styles/globals.css'; 
+import '../styles/globals.css';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { AuthProvider } from '../contexts/AuthContext';
+import { WebSocketProvider } from '../contexts/WebSocketContext';
 import { NextIntlClientProvider } from 'next-intl';
 
 import { useEffect } from 'react';
@@ -74,9 +75,11 @@ export default function App({ Component, pageProps }: AppProps) {
       <PersistGate loading={null} persistor={persistor}>
         <SessionRestorer />
         <AuthProvider>
-          <NextIntlClientProvider locale={locale} messages={messages}>
-            <Component {...pageProps} />
-          </NextIntlClientProvider>
+          <WebSocketProvider>
+            <NextIntlClientProvider locale={locale} messages={messages}>
+              <Component {...pageProps} />
+            </NextIntlClientProvider>
+          </WebSocketProvider>
         </AuthProvider>
       </PersistGate>
     </Provider>

@@ -38,6 +38,7 @@ import CollectPaymentModal from './CollectPaymentModal';
 import ServiceRequestDetailModal from './ServiceRequestDetailModal';
 import QuotationBuilderModal from './QuotationBuilderModal';
 import { useTranslations } from 'next-intl';
+import { useWebSocket } from '../../../contexts/WebSocketContext';
 
 // Interface replaced by alias above
 
@@ -86,71 +87,46 @@ export default function AdminRequests() {
     }
   };
 
-  // WebSocket Connection
+
+  // WebSocket Integration (Global)
+  const { lastMessage } = useWebSocket();
+
   useEffect(() => {
-    if (!company?.id || !accessToken) return;
+    if (!lastMessage) return;
 
-    const wsUrl = `wss://api-dev.hakimauto.com/ops-tracking/v1/ws/company/${company.id}?token=${accessToken}`;
-    console.log('🔌 Connecting to WebSocket:', wsUrl);
+    try {
+      const data = lastMessage;
+      console.log('📩 WebSocket Message (Global at Requests):', data);
 
-    let socket: WebSocket | null = new WebSocket(wsUrl);
-
-    socket.onopen = () => {
-      console.log('✅ WebSocket Connected');
-    };
-
-    socket.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        console.log('📩 WebSocket Message:', data);
-
-        if (data.type === 'event' || data.role === 'customer') {
-          console.log('🔄 Received generic event or customer update, refreshing data silently...');
-          fetchRequests(true);
-          return;
-        }
-
-        // Handle booking status updates
-        // Expected payload structure: { booking_id: "...", status: "...", ... } or { data: { ... } }
-        const update = data.data || data;
-
-        if (update && (update.booking_id || update.id) && update.status) {
-          const targetId = update.booking_id || update.id;
-
-          setRequests(prevRequests => {
-            const exists = prevRequests.find(r => r.booking_id === targetId);
-            if (!exists) return prevRequests;
-
-            if (exists.status === update.status) return prevRequests;
-
-            return prevRequests.map(req =>
-              req.booking_id === targetId ? { ...req, status: update.status } : req
-            );
-          });
-        }
-      } catch (error) {
-        console.error('Error parsing WS message:', error);
+      if (data.type === 'event' || data.role === 'customer') {
+        fetchRequests(true);
+        return;
       }
-    };
 
-    socket.onerror = (error) => {
-      console.error('❌ WebSocket Error:', error);
-    };
+      const update = data.data || data;
 
-    socket.onclose = () => {
-      console.log('⚠️ WebSocket Disconnected');
-    };
+      if (update && (update.booking_id || update.id) && update.status) {
+        const targetId = update.booking_id || update.id;
 
-    return () => {
-      if (socket) {
-        socket.close();
-        socket = null;
+        setRequests(prevRequests => {
+          const exists = prevRequests.find(r => r.booking_id === targetId);
+          if (!exists) return prevRequests;
+
+          if (exists.status === update.status) return prevRequests;
+
+          return prevRequests.map(req =>
+            req.booking_id === targetId ? { ...req, status: update.status } : req
+          );
+        });
       }
-    };
-  }, [company?.id, accessToken]);
+    } catch (error) {
+      console.error('Error processing WS message:', error);
+    }
+  }, [lastMessage]);
 
   useEffect(() => {
     fetchRequests();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [company?.id]);
 
   // Rejection Modal State
@@ -276,7 +252,7 @@ export default function AdminRequests() {
         const response = await servicesAPI.respondToBodyCheckPhotos(bookingId, { photo_approvals: refusals });
 
         if (response.success || response.status === 'success') {
-        Swal.fire(t('alerts.rejected.title'), t('alerts.rejected.bodyCheckPhotos'), 'success');
+          Swal.fire(t('alerts.rejected.title'), t('alerts.rejected.bodyCheckPhotos'), 'success');
           setIsPhotoGalleryOpen(false);
           // Refresh
           if (company?.id) {
@@ -284,11 +260,11 @@ export default function AdminRequests() {
             if (res.success && res.data) setRequests(res.data.bookings);
           }
         } else {
-        throw new Error(response.error || t('alerts.error.rejectPhotosFailed'));
+          throw new Error(response.error || t('alerts.error.rejectPhotosFailed'));
         }
       } catch (error) {
         console.error('Error rejecting photos:', error);
-      Swal.fire(t('alerts.error.title'), t('alerts.error.rejectPhotosFailed'), 'error');
+        Swal.fire(t('alerts.error.title'), t('alerts.error.rejectPhotosFailed'), 'error');
       } finally {
         setLoading(false);
       }
@@ -769,19 +745,19 @@ export default function AdminRequests() {
               className="flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white text-sm font-medium rounded-lg hover:bg-green-600 transition-colors"
             >
               <FaCheck className="w-3 h-3" />
-            {t('actions.accept')}
+              {t('actions.accept')}
             </button>
             <button
               onClick={() => handleRejectClick(request)}
               className="flex items-center gap-1 px-3 py-1.5 bg-red-500 text-white text-sm font-medium rounded-lg hover:bg-red-600 transition-colors"
             >
               <FaTimes className="w-3 h-3" />
-            {t('actions.reject')}
+              {t('actions.reject')}
             </button>
             <button
               onClick={() => handleViewQuotation(request)}
               className="p-1.5 text-gray-500 hover:text-gray-700 transition-colors"
-            title={t('actions.viewQuotation')}
+              title={t('actions.viewQuotation')}
             >
               <FaFileInvoiceDollar className="w-4 h-4" />
             </button>
@@ -795,12 +771,12 @@ export default function AdminRequests() {
               className="flex items-center gap-2 px-3 py-1.5 bg-yellow-400 text-gray-900 text-sm font-medium rounded-lg hover:bg-yellow-500 transition-colors"
             >
               <FaFileAlt className="w-3 h-3" />
-            {t('actions.submitQuotation')}
+              {t('actions.submitQuotation')}
             </button>
             <button
               onClick={() => handleViewQuotation(request)}
               className="p-1.5 text-gray-500 hover:text-gray-700 transition-colors"
-            title={t('actions.viewQuotation')}
+              title={t('actions.viewQuotation')}
             >
               <FaFileInvoiceDollar className="w-4 h-4" />
             </button>
@@ -815,12 +791,12 @@ export default function AdminRequests() {
               className="flex items-center gap-2 px-3 py-1.5 bg-yellow-400 text-gray-900 text-sm font-medium rounded-lg hover:bg-yellow-500 transition-colors"
             >
               <FaCamera className="w-3 h-3" />
-            {t('actions.submitPhotos')}
+              {t('actions.submitPhotos')}
             </button>
             <button
               onClick={() => handleViewQuotation(request)}
               className="p-1.5 text-gray-500 hover:text-gray-700 transition-colors"
-            title={t('actions.viewQuotation')}
+              title={t('actions.viewQuotation')}
             >
               <FaFileInvoiceDollar className="w-4 h-4" />
             </button>
@@ -835,12 +811,12 @@ export default function AdminRequests() {
               className="flex items-center gap-2 px-3 py-1.5 bg-yellow-400 text-gray-900 text-sm font-medium rounded-lg hover:bg-yellow-500 transition-colors"
             >
               <FaEdit className="w-3 h-3" />
-            {t('actions.editQuotation')}
+              {t('actions.editQuotation')}
             </button>
             <button
               onClick={() => handleViewQuotation(request)}
               className="p-1.5 text-gray-500 hover:text-gray-700 transition-colors"
-            title={t('actions.viewQuotation')}
+              title={t('actions.viewQuotation')}
             >
               <FaFileInvoiceDollar className="w-4 h-4" />
             </button>
@@ -855,12 +831,12 @@ export default function AdminRequests() {
               className="flex items-center gap-2 px-3 py-1.5 bg-yellow-400 text-gray-900 text-sm font-medium rounded-lg hover:bg-yellow-500 transition-colors"
             >
               <FaEdit className="w-3 h-3" />
-            {t('actions.editQuotation')}
+              {t('actions.editQuotation')}
             </button>
             <button
               onClick={() => handleViewQuotation(request)}
               className="p-1.5 text-gray-500 hover:text-gray-700 transition-colors"
-            title={t('actions.viewQuotation')}
+              title={t('actions.viewQuotation')}
             >
               <FaFileInvoiceDollar className="w-4 h-4" />
             </button>
@@ -875,12 +851,12 @@ export default function AdminRequests() {
               className="flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white text-sm font-medium rounded-lg hover:bg-green-600 transition-colors"
             >
               <span className="text-xs">$</span>
-            {t('actions.collectPayment')}
+              {t('actions.collectPayment')}
             </button>
             <button
               onClick={() => handleViewQuotation(request)}
               className="p-1.5 text-gray-500 hover:text-gray-700 transition-colors"
-            title={t('actions.viewQuotation')}
+              title={t('actions.viewQuotation')}
             >
               <FaFileInvoiceDollar className="w-4 h-4" />
             </button>
@@ -893,7 +869,7 @@ export default function AdminRequests() {
             <button
               onClick={() => handleViewQuotation(request)}
               className="p-1.5 text-gray-500 hover:text-gray-700 transition-colors"
-            title={t('actions.viewQuotation')}
+              title={t('actions.viewQuotation')}
             >
               <FaFileInvoiceDollar className="w-4 h-4" />
             </button>
@@ -906,7 +882,7 @@ export default function AdminRequests() {
             <button
               onClick={() => handleViewQuotation(request)}
               className="p-1.5 text-gray-500 hover:text-gray-700 transition-colors"
-            title={t('actions.viewQuotation')}
+              title={t('actions.viewQuotation')}
             >
               <FaFileInvoiceDollar className="w-4 h-4" />
             </button>
