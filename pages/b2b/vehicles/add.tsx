@@ -4,7 +4,7 @@ import AdminLayout from '../../../components/AdminLayout';
 import Cookies from 'js-cookie';
 import { FaArrowLeft, FaCar, FaCheck, FaInfoCircle, FaBarcode, FaPlus, FaPalette, FaImage, FaTimes } from 'react-icons/fa';
 import { useRouter } from 'next/router';
-import { vehiclesAPI, VehicleBrand, VehicleModel } from '../../../services/api/vehicles.api';
+import { vehiclesAPI, VehicleBrand, VehicleModel, City } from '../../../services/api/vehicles.api';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
 import SearchableSelect from '../../../components/common/SearchableSelect';
@@ -54,6 +54,8 @@ export default function AddVehiclePage() {
     const [modelOptions, setModelOptions] = useState<VehicleModel[]>([]);
     const [isLoadingBrands, setIsLoadingBrands] = useState(false);
     const [isLoadingModels, setIsLoadingModels] = useState(false);
+    const [cityOptions, setCityOptions] = useState<City[]>([]);
+    const [isLoadingCities, setIsLoadingCities] = useState(false);
 
     // Fetch Brands on Mount
     React.useEffect(() => {
@@ -70,6 +72,24 @@ export default function AddVehiclePage() {
         };
         fetchBrands();
     }, []);
+
+    // Fetch Cities when Old Format is selected
+    React.useEffect(() => {
+        if (formData.plateFormat === 'old' && cityOptions.length === 0) {
+            const fetchCities = async () => {
+                setIsLoadingCities(true);
+                try {
+                    const cities = await vehiclesAPI.getCities();
+                    setCityOptions(cities);
+                } catch (error) {
+                    console.error("Failed to fetch cities", error);
+                } finally {
+                    setIsLoadingCities(false);
+                }
+            };
+            fetchCities();
+        }
+    }, [formData.plateFormat]);
 
     // Fetch Models when Make (Brand) changes
     React.useEffect(() => {
@@ -587,40 +607,44 @@ export default function AddVehiclePage() {
                                     </div>
                                 ) : (
                                     <div className="flex gap-2 items-center">
-                                        <div className="flex-1 max-w-[100px]">
-                                            <label className="text-[10px] font-bold text-gray-500 mb-1 block">{t('plate.code')}</label>
-                                            <input
-                                                type="text"
-                                                maxLength={2}
-                                                placeholder="54"
-                                                className="w-full px-3 py-2 text-center text-lg font-bold border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FCD34D]"
-                                                onChange={(e) => {
-                                                    const val = e.target.value.replace(/\D/g, '');
-                                                    const current = formData.plateNumber.replace(/\s/g, '');
-                                                    const _num = current.length > 2 ? current.substring(current.length - 6) : '';
-                                                    // Simple fallback logic since splitting is harder without separators. 
-                                                    // Better: use explicit state for parts, but sticking to existing pattern:
-                                                    // Actually for Old, it's just contiguous numbers?
-                                                    // Or separate fields? "Code" and "Number".
-                                                    // Let's assume space separation for internal storage to avoid ambiguity: "54 8306"
-                                                    const parts = formData.plateNumber.split(' ');
-                                                    const numberPart = parts[1] || '';
-                                                    setFormData(prev => ({ ...prev, plateNumber: `${val} ${numberPart}`.trim() }));
+                                        <div className="flex-[2] min-w-[120px]">
+                                            <label className="text-[10px] font-bold text-gray-500 mb-1 block">{t('plate.city')}</label>
+                                            <SearchableSelect
+                                                name="city"
+                                                value={(() => {
+                                                    const parts = formData.plateNumber.split('-');
+                                                    return parts[1] || '';
+                                                })()}
+                                                onChange={(value) => {
+                                                    const parts = formData.plateNumber.split('-');
+                                                    const numberPart = parts[0] || '';
+                                                    setFormData(prev => ({ ...prev, plateNumber: `${numberPart}-${value}`.trim() }));
                                                 }}
+                                                options={cityOptions.map(city => ({
+                                                    value: city.name,
+                                                    label: city.name
+                                                }))}
+                                                placeholder={isLoadingCities ? 'Loading...' : 'Select City'}
+                                                disabled={isLoadingCities}
+                                                error={formErrors.plateNumber}
                                             />
                                         </div>
                                         <div className="flex-[2]">
                                             <label className="text-[10px] font-bold text-gray-500 mb-1 block">{t('plate.number')}</label>
                                             <input
                                                 type="text"
-                                                maxLength={6}
+                                                maxLength={5}
                                                 placeholder="8306"
-                                                className="w-full px-3 py-2 text-center text-lg font-bold border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FCD34D] tracking-widest"
+                                                className="w-full px-3 py-[10px] text-center text-lg font-bold border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FCD34D] tracking-widest"
+                                                value={(() => {
+                                                    const parts = formData.plateNumber.split('-');
+                                                    return parts[0] || '';
+                                                })()}
                                                 onChange={(e) => {
                                                     const val = e.target.value.replace(/\D/g, '');
-                                                    const parts = formData.plateNumber.split(' ');
-                                                    const codePart = parts[0] || '';
-                                                    setFormData(prev => ({ ...prev, plateNumber: `${codePart} ${val}`.trim() }));
+                                                    const parts = formData.plateNumber.split('-');
+                                                    const cityPart = parts[1] || '';
+                                                    setFormData(prev => ({ ...prev, plateNumber: `${val}-${cityPart}`.trim() }));
                                                 }}
                                             />
                                         </div>
@@ -679,10 +703,10 @@ export default function AddVehiclePage() {
                         </div>
 
                     </div>
-                </div>
+                </div >
 
                 {/* Help Box */}
-                <div className="mt-6 bg-blue-50 border border-blue-100 rounded-xl p-4 flex gap-3 items-start">
+                < div className="mt-6 bg-blue-50 border border-blue-100 rounded-xl p-4 flex gap-3 items-start" >
                     <div className="p-1 rounded-full bg-blue-100 text-blue-600 mt-0.5">
                         <FaInfoCircle className="text-sm" />
                     </div>
@@ -693,8 +717,8 @@ export default function AddVehiclePage() {
                             {t('help.imageInfo')}
                         </p>
                     </div>
-                </div>
-            </div>
-        </AdminLayout>
+                </div >
+            </div >
+        </AdminLayout >
     );
 }

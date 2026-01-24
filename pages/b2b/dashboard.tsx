@@ -12,6 +12,7 @@ import QuotationModal from './components/QuotationModal'; // Correct path based 
 // Provide fallback imports if these don't exist in ./components, they might be in ./services/components or just ./services
 // Based on requests.tsx: import QuotationModal from '../components/QuotationModal'; (from services folder) -> so ./components/QuotationModal from dashboard folder.
 import PaymentModal from './components/PaymentModal';
+import { useWebSocket } from '../../contexts/WebSocketContext';
 import AddCarModal from './components/AddCarModal';
 import ConfirmCarReceiptModal from './components/ConfirmCarReceiptModal';
 
@@ -95,75 +96,48 @@ export default function B2BDashboard() {
     }
   };
 
-  // WebSocket Connection
+
+  // WebSocket Integration (Global)
+  const { lastMessage } = useWebSocket();
+
   useEffect(() => {
-    if (!company?.id || !accessToken) return;
+    if (!lastMessage) return;
 
-    const wsUrl = `wss://api-dev.hakimauto.com/ops-tracking/v1/ws/company/${company.id}?token=${accessToken}`;
-    console.log('🔌 Connecting to WebSocket:', wsUrl);
+    try {
+      const data = lastMessage;
+      console.log('📩 WebSocket Message (Global):', data);
 
-    let socket: WebSocket | null = new WebSocket(wsUrl);
-
-    socket.onopen = () => {
-      console.log('✅ WebSocket Connected');
-    };
-
-    socket.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        console.log('📩 WebSocket Message:', data);
-
-        if (data.type === 'event' || data.role === 'customer') {
-          console.log('🔄 Received generic event or customer update, refreshing data silently...');
-          fetchRequests(true);
-          return;
-        }
-
-        // Handle booking status updates
-        // Expected payload structure: { booking_id: "...", status: "...", ... } or { data: { ... } }
-        const update = data.data || data;
-
-        if (update && (update.booking_id || update.id) && update.status) {
-          const targetId = update.booking_id || update.id;
-
-          setRequests(prevRequests => {
-            const exists = prevRequests.find(r => r.booking_id === targetId);
-            if (!exists) return prevRequests; // Don't add if not in list (or maybe we should? for now just update)
-
-            // Check if status actually changed to avoid unnecessary re-renders
-            if (exists.status === update.status) return prevRequests;
-
-            return prevRequests.map(req =>
-              req.booking_id === targetId ? { ...req, status: update.status } : req
-            );
-          });
-
-          // If we wanted to update stats dynamically, we'd need more complex logic or just refetch.
-          // For simple status updates, local state update is fine.
-        }
-      } catch (error) {
-        console.error('Error parsing WS message:', error);
+      if (data.type === 'event' || data.role === 'customer') {
+        console.log('🔄 Received generic event or customer update, refreshing data silently...');
+        fetchRequests(true);
+        return;
       }
-    };
 
-    socket.onerror = (error) => {
-      console.error('❌ WebSocket Error:', error);
-    };
+      // Handle booking status updates
+      const update = data.data || data;
 
-    socket.onclose = () => {
-      console.log('⚠️ WebSocket Disconnected');
-    };
+      if (update && (update.booking_id || update.id) && update.status) {
+        const targetId = update.booking_id || update.id;
 
-    return () => {
-      if (socket) {
-        socket.close();
-        socket = null;
+        setRequests(prevRequests => {
+          const exists = prevRequests.find(r => r.booking_id === targetId);
+          if (!exists) return prevRequests;
+
+          if (exists.status === update.status) return prevRequests;
+
+          return prevRequests.map(req =>
+            req.booking_id === targetId ? { ...req, status: update.status } : req
+          );
+        });
       }
-    };
-  }, [company?.id, accessToken]);
+    } catch (error) {
+      console.error('Error handling WS message:', error);
+    }
+  }, [lastMessage]); // Removed fetchRequests dependency to avoid loop if not stable, but strictly it depends on it.
 
   useEffect(() => {
     fetchRequests();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [company?.id]);
 
 

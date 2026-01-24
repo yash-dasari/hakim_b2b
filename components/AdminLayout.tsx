@@ -22,6 +22,7 @@ import {
 } from 'react-icons/fa';
 import NotificationDropdown, { NotificationItem } from './common/NotificationDropdown';
 import LanguageSwitcher from './common/LanguageSwitcher';
+import { useWebSocket } from '../contexts/WebSocketContext';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -44,126 +45,93 @@ export default function AdminLayout({ children, title, subtitle, headerActions, 
   const hasCheckedRef = useRef(false);
   const redirectingRef = useRef(false);
 
-  // Redux state for WebSocket
-  const { company, accessToken } = useSelector((state: RootState) => state.auth);
+
+  // WebSocket Integration (Global)
+  const { lastMessage, isConnected } = useWebSocket();
+  // We don't need company/accessToken here anymore for WS connection as it's handled in provider
+  const { company } = useSelector((state: RootState) => state.auth); // kept for other potential usages if any, or just useAuth
+
   const [notificationCount, setNotificationCount] = useState(0);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
-  const wsRef = useRef<WebSocket | null>(null);
 
-  // WebSocket Integration
+  // Handle incoming WebSocket messages for notifications
   useEffect(() => {
-    if (!company?.id || !accessToken) return;
+    if (!lastMessage) return;
 
-    const wsUrl = `wss://api-dev.hakimauto.com/ops-tracking/v1/ws/company/${company.id}?token=${accessToken}`;
+    let messageText = '';
+    let msgType: 'info' | 'success' | 'warning' | 'error' = 'info';
+    let referenceId = '';
 
-    try {
-      const ws = new WebSocket(wsUrl);
-      wsRef.current = ws;
+    // We already have parsed JSON from context
+    const rootData = lastMessage;
 
-      ws.onopen = () => {
-        console.log('✅ WS: Connected for notifications');
-      };
+    console.log('Notification Received (Global):', rootData);
 
-      ws.onmessage = (event) => {
-        let messageText = '';
-        let msgType: 'info' | 'success' | 'warning' | 'error' = 'info';
-        let referenceId = '';
-        const rawData = event.data;
-
-        try {
-          // Try valid JSON
-          const rootData = JSON.parse(rawData);
-
-          console.log('Notification Received:', rootData);
-
-          // Handle initial connection message specially
-          if (rootData.type === 'connected') {
-            return;
-          }
-
-          // Search for message and reference_id in potential locations
-          // Priority: data.data -> data -> root
-          let targetData: any = null;
-
-          if (rootData.data && rootData.data.data && (rootData.data.data.message || rootData.data.data.reference_id)) {
-            targetData = rootData.data.data;
-          } else if (rootData.data && (rootData.data.message || rootData.data.reference_id)) {
-            targetData = rootData.data;
-          } else {
-            targetData = rootData;
-          }
-
-          if (targetData) {
-            if (targetData.message) messageText = targetData.message;
-            if (targetData.reference_id) referenceId = targetData.reference_id;
-            // Also map type if present
-            if (targetData.type) msgType = targetData.type;
-          }
-
-          // Fallback for type at root if not found in target
-          if (msgType === 'info' && rootData.type) {
-            msgType = rootData.type;
-          }
-
-
-          // If we parsed successfully but have no message, try to construct one
-          if (!messageText && rootData.event_type) {
-            messageText = `New ${rootData.event_type.replace('.', ' ')} event`;
-          }
-
-        } catch (e) {
-          // Not JSON, use raw text or generic message
-          console.error('Error parsing notification JSON:', e);
-          messageText = String(rawData);
-        }
-
-        // Final safeguard: If message is still the raw JSON object string, forcing a clean message
-        if (messageText && messageText.trim().startsWith('{') && messageText.length > 50) {
-          // It looks like a raw JSON dump
-          if (referenceId) {
-            messageText = "You have a new update";
-          } else {
-            messageText = "New System Notification";
-          }
-        } else if (!messageText) {
-          messageText = "New Notification";
-        }
-
-        const newNotification: NotificationItem = {
-          id: Date.now().toString() + Math.random().toString(),
-          message: String(messageText),
-          type: msgType,
-          timestamp: new Date(),
-          read: false,
-          referenceId: referenceId
-        };
-
-        setNotifications(prev => [newNotification, ...prev]);
-
-        // Only increment count if dropdown is closed
-        if (!isNotificationsOpen) {
-          setNotificationCount(prev => prev + 1);
-        }
-      };
-
-      ws.onerror = (error) => {
-        console.error('❌ WS: Error', error);
-      };
-
-      ws.onclose = () => {
-        console.log('⚠️ WS: Disconnected');
-      };
-
-      return () => {
-        if (ws.readyState === WebSocket.OPEN) {
-          ws.close();
-        }
-      };
-    } catch (error) {
-      console.error('Failed to connect to WebSocket:', error);
+    // Handle initial connection message specially
+    if (rootData.type === 'connected') {
+      return;
     }
-  }, [company?.id, accessToken, isNotificationsOpen]);
+
+    // Search for message and reference_id in potential locations
+    let targetData: any = null;
+
+    if (rootData.data && rootData.data.data && (rootData.data.data.message || rootData.data.data.reference_id)) {
+      targetData = rootData.data.data;
+    } else if (rootData.data && (rootData.data.message || rootData.data.reference_id)) {
+      targetData = rootData.data;
+    } else {
+      targetData = rootData;
+    }
+
+    if (targetData) {
+      if (targetData.message) messageText = targetData.message;
+      if (targetData.reference_id) referenceId = targetData.reference_id;
+      // Also map type if present
+      if (targetData.type) msgType = targetData.type;
+    }
+
+    // Fallback for type at root if not found in target
+    if (msgType === 'info' && rootData.type) {
+      msgType = rootData.type;
+    }
+
+    // If we have a message, add it to notifications
+    if (!messageText && rootData.event_type) {
+      messageText = `New ${rootData.event_type.replace('.', ' ')} event`;
+    }
+
+    // Final safeguard
+    if (messageText && messageText.trim().startsWith('{') && messageText.length > 50) {
+      if (referenceId) {
+        messageText = "You have a new update";
+      } else {
+        messageText = "New System Notification";
+      }
+    } else if (!messageText) {
+      // If we really can't find a message logic, skip or generic
+      // But for many operational events we might just want to notify
+      return;
+    }
+
+    const newNotification: NotificationItem = {
+      id: Date.now().toString() + Math.random().toString(),
+      message: String(messageText),
+      type: msgType,
+      timestamp: new Date(),
+      read: false,
+      referenceId: referenceId
+    };
+
+    setNotifications(prev => [newNotification, ...prev]);
+
+    // Only increment count if dropdown is closed
+    if (!isNotificationsOpen) {
+      setNotificationCount(prev => prev + 1);
+    }
+
+  }, [lastMessage]); // Removed isNotificationsOpen dependency to avoid stale closure issues if not careful, but setNotificationCount uses func update so it's fine.
+
 
   const handleNotificationClick = () => {
     if (!isNotificationsOpen) {

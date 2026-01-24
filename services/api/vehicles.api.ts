@@ -36,7 +36,67 @@ export interface VehicleModel {
     model_name: string;
 }
 
+export interface City {
+    id: number;
+    name: string;
+    description?: string;
+}
+
 export const vehiclesAPI = {
+    /**
+     * Get all cities
+     */
+    getCities: async (): Promise<City[]> => {
+        try {
+            const response = await apiClient.get<any>(`${BASE_URL}/customers/v1/cities`, {
+                params: {
+                    is_active: true
+                }
+            });
+            console.log('✅ Get Cities API Response (Raw):', JSON.stringify(response.data, null, 2));
+
+            const ensureArray = (data: any) => {
+                if (Array.isArray(data)) return data;
+                if (data && Array.isArray(data.data)) return data.data;
+                if (data && Array.isArray(data.cities)) return data.cities;
+                if (data && Array.isArray(data.items)) return data.items;
+                if (data && Array.isArray(data.results)) return data.results;
+                return [];
+            };
+
+            const list = ensureArray(response.data);
+            console.log(`🏙️ Found ${list.length} cities. First item:`, list[0]);
+
+            if (list.length === 0) {
+                console.warn('⚠️ No cities found in API response. Using Mock Data for testing.');
+                return [
+                    { id: 1, name: 'Dubai' },
+                    { id: 2, name: 'Abu Dhabi' },
+                    { id: 3, name: 'Sharjah' },
+                    { id: 4, name: 'Ajman' },
+                    { id: 5, name: 'Riyadh' },
+                    { id: 6, name: 'Jeddah' },
+                    { id: 7, name: 'Makkah' },
+                    { id: 8, name: 'Madinah' }
+                ];
+            }
+
+            return list.map((item: any, index: number) => {
+                // Handle array of strings
+                if (typeof item === 'string') {
+                    return { id: index, name: item };
+                }
+                // Handle various object structures
+                return {
+                    id: item.id || item.city_id || index,
+                    name: item.name || item.city_name || item.name_en || item.label || JSON.stringify(item)
+                };
+            });
+        } catch (error: any) {
+            console.error('❌ Get Cities API Error:', error.response?.data || error.message);
+            return [];
+        }
+    },
     /**
      * Get vehicles list for a company
      * @param companyId - The ID of the company
