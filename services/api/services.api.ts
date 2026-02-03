@@ -112,7 +112,7 @@ export const servicesAPI = {
         // Verify if we need to prepend /customers or use absolute path if apiClient adds base.
         // Assuming apiClient adds BASE_URL. If the user provided path is absolute related to domain, we might need adjustment.
         // However, standard consistency suggests using the client.
-        const response = await apiClient.post('/bookings/v1/bookings/batch', payload);
+        const response = await apiClient.post('/bookings/v1/bookings/batch/create', payload);
         return response.data;
     },
 
