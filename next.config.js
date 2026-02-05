@@ -5,18 +5,18 @@ const nextConfig = {
   reactStrictMode: true,
 
 
-    // Tell Next.js it's served under /portal
+  // Tell Next.js it's served under /portal
   // basePath: '/portal',
   // Enable standalone output for Docker builds (Dockerfile expects .next/standalone)
   // Always enable standalone output since Docker build requires it
-  output: 'standalone', 
+  output: 'standalone',
   images: {
-    domains: ['localhost', '147.93.72.229', 'api.hakimcarservice.com', 'dev-api.hakimauto.com'],
+    domains: ['localhost', '147.93.72.229', 'api.hakimcarservice.com', 'dev-api.hakimauto.com', 'dev-hakim-asset.s3.me-central-1.amazonaws.com'],
   },
 
   // API routes removed - using external API instead
   // Headers configuration removed as there are no local API routes
-  
+
   // Exclude pages/api from webpack compilation
   webpack: (config, { isServer, webpack }) => {
     // Ignore pages/api directory files completely
@@ -30,7 +30,7 @@ const nextConfig = {
         }
       )
     );
-    
+
     // Also ignore mockData imports from pages/api
     config.plugins.push(
       new webpack.IgnorePlugin({
@@ -45,10 +45,10 @@ const nextConfig = {
         }
       })
     );
-    
+
     return config;
   },
-  
+
   // Experimental feature to exclude pages/api
   experimental: {
     serverActions: {

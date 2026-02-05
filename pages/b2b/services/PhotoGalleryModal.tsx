@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { FaTimes, FaImage, FaCheck, FaBan, FaChevronLeft, FaChevronRight, FaExpand, FaDownload } from 'react-icons/fa';
 import { useTranslations } from 'next-intl';
 
@@ -143,12 +144,14 @@ export default function PhotoGalleryModal({
                                                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-300"></div>
                                             </div>
                                         )}
-                                        <img
+                                        <Image
                                             src={photoUrl}
                                             alt={t('photoAlt', { index: index + 1 })}
                                             className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-110 ${loadedImages.has(index) ? 'opacity-100' : 'opacity-0'}`}
                                             onLoad={() => handleImageLoad(index)}
                                             loading="lazy"
+                                            width={400}
+                                            height={400}
                                         />
                                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
                                             <FaExpand className="text-white text-xl drop-shadow-md transform scale-90 group-hover:scale-100 transition-transform" />
@@ -219,10 +222,12 @@ export default function PhotoGalleryModal({
                             <FaChevronLeft className="text-xl rtl:rotate-180" />
                         </button>
 
-                        <img
+                        <Image
                             src={photos[currentIndex]}
                             alt={t('lightbox.fullViewAlt', { index: currentIndex + 1 })}
                             className="max-h-[85vh] max-w-full object-contain shadow-2xl rounded-lg"
+                            width={1200}
+                            height={800}
                         />
 
                         <button
@@ -241,7 +246,7 @@ export default function PhotoGalleryModal({
                                 onClick={(e) => { e.stopPropagation(); setCurrentIndex(idx); }}
                                 className={`h-full aspect-square rounded-lg overflow-hidden border-2 transition-all ${idx === currentIndex ? 'border-orange-500 opacity-100 scale-105' : 'border-transparent opacity-50 hover:opacity-100'}`}
                             >
-                                <img src={photo} alt={t('lightbox.thumbnailAlt')} className="w-full h-full object-cover" />
+                                <Image src={photo} alt={t('lightbox.thumbnailAlt')} className="w-full h-full object-cover" width={80} height={80} />
                             </button>
                         ))}
                     </div>

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import { useCompanyWebSocket } from '../hooks/useCompanyWebSocket';

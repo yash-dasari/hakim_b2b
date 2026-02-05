@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { FaTimes, FaCheck, FaInfoCircle, FaTools, FaQrcode, FaMoneyBillWave, FaUniversity, FaWallet, FaExternalLinkAlt } from 'react-icons/fa';
 import { useTranslations } from 'next-intl';
 import { servicesAPI } from '../../../services/api/services.api';
@@ -36,7 +37,6 @@ export default function PaymentModal({
     const pollInterval = useRef<NodeJS.Timeout | null>(null);
 
     const t = useTranslations('modals.collectPayment');
-    const tCommon = useTranslations('common');
 
     // Reset state on open
     useEffect(() => {
@@ -133,7 +133,7 @@ export default function PaymentModal({
     };
 
     // Alias for backward compatibility if needed, using the generic handler
-    const handleInitiateFibPayment = () => handleInitiatePayment('fib');
+    // const handleInitiateFibPayment = () => handleInitiatePayment('fib'); // Commented out to satisfy unused var check if not exported
 
     const startPolling = (bookingId: string) => {
         if (pollInterval.current) clearInterval(pollInterval.current);
@@ -317,7 +317,13 @@ export default function PaymentModal({
                                     {paymentMethod === 'fib' && qrCode && (
                                         <>
                                             <div className="bg-white p-4 rounded-xl border-2 border-dashed border-gray-200 inline-block mx-auto relative group">
-                                                <img src={qrCode} alt="FIB QR Code" className="w-48 h-48 object-contain" />
+                                                <Image
+                                                    src={qrCode}
+                                                    alt="FIB QR Code"
+                                                    className="w-48 h-48 object-contain"
+                                                    width={192}
+                                                    height={192}
+                                                />
 
                                                 {paymentStatus === 'paid' && (
                                                     <div className="absolute inset-0 bg-white/90 flex items-center justify-center backdrop-blur-sm transition-all">

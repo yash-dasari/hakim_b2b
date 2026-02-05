@@ -7,7 +7,7 @@ import '../styles/globals.css';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { AuthProvider } from '../contexts/AuthContext';
 import { WebSocketProvider } from '../contexts/WebSocketContext';
-import { NextIntlClientProvider } from 'next-intl';
+import { NextIntlClientProvider, AbstractIntlMessages } from 'next-intl';
 
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -76,7 +76,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <SessionRestorer />
         <AuthProvider>
           <WebSocketProvider>
-            <NextIntlClientProvider locale={locale} messages={messages}>
+            <NextIntlClientProvider locale={locale} messages={messages as AbstractIntlMessages}>
               <Component {...pageProps} />
             </NextIntlClientProvider>
           </WebSocketProvider>

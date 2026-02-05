@@ -1,7 +1,7 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
+import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import Cookies from 'js-cookie';
 import { store } from '../store/store';
-import { isNetworkError, getErrorMessage, createApiError } from '../lib/error-handler';
+import { isNetworkError, createApiError } from '../lib/error-handler';
 
 // Base URL from environment or fallback
 export const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;

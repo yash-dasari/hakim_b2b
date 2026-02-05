@@ -1,10 +1,25 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
 import { servicesAPI, BookingListItem } from '../../../services/api/services.api';
 // Temporarily alias BookingListItem as ServiceRequest to satisfy legacy types until full refactor
-type ServiceRequest = BookingListItem;
+interface BookingListItemExtended extends BookingListItem {
+  service_center_id?: string;
+  company_id?: string;
+}
+
+interface BodyCheckPhoto {
+  url?: string;
+  signed_url?: string;
+  photo_url?: string;
+  image_url?: string;
+  file_url?: string;
+  photo_id?: string;
+  id?: string;
+}
+
+type ServiceRequest = BookingListItemExtended;
 
 import AdminLayout from '../../../components/AdminLayout';
 import {
@@ -18,7 +33,6 @@ import {
   FaClock,
   FaCheckCircle,
   FaCamera,
-  FaHourglassHalf,
   FaCreditCard,
   FaEdit,
   FaFileAlt,
@@ -50,7 +64,6 @@ export default function AdminRequests() {
   const router = useRouter();
   const t = useTranslations('servicesRequests');
   const company = useSelector((state: RootState) => state.auth.company);
-  const accessToken = useSelector((state: RootState) => state.auth.accessToken);
   const [requests, setRequests] = useState<BookingListItem[]>([]);
   const [stats, setStats] = useState({
     total_bookings: 0,
@@ -68,7 +81,7 @@ export default function AdminRequests() {
   // Modal States
   const [selectedRequest, setSelectedRequest] = useState<BookingListItem | null>(null);
 
-  const fetchRequests = async (silent = false) => {
+  const fetchRequests = useCallback(async (silent = false) => {
     if (!company?.id) return;
     try {
       if (!silent) setLoading(true);
@@ -86,7 +99,7 @@ export default function AdminRequests() {
     } finally {
       if (!silent) setLoading(false);
     }
-  };
+  }, [company?.id]);
 
 
   // WebSocket Integration (Global)
@@ -123,12 +136,11 @@ export default function AdminRequests() {
     } catch (error) {
       console.error('Error processing WS message:', error);
     }
-  }, [lastMessage]);
+  }, [lastMessage, fetchRequests]);
 
   useEffect(() => {
     fetchRequests();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [company?.id]);
+  }, [company?.id, fetchRequests]);
 
   // Rejection Modal State
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
@@ -196,7 +208,7 @@ export default function AdminRequests() {
       let response;
 
       const requestItem = requests.find(r => r.booking_id === bookingId) || selectedRequest;
-      const isServiceCenter = (requestItem as any)?.service_center_id || (viewQuotationData as any)?.service_center_id;
+      const isServiceCenter = (requestItem as BookingListItemExtended)?.service_center_id || (viewQuotationData as unknown as BookingListItemExtended)?.service_center_id;
 
       if (isServiceCenter) {
         // Approve all photos (Legacy)
@@ -258,7 +270,7 @@ export default function AdminRequests() {
         setLoading(true);
         let response;
         const requestItem = requests.find(r => r.booking_id === bookingId) || selectedRequest;
-        const isServiceCenter = (requestItem as any)?.service_center_id || (viewQuotationData as any)?.service_center_id;
+        const isServiceCenter = (requestItem as BookingListItemExtended)?.service_center_id || (viewQuotationData as unknown as BookingListItemExtended)?.service_center_id;
 
         if (isServiceCenter) {
           // Reject all photos (Legacy)
@@ -297,6 +309,48 @@ export default function AdminRequests() {
     }
   };
 
+  const handleStartDriving = async (bookingId: string) => {
+    try {
+      Swal.fire({
+        title: t('alerts.processing.title'),
+        text: t('alerts.processing.notifying'),
+        icon: 'info',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      // Assuming refreshData is a function that re-fetches the booking list
+      const refreshData = async () => {
+        if (company?.id) {
+          const res = await servicesAPI.getBatchBookingsList(company.id);
+          if (res.success && res.data) {
+            setRequests(res.data.bookings);
+          }
+        }
+      };
+
+      const response = await servicesAPI.startDrivingToServiceCenter(bookingId);
+
+      if (response.success) {
+        await refreshData();
+        Swal.fire(t('alerts.success.title'), t('alerts.success.serviceCenterNotified'), 'success');
+      } else {
+        throw new Error(response.error || t('alerts.error.notifyServiceCenterFailed'));
+      }
+    } catch (error: unknown) {
+      console.error('Error notifying center:', error);
+      const errorMessage = error instanceof Error ? error.message : t('alerts.error.notifyServiceCenterFailed');
+      Swal.fire({
+        title: t('alerts.error.title'),
+        text: errorMessage,
+        icon: 'error',
+        confirmButtonText: t('alerts.error.confirm')
+      });
+    }
+  };
+
   const handleCustomerArrived = async (bookingId: string) => {
     try {
       Swal.fire({
@@ -327,11 +381,12 @@ export default function AdminRequests() {
       } else {
         throw new Error(response.error || t('alerts.error.notifyServiceCenterFailed'));
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error notifying arrival:', error);
+      const errorMessage = error instanceof Error ? error.message : t('alerts.error.notifyServiceCenterFailed');
       Swal.fire({
         title: t('alerts.error.title'),
-        text: error.message || t('alerts.error.notifyServiceCenterFailed'),
+        text: errorMessage,
         icon: 'error',
         confirmButtonText: t('alerts.error.confirm')
       });
@@ -373,13 +428,30 @@ export default function AdminRequests() {
         }
         Swal.fire('Success', 'Car received confirmed!', 'success');
       } else {
-        throw new Error(response.error || t('alerts.error.updateFailed'));
+        // Handle specific error for No Active Dispatch
+        if (response.error?.code === 'HTTP_404' && response.error?.message?.includes('No active dispatch found')) {
+          if (company?.id) {
+            const res = await servicesAPI.getBatchBookingsList(company.id);
+            if (res.success && res.data) {
+              setRequests(res.data.bookings);
+            }
+          }
+          Swal.fire({
+            title: 'Status Updated',
+            text: 'The booking status seems to have been updated already. The list has been refreshed.',
+            icon: 'warning',
+            confirmButtonText: 'OK'
+          });
+        } else {
+          throw new Error(response.error?.message || response.error || t('alerts.error.updateFailed'));
+        }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error confirming receipt:', error);
+      const errorMessage = error instanceof Error ? error.message : t('alerts.error.updateFailed');
       Swal.fire({
         title: t('alerts.error.title'),
-        text: error.message || t('alerts.error.updateFailed'),
+        text: errorMessage,
         icon: 'error',
         confirmButtonText: t('alerts.error.confirm')
       });
@@ -475,15 +547,15 @@ export default function AdminRequests() {
               const photosData = Array.isArray(photoResponse.data) ? photoResponse.data : photoResponse.data?.photos;
 
               if (Array.isArray(photosData)) {
-                const photos = photosData.map((p: any) => {
+                const photos = (photosData as BodyCheckPhoto[]).map((p) => {
                   if (typeof p === 'string') return { url: p, photo_id: '' };
                   return {
-                    url: p.url || p.signed_url || p.photo_url || p.image_url || p.file_url,
-                    photo_id: p.photo_id || p.id
+                    url: (p.url || p.signed_url || p.photo_url || p.image_url || p.file_url || '') as string,
+                    photo_id: (p.photo_id || p.id || '') as string
                   };
                 });
                 console.log('Parsed Photos:', photos);
-                setViewBodyCheckPhotos(photos.filter((p: any) => p.url));
+                setViewBodyCheckPhotos(photos.filter((p) => p.url));
               } else {
                 console.warn('Unknown photos structure:', photoResponse);
               }
@@ -578,7 +650,7 @@ export default function AdminRequests() {
 
     Swal.fire({
       title: t('alerts.paymentRecorded.title'),
-      text: t('alerts.paymentRecorded.text', { id: selectedRequest?.booking_id }),
+      text: t('alerts.paymentRecorded.text', { id: selectedRequest?.booking_id ?? '' }),
       icon: 'success',
       confirmButtonColor: '#eab308'
     });
@@ -598,7 +670,7 @@ export default function AdminRequests() {
     setSelectedRequest(null);
     Swal.fire({
       title: t('alerts.draftSaved.title'),
-      text: t('alerts.draftSaved.text', { id: requestId }),
+      text: t('alerts.draftSaved.text', { id: requestId ?? '' }),
       icon: 'success',
       confirmButtonColor: '#eab308'
     });
@@ -610,7 +682,7 @@ export default function AdminRequests() {
     setSelectedRequest(null);
     Swal.fire({
       title: t('alerts.quotationSent.title'),
-      text: t('alerts.quotationSent.text', { id: requestId }),
+      text: t('alerts.quotationSent.text', { id: requestId ?? '' }),
       icon: 'success',
       confirmButtonColor: '#eab308'
     });
@@ -622,7 +694,6 @@ export default function AdminRequests() {
   // Photo Gallery State
   const [isPhotoGalleryOpen, setIsPhotoGalleryOpen] = useState(false);
   const [isPhotoGalleryLoading, setIsPhotoGalleryLoading] = useState(false);
-  const [galleryPhotos, setGalleryPhotos] = useState<string[]>([]);
 
   const handleViewBodyCheck = async (request: ServiceRequest) => {
     setSelectedRequest(request);
@@ -631,33 +702,33 @@ export default function AdminRequests() {
     setViewBodyCheckPhotos([]);
 
     try {
-      let photosData: any[] = [];
+      let photosData: BodyCheckPhoto[] = [];
 
-      if ((request as any).service_center_id) {
+      if ((request as BookingListItemExtended).service_center_id) {
         const photoResponse = await servicesAPI.getServiceCenterBodyCheckPhotos(request.booking_id);
         photosData = Array.isArray(photoResponse.data) ? photoResponse.data : photoResponse.data?.photos;
       } else {
         // Use batch API for non-service-center flows (e.g. mobile/tow)
-        const targetCompanyId = (request as any).company_id || company?.id;
-        const photoResponse = await servicesAPI.getBatchBodyCheckPhotos(request.booking_id, targetCompanyId);
+        const targetCompanyId = (request as BookingListItemExtended).company_id || company?.id;
+        const photoResponse = await servicesAPI.getBatchBodyCheckPhotos(request.booking_id, targetCompanyId || '');
 
         // Parse batch response: data.bookings[].photos
         if (photoResponse?.data?.bookings && Array.isArray(photoResponse.data.bookings)) {
           // Find specific booking or take the first one (since we only requested one)
-          const bookingData = photoResponse.data.bookings.find((b: any) => b.booking_id === request.booking_id) || photoResponse.data.bookings[0];
+          const bookingData = photoResponse.data.bookings.find((b: { booking_id: string }) => b.booking_id === request.booking_id) || photoResponse.data.bookings[0];
           photosData = bookingData?.photos || [];
         }
       }
 
       if (Array.isArray(photosData)) {
-        const photos = photosData.map((p: any) => {
+        const photos = (photosData as BodyCheckPhoto[]).map((p) => {
           if (typeof p === 'string') return { url: p, photo_id: '' };
           return {
-            url: p.url || p.signed_url || p.photo_url || p.image_url || p.file_url,
-            photo_id: p.photo_id || p.id
+            url: (p.url || p.signed_url || p.photo_url || p.image_url || p.file_url || '') as string,
+            photo_id: (p.photo_id || p.id || '') as string
           };
         });
-        setViewBodyCheckPhotos(photos.filter((p: any) => p.url));
+        setViewBodyCheckPhotos(photos.filter((p) => p.url));
       } else {
         // Just empty if none found
       }
@@ -703,7 +774,7 @@ export default function AdminRequests() {
     if (!status) return null;
     const s = status.toLowerCase();
 
-    let config = { bg: 'bg-gray-100 text-gray-600', icon: <FaClock className="me-1.5" />, label: status };
+    const config = { bg: 'bg-gray-100 text-gray-600', icon: <FaClock className="me-1.5" />, label: status };
 
     if (s.includes('quotation price') || s.includes('pending price')) {
       config.bg = 'bg-yellow-50 text-yellow-700 border border-yellow-100';
@@ -747,7 +818,7 @@ export default function AdminRequests() {
   };
 
   // Get action buttons based on status
-  const getActionButtons = (request: any) => {
+  const getActionButtons = (request: ServiceRequest) => {
     if (request.status === 'Pending Quotation') {
       return (
         <span className="text-sm font-medium text-gray-400 italic">
@@ -762,12 +833,36 @@ export default function AdminRequests() {
           <button
             onClick={(e) => {
               e.stopPropagation();
+              handleStartDriving(request.booking_id);
+            }}
+            className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-bold rounded-lg shadow-sm transition-colors flex items-center gap-2"
+          >
+            <FaTruck />
+            {t('actions.startDriving') || 'Start Driving'}
+          </button>
+          <button
+            onClick={() => handleViewQuotation(request)}
+            className="p-1.5 text-gray-500 hover:text-gray-700 transition-colors"
+            title={t('actions.viewQuotation')}
+          >
+            <FaFileInvoiceDollar className="w-4 h-4" />
+          </button>
+        </div>
+      );
+    }
+
+    if (request.status === 'On The Way') {
+      return (
+        <div className="flex items-center gap-2">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
               handleCustomerArrived(request.booking_id);
             }}
             className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-bold rounded-lg shadow-sm transition-colors flex items-center gap-2"
           >
             <FaCheckCircle />
-            {t('actions.arrivedAtServiceCenter')}
+            {t('actions.arrivedAtServiceCenter') || 'Arrived'}
           </button>
           <button
             onClick={() => handleViewQuotation(request)}
@@ -1408,7 +1503,7 @@ export default function AdminRequests() {
           isOpen={isCollectPaymentModalOpen}
           onClose={() => setIsCollectPaymentModalOpen(false)}
           onConfirm={handleCollectPaymentConfirm}
-          request={selectedRequest as any}
+          request={(selectedRequest as unknown) as Record<string, unknown>}
         />
       )}
 

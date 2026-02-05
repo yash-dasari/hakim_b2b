@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import {
@@ -68,7 +68,7 @@ export default function Register() {
         });
     }, [formData.password]);
 
-    const detectLocation = () => {
+    const detectLocation = useCallback(() => {
         if (!navigator.geolocation) {
             Swal.fire({
                 icon: 'error',
@@ -126,11 +126,11 @@ export default function Register() {
                 setFormData(prev => ({ ...prev, city: '' })); // Clear city if denied
             }
         );
-    };
+    }, [t]);
 
     useEffect(() => {
         detectLocation();
-    }, []);
+    }, [detectLocation]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -154,31 +154,7 @@ export default function Register() {
         console.log('Selected Location:', loc);
     };
 
-    const _handleCityBlur = async () => {
-        if (!formData.city) return;
 
-        try {
-            // Forward geocoding - restrict result to city/place
-            const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
-            if (!token) return;
-
-            const res = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(formData.city)}.json?types=place&limit=1&access_token=${token}`);
-            const data = await res.json();
-
-            if (data.features && data.features.length > 0) {
-                const feature = data.features[0];
-                const [lng, lat] = feature.center;
-                setLocation({
-                    lat,
-                    lng,
-                    address: feature.text,
-                    fullAddress: feature.place_name
-                });
-            }
-        } catch (error) {
-            console.error('City geocoding failed', error);
-        }
-    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -536,7 +512,7 @@ export default function Register() {
                                         name="password"
                                         value={formData.password}
                                         onChange={handleChange}
-                                    placeholder={t('placeholders.password')}
+                                        placeholder={t('placeholders.password')}
                                         required
                                         className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FCD34D] focus:border-transparent transition-all pr-10"
                                     />

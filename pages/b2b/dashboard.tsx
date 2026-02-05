@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
@@ -13,7 +13,6 @@ import QuotationModal from './components/QuotationModal'; // Correct path based 
 // Based on requests.tsx: import QuotationModal from '../components/QuotationModal'; (from services folder) -> so ./components/QuotationModal from dashboard folder.
 import { useWebSocket } from '../../contexts/WebSocketContext';
 import AddCarModal from './components/AddCarModal';
-import ConfirmCarReceiptModal from './components/ConfirmCarReceiptModal';
 
 // Service Modals (from services folder)
 import PhotoGalleryModal from './services/PhotoGalleryModal';
@@ -21,7 +20,6 @@ import RejectServiceRequestModal from './services/RejectServiceRequestModal';
 import SubmitPhotosModal from './services/SubmitPhotosModal';
 // import CollectPaymentModal from './services/CollectPaymentModal'; // Removed
 import PaymentModal from './components/PaymentModal'; // Added
-import ServiceRequestDetailModal from './services/ServiceRequestDetailModal';
 import QuotationBuilderModal from './services/QuotationBuilderModal';
 
 import {
@@ -34,37 +32,45 @@ import {
   FaTruck,
   FaTools,
   FaCheck,
-  FaTimes,
   FaFileInvoiceDollar,
-  FaFileAlt,
   FaCamera,
   FaEdit,
   FaClipboardList,
   FaCheckDouble,
   FaWrench,
-  FaFilter,
   FaUserCircle,
-  FaHourglassHalf,
   FaCreditCard
 } from 'react-icons/fa';
 
 // Alias for easier migration
-type ServiceRequest = BookingListItem;
+interface BookingListItemExtended extends BookingListItem {
+  service_center_id?: string;
+  company_id?: string;
+}
+
+interface BodyCheckPhoto {
+  url?: string;
+  signed_url?: string;
+  photo_url?: string;
+  image_url?: string;
+  file_url?: string;
+  photo_id?: string;
+  id?: string;
+}
+
+type ServiceRequest = BookingListItemExtended;
 
 export default function B2BDashboard() {
   const router = useRouter();
   const t = useTranslations('dashboard');
   const company = useSelector((state: RootState) => state.auth.company);
-  const accessToken = useSelector((state: RootState) => state.auth.accessToken);
 
   // State
   const [requests, setRequests] = useState<ServiceRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [categoryFilter, setCategoryFilter] = useState<string>('all');
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 7;
+  const [categoryFilter] = useState<string>('all');
 
   // Stats
   const [stats, setStats] = useState({
@@ -76,7 +82,7 @@ export default function B2BDashboard() {
   // Modal States
   const [selectedRequest, setSelectedRequest] = useState<ServiceRequest | null>(null);
 
-  const fetchRequests = async (silent = false) => {
+  const fetchRequests = useCallback(async (silent = false) => {
     if (!company?.id) return;
     try {
       if (!silent) setLoading(true);
@@ -94,7 +100,7 @@ export default function B2BDashboard() {
     } finally {
       if (!silent) setLoading(false);
     }
-  };
+  }, [company?.id]);
 
 
   // WebSocket Integration (Global)
@@ -133,22 +139,16 @@ export default function B2BDashboard() {
     } catch (error) {
       console.error('Error handling WS message:', error);
     }
-  }, [lastMessage]); // Removed fetchRequests dependency to avoid loop if not stable, but strictly it depends on it.
+  }, [lastMessage, fetchRequests]);
 
   useEffect(() => {
     fetchRequests();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [company?.id]);
+  }, [company?.id, fetchRequests]);
 
 
   // Modal States
   const [isAddCarModalOpen, setIsAddCarModalOpen] = useState(false);
   // const [selectedRequest, setSelectedRequest] = useState<ServiceRequest | null>(null); // This was moved up
-
-  const [isQuotationModalOpen, setIsQuotationModalOpen] = useState(false); // For Viewing Quote (legacy name in dashboard) or Builder?
-  // In requests.tsx: isViewQuotationModalOpen vs isQuotationModalOpen (Builder).
-  // Dashboard originally had isQuotationModalOpen for the "QuotationModal" component.
-  // We will map legacy Dashboard UI actions to correct logic.
 
   const [viewQuotationData, setViewQuotationData] = useState<Record<string, unknown> | null>(null);
   const [viewBodyCheckPhotos, setViewBodyCheckPhotos] = useState<Array<{ url: string, photo_id: string }>>([]);
@@ -159,11 +159,7 @@ export default function B2BDashboard() {
   const [isCollectPaymentModalOpen, setIsCollectPaymentModalOpen] = useState(false);
   const [isBuilderModalOpen, setIsBuilderModalOpen] = useState(false); // For QuotationBuilder
   const [isPhotoGalleryOpen, setIsPhotoGalleryOpen] = useState(false);
-  const [galleryPhotos, setGalleryPhotos] = useState<string[]>([]);
 
-  // Dashboard Legacy Modals (keep if needed, or replace)
-  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-  const [isConfirmReceiptModalOpen, setIsConfirmReceiptModalOpen] = useState(false);
   const [isPhotoGalleryLoading, setIsPhotoGalleryLoading] = useState(false);
 
 
@@ -239,7 +235,7 @@ export default function B2BDashboard() {
       setLoading(true);
       let response;
       const requestItem = requests.find(r => r.booking_id === bookingId) || selectedRequest;
-      const isServiceCenter = (requestItem as any)?.service_center_id || (viewQuotationData as any)?.service_center_id;
+      const isServiceCenter = requestItem?.service_center_id || (viewQuotationData as unknown as BookingListItemExtended)?.service_center_id;
 
       if (isServiceCenter) {
         const approvals = viewBodyCheckPhotos.map(p => ({
@@ -296,7 +292,7 @@ export default function B2BDashboard() {
         setLoading(true);
         let response;
         const requestItem = requests.find(r => r.booking_id === bookingId) || selectedRequest;
-        const isServiceCenter = (requestItem as any)?.service_center_id || (viewQuotationData as any)?.service_center_id;
+        const isServiceCenter = requestItem?.service_center_id || (viewQuotationData as unknown as BookingListItemExtended)?.service_center_id;
 
         if (isServiceCenter) {
           const refusals = viewBodyCheckPhotos.map(p => ({
@@ -393,15 +389,15 @@ export default function B2BDashboard() {
               const photosData = Array.isArray(photoResponse.data) ? photoResponse.data : photoResponse.data?.photos;
 
               if (Array.isArray(photosData)) {
-                const photos = photosData.map((p: any) => {
+                const photos = (photosData as BodyCheckPhoto[]).map((p) => {
                   if (typeof p === 'string') return { url: p, photo_id: '' };
                   return {
-                    url: p.url || p.signed_url || p.photo_url || p.image_url || p.file_url,
-                    photo_id: p.photo_id || p.id
+                    url: (p.url || p.signed_url || p.photo_url || p.image_url || p.file_url || '') as string,
+                    photo_id: (p.photo_id || p.id || '') as string
                   };
                 });
                 console.log('Parsed Photos:', photos);
-                setViewBodyCheckPhotos(photos.filter((p: any) => p.url));
+                setViewBodyCheckPhotos(photos.filter((p) => p.url));
               } else {
                 console.warn('Unknown photos structure:', photoResponse);
               }
@@ -470,32 +466,32 @@ export default function B2BDashboard() {
     setViewBodyCheckPhotos([]);
 
     try {
-      let photosData: any[] = [];
+      let photosData: BodyCheckPhoto[] = [];
 
-      if ((request as any).service_center_id) {
+      if ((request as BookingListItemExtended).service_center_id) {
         const photoResponse = await servicesAPI.getServiceCenterBodyCheckPhotos(request.booking_id);
         photosData = Array.isArray(photoResponse.data) ? photoResponse.data : photoResponse.data?.photos;
       } else {
         // Use batch API for non-service-center flows
-        const targetCompanyId = (request as any).company_id || company?.id;
-        const photoResponse = await servicesAPI.getBatchBodyCheckPhotos(request.booking_id, targetCompanyId);
+        const targetCompanyId = (request as BookingListItemExtended).company_id || company?.id;
+        const photoResponse = await servicesAPI.getBatchBodyCheckPhotos(request.booking_id, targetCompanyId || '');
 
         // Parse batch response: data.bookings[].photos
         if (photoResponse?.data?.bookings && Array.isArray(photoResponse.data.bookings)) {
-          const bookingData = photoResponse.data.bookings.find((b: any) => b.booking_id === request.booking_id) || photoResponse.data.bookings[0];
+          const bookingData = photoResponse.data.bookings.find((b: { booking_id: string }) => b.booking_id === request.booking_id) || photoResponse.data.bookings[0];
           photosData = bookingData?.photos || [];
         }
       }
 
       if (Array.isArray(photosData)) {
-        const photos = photosData.map((p: any) => {
+        const photos = (photosData as BodyCheckPhoto[]).map((p) => {
           if (typeof p === 'string') return { url: p, photo_id: '' };
           return {
-            url: p.url || p.signed_url || p.photo_url || p.image_url || p.file_url,
-            photo_id: p.photo_id || p.id
+            url: (p.url || p.signed_url || p.photo_url || p.image_url || p.file_url || '') as string,
+            photo_id: (p.photo_id || p.id || '') as string
           };
         });
-        setViewBodyCheckPhotos(photos.filter((p: any) => p.url));
+        setViewBodyCheckPhotos(photos.filter((p) => p.url));
       } else {
         // Just empty if none found
       }
@@ -511,6 +507,38 @@ export default function B2BDashboard() {
   const handleSubmitPhotosClick = (request: ServiceRequest) => {
     setSelectedRequest(request);
     setIsSubmitPhotosModalOpen(true);
+  };
+
+  const handleStartDriving = async (bookingId: string) => {
+    try {
+      Swal.fire({
+        title: t('alerts.processing.title'),
+        text: t('alerts.processing.notifying'),
+        icon: 'info',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      const response = await servicesAPI.startDrivingToServiceCenter(bookingId);
+
+      if (response.success) {
+        await refreshData();
+        Swal.fire(t('alerts.success.title'), t('alerts.success.serviceCenterNotified'), 'success'); // Verify if translation key needs update or if generic success message is ok
+      } else {
+        throw new Error(response.error || t('alerts.error.notifyServiceCenterFailed'));
+      }
+    } catch (error: unknown) {
+      console.error('Error notifying center:', error);
+      const errorMessage = error instanceof Error ? error.message : t('alerts.error.notifyServiceCenterFailed');
+      Swal.fire({
+        title: t('alerts.error.title'),
+        text: errorMessage,
+        icon: 'error',
+        confirmButtonText: t('alerts.error.confirm')
+      });
+    }
   };
 
   const handleCustomerArrived = async (bookingId: string) => {
@@ -533,11 +561,12 @@ export default function B2BDashboard() {
       } else {
         throw new Error(response.error || t('alerts.error.notifyServiceCenterFailed'));
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error notifiying arrival:', error);
+      const errorMessage = error instanceof Error ? error.message : t('alerts.error.notifyServiceCenterFailed');
       Swal.fire({
         title: t('alerts.error.title'),
-        text: error.message || t('alerts.error.notifyServiceCenterFailed'),
+        text: errorMessage,
         icon: 'error',
         confirmButtonText: t('alerts.error.confirm')
       });
@@ -574,13 +603,25 @@ export default function B2BDashboard() {
         refreshData();
         Swal.fire('Success', 'Car received confirmed!', 'success');
       } else {
-        throw new Error(response.error || t('alerts.error.updateFailed'));
+        // Handle specific error for No Active Dispatch (which essentially means it's already done or invalid state)
+        if (response.error?.code === 'HTTP_404' && response.error?.message?.includes('No active dispatch found')) {
+          await refreshData();
+          Swal.fire({
+            title: 'Status Updated',
+            text: 'The booking status seems to have been updated already. The list has been refreshed.',
+            icon: 'warning',
+            confirmButtonText: 'OK'
+          });
+        } else {
+          throw new Error(response.error?.message || response.error || t('alerts.error.updateFailed'));
+        }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error confirming receipt:', error);
+      const errorMessage = error instanceof Error ? error.message : t('alerts.error.updateFailed');
       Swal.fire({
         title: t('alerts.error.title'),
-        text: error.message || t('alerts.error.updateFailed'),
+        text: errorMessage,
         icon: 'error',
         confirmButtonText: t('alerts.error.confirm')
       });
@@ -656,7 +697,7 @@ export default function B2BDashboard() {
     if (!status) return null;
     const s = status.toLowerCase();
 
-    let config = { bg: 'bg-gray-100 text-gray-600', icon: <FaClock className="me-1.5" />, label: status };
+    const config = { bg: 'bg-gray-100 text-gray-600', icon: <FaClock className="me-1.5" />, label: status };
 
     // Determine colors based on status keywords
     if (s.includes('quotation price') || s.includes('pending price')) {
@@ -706,7 +747,31 @@ export default function B2BDashboard() {
 
   const renderActions = (request: ServiceRequest) => {
     // Determine actions based on status, similar to requests.tsx
-    if (request.status === 'Drive to Service Location') {
+    if (request.status === 'Driver will start' || request.status === 'Driver is on the way') {
+      return (
+        <div className="flex items-center gap-2">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleStartDriving(request.booking_id);
+            }}
+            className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-bold rounded-lg shadow-sm transition-colors flex items-center gap-2"
+          >
+            <FaTruck className="w-4 h-4" />
+            {t('actions.startDriving') || 'Start Driving'}
+          </button>
+          <button
+            onClick={() => handleViewQuotation(request)}
+            className="p-1.5 text-gray-500 hover:text-gray-700 transition-colors"
+            title={t('actions.viewQuotation')}
+          >
+            <FaFileInvoiceDollar className="w-4 h-4" />
+          </button>
+        </div>
+      );
+    }
+
+    if (request.status === 'On The Way') {
       return (
         <div className="flex items-center gap-2">
           <button
@@ -716,8 +781,8 @@ export default function B2BDashboard() {
             }}
             className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-bold rounded-lg shadow-sm transition-colors flex items-center gap-2"
           >
-            <FaCheckCircle />
-            {t('actions.arrivedAtServiceCenter')}
+            <FaCheckCircle className="w-4 h-4" />
+            {t('actions.arrivedAtServiceCenter') || 'Arrived'}
           </button>
           <button
             onClick={() => handleViewQuotation(request)}
@@ -1071,7 +1136,7 @@ export default function B2BDashboard() {
           isOpen={isCollectPaymentModalOpen}
           onClose={() => setIsCollectPaymentModalOpen(false)}
           onConfirm={handleCollectPaymentConfirm}
-          request={selectedRequest as any}
+          request={(selectedRequest as unknown) as Record<string, unknown>}
         />
       )}
 

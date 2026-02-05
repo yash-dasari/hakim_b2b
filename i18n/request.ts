@@ -6,8 +6,9 @@ const supportedLocales = ['en', 'ar', 'ku'] as const;
 
 type SupportedLocale = (typeof supportedLocales)[number];
 
-function resolveLocale(requestLocale?: string | null) {
-  const cookieLocale = cookies().get('NEXT_LOCALE')?.value;
+async function resolveLocale(requestLocale?: string | null) {
+  const cookieStore = await cookies();
+  const cookieLocale = cookieStore.get('NEXT_LOCALE')?.value;
   const candidate = cookieLocale || requestLocale || defaultLocale;
   return supportedLocales.includes(candidate as SupportedLocale)
     ? (candidate as SupportedLocale)
@@ -15,7 +16,7 @@ function resolveLocale(requestLocale?: string | null) {
 }
 
 export default getRequestConfig(async ({ requestLocale }) => {
-  const locale = resolveLocale(requestLocale);
+  const locale = await resolveLocale(await requestLocale);
   const messages = (await import(`../messages/${locale}.json`)).default;
 
   return {

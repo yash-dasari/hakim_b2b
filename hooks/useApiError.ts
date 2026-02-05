@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { createApiError, isNetworkError, getErrorMessage, ApiError } from '../lib/error-handler';
+import { createApiError, ApiError } from '../lib/error-handler';
 
 interface UseApiErrorReturn {
   error: ApiError | null;

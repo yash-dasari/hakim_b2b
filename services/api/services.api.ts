@@ -225,6 +225,15 @@ export const servicesAPI = {
     },
 
     /**
+     * Start driving to service center
+     * @param booking_id
+     */
+    startDrivingToServiceCenter: async (booking_id: string): Promise<any> => {
+        const response = await apiClient.post(`/bookings/v1/bookings/${booking_id}/start-driving-to-service-center`);
+        return response.data;
+    },
+
+    /**
      * Confirm customer received car
      * @param booking_id
      */
@@ -272,6 +281,25 @@ export const servicesAPI = {
         const response = await apiClient.post(`/bookings/v1/bookings/batch/body-check/approve`, payload);
         return response.data;
     },
+
+    /**
+     * Get rejection fee details
+     * @param booking_id
+     */
+    getRejectionFeeDetails: async (booking_id: string): Promise<any> => {
+        const response = await apiClient.get(`/bookings/v1/bookings/${booking_id}/rejection-fee-details`);
+        return response.data;
+    },
+
+    /**
+     * Get booking estimation
+     * @param payload - BatchBookingPayload
+     */
+    getBookingEstimation: async (payload: BatchBookingPayload): Promise<any> => {
+        const response = await apiClient.post('/ops-tracking/v1/bookings/batch/fee-details', payload);
+        return response.data;
+    },
+
 };
 
 export interface BookingRequestItem {

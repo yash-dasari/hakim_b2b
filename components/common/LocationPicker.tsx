@@ -114,7 +114,7 @@ export default function LocationPicker({ onLocationSelect, initialLocation }: Lo
             const errorMessage = err instanceof Error ? err.message : 'Unknown error';
             setError('Failed to load map: ' + errorMessage);
         }
-    }, []);
+    }, [initialLocation]);
 
     // Update marker when prop changes
     useEffect(() => {

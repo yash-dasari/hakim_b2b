@@ -60,7 +60,6 @@ export default function QuotationBuilderModal({
     const [serviceCategories, setServiceCategories] = useState<ServiceCategory[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [_errorMessage, _setErrorMessage] = useState('');
-    const [successMessage, setSuccessMessage] = useState('');
     const t = useTranslations('modals.quotationBuilder');
     const tCommon = useTranslations('common');
 
@@ -158,7 +157,6 @@ export default function QuotationBuilderModal({
         setIsSubmitting(true);
         // Simulate API call
         setTimeout(() => {
-            setSuccessMessage(t('alerts.saved'));
             setIsSubmitting(false);
             if (onSave) onSave({ services, parts, totals, validUntil, internalNotes });
         }, 1000);
@@ -168,7 +166,6 @@ export default function QuotationBuilderModal({
         setIsSubmitting(true);
         // Simulate API call
         setTimeout(() => {
-            setSuccessMessage(t('alerts.sent'));
             setIsSubmitting(false);
             if (onSend) onSend({ services, parts, totals, validUntil, internalNotes });
         }, 1000);

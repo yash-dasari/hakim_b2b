@@ -115,7 +115,7 @@ export default function B2BVehicles() {
         };
 
         fetchVehicles();
-    }, [company, debouncedSearch, status, page]);
+    }, [company, debouncedSearch, status, page, t]);
 
     const handleDelete = async (vehicleId: string) => {
         const result = await Swal.fire({
