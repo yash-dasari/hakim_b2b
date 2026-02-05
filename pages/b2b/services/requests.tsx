@@ -27,14 +27,15 @@ import {
   FaCheckDouble,
   FaFileInvoiceDollar,
   FaTruck,
-  FaCar
+  FaCar,
+  FaKey
 } from 'react-icons/fa';
 import QuotationModal from '../components/QuotationModal';
 import PhotoGalleryModal from './PhotoGalleryModal';
 import Swal from 'sweetalert2';
 import RejectServiceRequestModal from './RejectServiceRequestModal';
 import SubmitPhotosModal from './SubmitPhotosModal';
-import CollectPaymentModal from './CollectPaymentModal';
+import PaymentModal from '../components/PaymentModal';
 import ServiceRequestDetailModal from './ServiceRequestDetailModal';
 import QuotationBuilderModal from './QuotationBuilderModal';
 import { useTranslations } from 'next-intl';
@@ -191,19 +192,32 @@ export default function AdminRequests() {
     }
 
     try {
-      // Approve all photos
-      const approvals = viewBodyCheckPhotos.map(p => ({
-        action: 'approve',
-        photo_id: p.photo_id
-      }));
-
-      if (approvals.length === 0) {
-        Swal.fire(t('alerts.warning.title'), t('alerts.warning.noPhotosToApprove'), 'warning');
-        return;
-      }
-
       setLoading(true);
-      const response = await servicesAPI.respondToBodyCheckPhotos(bookingId, { photo_approvals: approvals });
+      let response;
+
+      const requestItem = requests.find(r => r.booking_id === bookingId) || selectedRequest;
+      const isServiceCenter = (requestItem as any)?.service_center_id || (viewQuotationData as any)?.service_center_id;
+
+      if (isServiceCenter) {
+        // Approve all photos (Legacy)
+        const approvals = viewBodyCheckPhotos.map(p => ({
+          action: 'approve',
+          photo_id: p.photo_id
+        }));
+
+        if (approvals.length === 0) {
+          Swal.fire(t('alerts.warning.title'), t('alerts.warning.noPhotosToApprove'), 'warning');
+          setLoading(false);
+          return;
+        }
+        response = await servicesAPI.respondToBodyCheckPhotos(bookingId, { photo_approvals: approvals });
+      } else {
+        // Batch API (Mobile/Tow)
+        response = await servicesAPI.respondToBatchBodyCheckPhotos({
+          booking_ids: [bookingId],
+          action: 'approve_all'
+        });
+      }
 
       if (response.success || response.status === 'success') {
         Swal.fire(t('alerts.success.title'), t('alerts.success.bodyCheckApproved'), 'success');
@@ -241,15 +255,27 @@ export default function AdminRequests() {
 
     if (reason) {
       try {
-        // Reject all photos
-        const refusals = viewBodyCheckPhotos.map(p => ({
-          action: 'reject',
-          photo_id: p.photo_id,
-          rejection_reason: reason
-        }));
-
         setLoading(true);
-        const response = await servicesAPI.respondToBodyCheckPhotos(bookingId, { photo_approvals: refusals });
+        let response;
+        const requestItem = requests.find(r => r.booking_id === bookingId) || selectedRequest;
+        const isServiceCenter = (requestItem as any)?.service_center_id || (viewQuotationData as any)?.service_center_id;
+
+        if (isServiceCenter) {
+          // Reject all photos (Legacy)
+          const refusals = viewBodyCheckPhotos.map(p => ({
+            action: 'reject',
+            photo_id: p.photo_id,
+            rejection_reason: reason
+          }));
+          response = await servicesAPI.respondToBodyCheckPhotos(bookingId, { photo_approvals: refusals });
+        } else {
+          // Batch API (Mobile/Tow)
+          response = await servicesAPI.respondToBatchBodyCheckPhotos({
+            booking_ids: [bookingId],
+            action: 'reject_all',
+            rejection_reason: reason
+          });
+        }
 
         if (response.success || response.status === 'success') {
           Swal.fire(t('alerts.rejected.title'), t('alerts.rejected.bodyCheckPhotos'), 'success');
@@ -306,6 +332,54 @@ export default function AdminRequests() {
       Swal.fire({
         title: t('alerts.error.title'),
         text: error.message || t('alerts.error.notifyServiceCenterFailed'),
+        icon: 'error',
+        confirmButtonText: t('alerts.error.confirm')
+      });
+    }
+  };
+
+  const handleConfirmCarReceived = async (bookingId: string) => {
+    try {
+      const result = await Swal.fire({
+        title: 'Confirm Pickup?',
+        text: 'Are you sure you have received your car?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#22c55e',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, I received it'
+      });
+
+      if (!result.isConfirmed) return;
+
+      Swal.fire({
+        title: t('alerts.processing.title'),
+        text: t('alerts.processing.updating'),
+        icon: 'info',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      const response = await servicesAPI.confirmCarReceived(bookingId);
+
+      if (response.success || response.status === 'success') {
+        if (company?.id) {
+          const res = await servicesAPI.getBatchBookingsList(company.id);
+          if (res.success && res.data) {
+            setRequests(res.data.bookings);
+          }
+        }
+        Swal.fire('Success', 'Car received confirmed!', 'success');
+      } else {
+        throw new Error(response.error || t('alerts.error.updateFailed'));
+      }
+    } catch (error: any) {
+      console.error('Error confirming receipt:', error);
+      Swal.fire({
+        title: t('alerts.error.title'),
+        text: error.message || t('alerts.error.updateFailed'),
         icon: 'error',
         confirmButtonText: t('alerts.error.confirm')
       });
@@ -557,8 +631,23 @@ export default function AdminRequests() {
     setViewBodyCheckPhotos([]);
 
     try {
-      const photoResponse = await servicesAPI.getServiceCenterBodyCheckPhotos(request.booking_id);
-      const photosData = Array.isArray(photoResponse.data) ? photoResponse.data : photoResponse.data?.photos;
+      let photosData: any[] = [];
+
+      if ((request as any).service_center_id) {
+        const photoResponse = await servicesAPI.getServiceCenterBodyCheckPhotos(request.booking_id);
+        photosData = Array.isArray(photoResponse.data) ? photoResponse.data : photoResponse.data?.photos;
+      } else {
+        // Use batch API for non-service-center flows (e.g. mobile/tow)
+        const targetCompanyId = (request as any).company_id || company?.id;
+        const photoResponse = await servicesAPI.getBatchBodyCheckPhotos(request.booking_id, targetCompanyId);
+
+        // Parse batch response: data.bookings[].photos
+        if (photoResponse?.data?.bookings && Array.isArray(photoResponse.data.bookings)) {
+          // Find specific booking or take the first one (since we only requested one)
+          const bookingData = photoResponse.data.bookings.find((b: any) => b.booking_id === request.booking_id) || photoResponse.data.bookings[0];
+          photosData = bookingData?.photos || [];
+        }
+      }
 
       if (Array.isArray(photosData)) {
         const photos = photosData.map((p: any) => {
@@ -691,7 +780,7 @@ export default function AdminRequests() {
       );
     }
 
-    if (request.status === 'Approve Estimated Price' || request.status === 'Approve Quotation Price') {
+    if (request.status === 'Approve Estimated Price' || request.status === 'Approve Quotation Price' || request.status?.toLowerCase() === 'approve service pricing') {
       return (
         <div className="flex items-center gap-2">
           <button
@@ -699,7 +788,7 @@ export default function AdminRequests() {
             className="px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 text-sm font-medium rounded-lg shadow-sm transition-colors flex items-center gap-2"
           >
             <FaFileInvoiceDollar />
-            {t('actions.viewEstimatedPrice')}
+            {request.status?.toLowerCase() === 'approve service pricing' ? t('actions.approveQuotation') : t('actions.viewEstimatedPrice')}
           </button>
           <button
             onClick={() => handleViewQuotation(request)}
@@ -724,6 +813,54 @@ export default function AdminRequests() {
           >
             <FaCamera />
             {t('actions.viewBodyCheck')}
+          </button>
+          <button
+            onClick={() => handleViewQuotation(request)}
+            className="p-1.5 text-gray-500 hover:text-gray-700 transition-colors"
+            title={t('actions.viewQuotation')}
+          >
+            <FaFileInvoiceDollar className="w-4 h-4" />
+          </button>
+        </div>
+      );
+    }
+
+    if (request.status === 'Car Ready - Please Pickup') {
+      return (
+        <div className="flex items-center gap-2">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleConfirmCarReceived(request.booking_id);
+            }}
+            className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-sm font-bold rounded-lg shadow-sm transition-colors flex items-center gap-2"
+          >
+            <FaKey />
+            Confirm pickup
+          </button>
+          <button
+            onClick={() => handleViewQuotation(request)}
+            className="p-1.5 text-gray-500 hover:text-gray-700 transition-colors"
+            title={t('actions.viewQuotation')}
+          >
+            <FaFileInvoiceDollar className="w-4 h-4" />
+          </button>
+        </div>
+      );
+    }
+
+    if (request.status === 'Complete Payment' || request.status?.toLowerCase() === 'complete payment') {
+      return (
+        <div className="flex items-center gap-2">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleCollectPaymentClick(request as ServiceRequest);
+            }}
+            className="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white text-sm font-bold rounded-lg shadow-sm transition-colors flex items-center gap-2"
+          >
+            <FaCreditCard />
+            Process Payment
           </button>
           <button
             onClick={() => handleViewQuotation(request)}
@@ -1265,13 +1402,13 @@ export default function AdminRequests() {
         onSubmit={handleSubmitPhotosConfirm}
       />
 
-      {/* Collect Payment Modal */}
+      {/* Payment Modal (Replaces CollectPaymentModal) */}
       {selectedRequest && (
-        <CollectPaymentModal
+        <PaymentModal
           isOpen={isCollectPaymentModalOpen}
           onClose={() => setIsCollectPaymentModalOpen(false)}
           onConfirm={handleCollectPaymentConfirm}
-          request={selectedRequest as BookingListItem & { [key: string]: unknown }}
+          request={selectedRequest as any}
         />
       )}
 
@@ -1297,7 +1434,7 @@ export default function AdminRequests() {
 
       {/* View Quotation Modal */}
       {(() => {
-        const canApprove = (selectedRequest && (selectedRequest.status === 'Approve Quotation Price' || selectedRequest.status === 'Approve Estimated Price' || selectedRequest.status === 'sent_to_customer'))
+        const canApprove = (selectedRequest && (selectedRequest.status === 'Approve Quotation Price' || selectedRequest.status === 'Approve Estimated Price' || selectedRequest.status?.toLowerCase() === 'approve service pricing' || selectedRequest.status === 'sent_to_customer'))
           || (viewQuotationData?.status === 'sent_to_customer');
 
         const isBodyCheckReview =
