@@ -11,7 +11,6 @@ import { useTranslations } from 'next-intl';
 import QuotationModal from './components/QuotationModal'; // Correct path based on original dashboard.tsx
 // Provide fallback imports if these don't exist in ./components, they might be in ./services/components or just ./services
 // Based on requests.tsx: import QuotationModal from '../components/QuotationModal'; (from services folder) -> so ./components/QuotationModal from dashboard folder.
-import PaymentModal from './components/PaymentModal';
 import { useWebSocket } from '../../contexts/WebSocketContext';
 import AddCarModal from './components/AddCarModal';
 import ConfirmCarReceiptModal from './components/ConfirmCarReceiptModal';
@@ -20,7 +19,8 @@ import ConfirmCarReceiptModal from './components/ConfirmCarReceiptModal';
 import PhotoGalleryModal from './services/PhotoGalleryModal';
 import RejectServiceRequestModal from './services/RejectServiceRequestModal';
 import SubmitPhotosModal from './services/SubmitPhotosModal';
-import CollectPaymentModal from './services/CollectPaymentModal';
+// import CollectPaymentModal from './services/CollectPaymentModal'; // Removed
+import PaymentModal from './components/PaymentModal'; // Added
 import ServiceRequestDetailModal from './services/ServiceRequestDetailModal';
 import QuotationBuilderModal from './services/QuotationBuilderModal';
 
@@ -236,18 +236,30 @@ export default function B2BDashboard() {
     }
 
     try {
-      const approvals = viewBodyCheckPhotos.map(p => ({
-        action: 'approve',
-        photo_id: p.photo_id
-      }));
-
-      if (approvals.length === 0) {
-        Swal.fire(t('alerts.warning.title'), t('alerts.warning.noPhotosToApprove'), 'warning');
-        return;
-      }
-
       setLoading(true);
-      const response = await servicesAPI.respondToBodyCheckPhotos(bookingId, { photo_approvals: approvals });
+      let response;
+      const requestItem = requests.find(r => r.booking_id === bookingId) || selectedRequest;
+      const isServiceCenter = (requestItem as any)?.service_center_id || (viewQuotationData as any)?.service_center_id;
+
+      if (isServiceCenter) {
+        const approvals = viewBodyCheckPhotos.map(p => ({
+          action: 'approve',
+          photo_id: p.photo_id
+        }));
+
+        if (approvals.length === 0) {
+          Swal.fire(t('alerts.warning.title'), t('alerts.warning.noPhotosToApprove'), 'warning');
+          setLoading(false);
+          return;
+        }
+        response = await servicesAPI.respondToBodyCheckPhotos(bookingId, { photo_approvals: approvals });
+      } else {
+        // Batch API
+        response = await servicesAPI.respondToBatchBodyCheckPhotos({
+          booking_ids: [bookingId],
+          action: 'approve_all'
+        });
+      }
 
       if (response.success || response.status === 'success') {
         Swal.fire(t('alerts.success.title'), t('alerts.success.bodyCheckApproved'), 'success');
@@ -281,14 +293,26 @@ export default function B2BDashboard() {
 
     if (reason) {
       try {
-        const refusals = viewBodyCheckPhotos.map(p => ({
-          action: 'reject',
-          photo_id: p.photo_id,
-          rejection_reason: reason
-        }));
-
         setLoading(true);
-        const response = await servicesAPI.respondToBodyCheckPhotos(bookingId, { photo_approvals: refusals });
+        let response;
+        const requestItem = requests.find(r => r.booking_id === bookingId) || selectedRequest;
+        const isServiceCenter = (requestItem as any)?.service_center_id || (viewQuotationData as any)?.service_center_id;
+
+        if (isServiceCenter) {
+          const refusals = viewBodyCheckPhotos.map(p => ({
+            action: 'reject',
+            photo_id: p.photo_id,
+            rejection_reason: reason
+          }));
+          response = await servicesAPI.respondToBodyCheckPhotos(bookingId, { photo_approvals: refusals });
+        } else {
+          // Batch API
+          response = await servicesAPI.respondToBatchBodyCheckPhotos({
+            booking_ids: [bookingId],
+            action: 'reject_all',
+            rejection_reason: reason
+          });
+        }
 
         if (response.success || response.status === 'success') {
           Swal.fire(t('alerts.rejected.title'), t('alerts.rejected.bodyCheckPhotos'), 'success');
@@ -446,8 +470,22 @@ export default function B2BDashboard() {
     setViewBodyCheckPhotos([]);
 
     try {
-      const photoResponse = await servicesAPI.getServiceCenterBodyCheckPhotos(request.booking_id);
-      const photosData = Array.isArray(photoResponse.data) ? photoResponse.data : photoResponse.data?.photos;
+      let photosData: any[] = [];
+
+      if ((request as any).service_center_id) {
+        const photoResponse = await servicesAPI.getServiceCenterBodyCheckPhotos(request.booking_id);
+        photosData = Array.isArray(photoResponse.data) ? photoResponse.data : photoResponse.data?.photos;
+      } else {
+        // Use batch API for non-service-center flows
+        const targetCompanyId = (request as any).company_id || company?.id;
+        const photoResponse = await servicesAPI.getBatchBodyCheckPhotos(request.booking_id, targetCompanyId);
+
+        // Parse batch response: data.bookings[].photos
+        if (photoResponse?.data?.bookings && Array.isArray(photoResponse.data.bookings)) {
+          const bookingData = photoResponse.data.bookings.find((b: any) => b.booking_id === request.booking_id) || photoResponse.data.bookings[0];
+          photosData = bookingData?.photos || [];
+        }
+      }
 
       if (Array.isArray(photosData)) {
         const photos = photosData.map((p: any) => {
@@ -459,7 +497,7 @@ export default function B2BDashboard() {
         });
         setViewBodyCheckPhotos(photos.filter((p: any) => p.url));
       } else {
-        // Empty if none found
+        // Just empty if none found
       }
     } catch (error) {
       console.error('Error fetching body check photos:', error);
@@ -500,6 +538,49 @@ export default function B2BDashboard() {
       Swal.fire({
         title: t('alerts.error.title'),
         text: error.message || t('alerts.error.notifyServiceCenterFailed'),
+        icon: 'error',
+        confirmButtonText: t('alerts.error.confirm')
+      });
+    }
+  };
+
+  const handleConfirmCarReceived = async (bookingId: string) => {
+    try {
+      const result = await Swal.fire({
+        title: 'Confirm Pickup?',
+        text: 'Are you sure you have received your car?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#22c55e',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, I received it'
+      });
+
+      if (!result.isConfirmed) return;
+
+      Swal.fire({
+        title: t('alerts.processing.title'),
+        text: t('alerts.processing.updating'),
+        icon: 'info',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      const response = await servicesAPI.confirmCarReceived(bookingId);
+
+      if (response.success || response.status === 'success') {
+        refreshData();
+        Swal.fire('Success', 'Car received confirmed!', 'success');
+      } else {
+        throw new Error(response.error || t('alerts.error.updateFailed'));
+      }
+    } catch (error: any) {
+      console.error('Error confirming receipt:', error);
+      Swal.fire({
+        title: t('alerts.error.title'),
+        text: error.message || t('alerts.error.updateFailed'),
         icon: 'error',
         confirmButtonText: t('alerts.error.confirm')
       });
@@ -649,7 +730,7 @@ export default function B2BDashboard() {
       );
     }
 
-    if (request.status === 'Approve Estimated Price') {
+    if (request.status === 'Approve Estimated Price' || request.status?.toLowerCase() === 'approve service pricing') {
       return (
         <div className="flex items-center gap-2">
           <button
@@ -657,7 +738,7 @@ export default function B2BDashboard() {
             className="px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 text-sm font-medium rounded-lg shadow-sm transition-colors flex items-center gap-2"
           >
             <FaFileInvoiceDollar />
-            {t('actions.viewEstimatedPrice')}
+            {request.status?.toLowerCase() === 'approve service pricing' ? t('actions.approveQuotation') : t('actions.viewEstimatedPrice')}
           </button>
           <button
             onClick={() => handleViewQuotation(request)}
@@ -682,6 +763,54 @@ export default function B2BDashboard() {
           >
             <FaCamera />
             {t('actions.viewBodyCheck')}
+          </button>
+          <button
+            onClick={() => handleViewQuotation(request)}
+            className="p-1.5 text-gray-500 hover:text-gray-700 transition-colors"
+            title={t('actions.viewQuotation')}
+          >
+            <FaFileInvoiceDollar className="w-4 h-4" />
+          </button>
+        </div>
+      );
+    }
+
+    if (request.status === 'Car Ready - Please Pickup') {
+      return (
+        <div className="flex items-center gap-2">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleConfirmCarReceived(request.booking_id);
+            }}
+            className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-sm font-bold rounded-lg shadow-sm transition-colors flex items-center gap-2"
+          >
+            <FaKey />
+            Confirm pickup
+          </button>
+          <button
+            onClick={() => handleViewQuotation(request)}
+            className="p-1.5 text-gray-500 hover:text-gray-700 transition-colors"
+            title={t('actions.viewQuotation')}
+          >
+            <FaFileInvoiceDollar className="w-4 h-4" />
+          </button>
+        </div>
+      );
+    }
+
+    if (request.status === 'Complete Payment' || request.status?.toLowerCase() === 'complete payment') {
+      return (
+        <div className="flex items-center gap-2">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleCollectPaymentClick(request);
+            }}
+            className="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white text-sm font-bold rounded-lg shadow-sm transition-colors flex items-center gap-2"
+          >
+            <FaCreditCard />
+            Process Payment
           </button>
           <button
             onClick={() => handleViewQuotation(request)}
@@ -907,7 +1036,7 @@ export default function B2BDashboard() {
         onAccept={
           (viewQuotationData?.status === 'Awaiting Body Check Response' || viewQuotationData?.status === 'Approve Body Check' || (selectedRequest?.status || '').includes('Body Check'))
             ? handleApproveBodyCheck
-            : (viewQuotationData?.status === 'sent_to_customer' ? handleApproveQuotation : undefined)
+            : (viewQuotationData?.status === 'sent_to_customer' || selectedRequest?.status === 'Approve Estimated Price' || selectedRequest?.status?.toLowerCase() === 'approve service pricing' ? handleApproveQuotation : undefined)
         }
         onReject={
           (viewQuotationData?.status === 'sent_to_customer') ? handleModalReject : undefined
@@ -915,7 +1044,7 @@ export default function B2BDashboard() {
         acceptLabel={
           (viewQuotationData?.status === 'Awaiting Body Check Response' || viewQuotationData?.status === 'Approve Body Check' || (selectedRequest?.status || '').includes('Body Check'))
             ? t('actions.approvePhotos')
-            : t('actions.accept')
+            : (viewQuotationData?.status === 'sent_to_customer' || selectedRequest?.status === 'Approve Estimated Price' || selectedRequest?.status?.toLowerCase() === 'approve service pricing' ? t('actions.approveQuotation') : t('actions.accept'))
         }
         rejectLabel={
           (viewQuotationData?.status === 'Awaiting Body Check Response' || viewQuotationData?.status === 'Approve Body Check' || (selectedRequest?.status || '').includes('Body Check'))
@@ -936,12 +1065,15 @@ export default function B2BDashboard() {
         onSubmit={handleSubmitPhotosConfirm}
       />
 
-      <CollectPaymentModal
-        isOpen={isCollectPaymentModalOpen}
-        onClose={() => setIsCollectPaymentModalOpen(false)}
-        onConfirm={handleCollectPaymentConfirm}
-        request={(selectedRequest || {}) as any}
-      />
+      {/* Payment Modal */}
+      {selectedRequest && (
+        <PaymentModal
+          isOpen={isCollectPaymentModalOpen}
+          onClose={() => setIsCollectPaymentModalOpen(false)}
+          onConfirm={handleCollectPaymentConfirm}
+          request={selectedRequest as any}
+        />
+      )}
 
       <QuotationBuilderModal
         isOpen={isBuilderModalOpen}

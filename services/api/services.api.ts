@@ -222,7 +222,56 @@ export const servicesAPI = {
     customerArrivedAtServiceCenter: async (booking_id: string): Promise<any> => {
         const response = await apiClient.post(`/bookings/v1/bookings/${booking_id}/customer-arrived-at-service-center`);
         return response.data;
-    }
+    },
+
+    /**
+     * Confirm customer received car
+     * @param booking_id
+     */
+    confirmCarReceived: async (booking_id: string): Promise<any> => {
+        const response = await apiClient.put(`/bookings/v1/bookings/${booking_id}/confirm-received`);
+        return response.data;
+    },
+
+    /**
+     * Initiate payment (FIB or other providers)
+     * @param payload { booking_id, amount, currency, provider }
+     */
+    initiatePayment: async (payload: { booking_id: string; amount: number; currency: string; provider: string }): Promise<any> => {
+        // Using the endpoint from workflow or assuming finance/v1
+        const response = await apiClient.post('/finance/v1/payments', payload);
+        return response.data;
+    },
+
+    /**
+     * Check payment status
+     * @param booking_id
+     */
+    checkPaymentStatus: async (booking_id: string): Promise<any> => {
+        const response = await apiClient.get(`/bookings/v1/bookings/${booking_id}/payment-status`);
+        return response.data;
+    },
+
+    /**
+     * Get batch body check photos
+     * @param booking_ids Comma-separated list of booking IDs
+     * @param company_id Company ID
+     */
+    getBatchBodyCheckPhotos: async (booking_ids: string, company_id: string): Promise<any> => {
+        const response = await apiClient.get(`/bookings/v1/bookings/batch/body-check/photos`, {
+            params: { booking_ids, company_id }
+        });
+        return response.data;
+    },
+
+    /**
+     * Respond to batch body check photos (Approve/Reject)
+     * @param payload { booking_ids: string[], action: 'approve_all' | 'reject_all', rejection_reason?: string }
+     */
+    respondToBatchBodyCheckPhotos: async (payload: { booking_ids: string[]; action: string; rejection_reason?: string }): Promise<any> => {
+        const response = await apiClient.post(`/bookings/v1/bookings/batch/body-check/approve`, payload);
+        return response.data;
+    },
 };
 
 export interface BookingRequestItem {
