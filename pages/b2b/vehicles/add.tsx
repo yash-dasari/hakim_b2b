@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import Image from 'next/image';
 import { toast } from 'react-hot-toast';
 import AdminLayout from '../../../components/AdminLayout';
 import Cookies from 'js-cookie';
@@ -14,7 +15,7 @@ export default function AddVehiclePage() {
     const router = useRouter();
     const t = useTranslations('addVehicle');
     const tCommon = useTranslations('common');
-    const { user, company } = useSelector((state: RootState) => state.auth);
+    const { company } = useSelector((state: RootState) => state.auth);
     const [vehicleImages, setVehicleImages] = useState<{ [key: string]: File | null }>({
         front: null,
         back: null,
@@ -47,7 +48,7 @@ export default function AddVehiclePage() {
     });
     const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
 
-    const getDirectionLabel = (direction: string) => t(`imageLabels.${direction}` as any);
+    const getDirectionLabel = (direction: string) => t(`imageLabels.${direction}` as 'imageLabels.front' | 'imageLabels.back' | 'imageLabels.left' | 'imageLabels.right');
 
     // Dynamic Options State
     const [brandOptions, setBrandOptions] = useState<VehicleBrand[]>([]);
@@ -89,7 +90,7 @@ export default function AddVehiclePage() {
             };
             fetchCities();
         }
-    }, [formData.plateFormat]);
+    }, [formData.plateFormat, cityOptions.length]);
 
     // Fetch Models when Make (Brand) changes
     React.useEffect(() => {
@@ -324,7 +325,13 @@ export default function AddVehiclePage() {
 
                 {previewUrls[direction] ? (
                     <>
-                        <img src={previewUrls[direction]!} alt={t('actions.imagePreview', { label })} className="w-full h-full object-cover rounded-md" />
+                        <Image
+                            src={previewUrls[direction]!}
+                            alt={t('actions.imagePreview', { label })}
+                            className="w-full h-full object-cover rounded-md"
+                            width={400}
+                            height={400}
+                        />
                         <button
                             onClick={(e) => { e.stopPropagation(); removeImage(direction); }}
                             className="absolute -top-2 -end-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600 z-10"
@@ -528,7 +535,7 @@ export default function AddVehiclePage() {
                                         <span className="text-xs font-bold text-gray-900">{t('plate.newFormat')}</span>
                                     </div>
                                     <div className="bg-gray-100 rounded-lg overflow-hidden h-16 w-full relative">
-                                        <img src="/assets/plates/new-plate.png" alt={t('plate.newFormat')} className="w-full h-full object-contain" />
+                                        <Image src="/assets/plates/new-plate.png" alt={t('plate.newFormat')} className="w-full h-full object-contain" width={200} height={64} />
                                     </div>
                                 </div>
 
@@ -546,7 +553,7 @@ export default function AddVehiclePage() {
                                         <span className="text-xs font-bold text-gray-900">{t('plate.oldFormat')}</span>
                                     </div>
                                     <div className="bg-gray-100 rounded-lg overflow-hidden h-16 w-full relative">
-                                        <img src="/assets/plates/old-plate.png" alt={t('plate.oldFormat')} className="w-full h-full object-contain" />
+                                        <Image src="/assets/plates/old-plate.png" alt={t('plate.oldFormat')} className="w-full h-full object-contain" width={200} height={64} />
                                     </div>
                                 </div>
                             </div>

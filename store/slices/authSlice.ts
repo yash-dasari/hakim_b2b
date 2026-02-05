@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import Cookies from 'js-cookie';
-import { authAPI, LoginPayload, LoginResponse, UserProfileResponse } from '../../services/api/auth.api';
+import { authAPI, LoginPayload } from '../../services/api/auth.api';
 
 // Helper function to process user profile data and extract firstName/lastName
 function processUserProfile(userProfile: any) {

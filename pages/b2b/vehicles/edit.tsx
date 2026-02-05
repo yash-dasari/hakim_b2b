@@ -1,11 +1,10 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useCallback } from 'react';
+import Image from 'next/image';
 import { toast } from 'react-hot-toast';
 import AdminLayout from '../../../components/AdminLayout';
 import { FaArrowLeft, FaBarcode, FaPalette, FaEdit } from 'react-icons/fa';
 import { useRouter } from 'next/router';
 import { vehiclesAPI, VehicleBrand, VehicleModel } from '../../../services/api/vehicles.api';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../../store/store';
 import SearchableSelect from '../../../components/common/SearchableSelect';
 import { useTranslations } from 'next-intl';
 
@@ -13,22 +12,7 @@ export default function EditVehiclePage() {
     const router = useRouter();
     const t = useTranslations('editVehicle');
     const tCommon = useTranslations('common');
-    const { user, company } = useSelector((state: RootState) => state.auth);
     const { id } = router.query;
-
-    // We only proceeded if ID is present, which usually implies edit mode is valid
-    const isEditMode = !!id;
-
-    // Image state (kept for compatibility, though obscured in UI)
-    const [vehicleImages, setVehicleImages] = useState<{ [key: string]: File | null }>({
-        front: null, back: null, left: null, right: null
-    });
-    const [previewUrls, setPreviewUrls] = useState<{ [key: string]: string | null }>({
-        front: null, back: null, left: null, right: null
-    });
-    const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({
-        front: null, back: null, left: null, right: null
-    });
 
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
@@ -53,12 +37,12 @@ export default function EditVehiclePage() {
     const [pendingModelName, setPendingModelName] = useState<string | null>(null);
 
     // Helper: Format Detection
-    const detectPlateFormat = (plate: string) => {
+    const detectPlateFormat = useCallback((plate: string) => {
         // New: 22 G 99720 or 22 AB 99720
         const newFormatRegex = /^\d{2}\s+[A-Za-z]{1,2}\s+\d{5}$/;
         if (newFormatRegex.test(plate)) return 'new';
         return 'old';
-    };
+    }, []);
 
     // 1. Fetch Brands & Handle Pre-fill
     React.useEffect(() => {
@@ -116,8 +100,6 @@ export default function EditVehiclePage() {
                         }
                     } else {
                         console.warn('⚠️ Could not find matching brand for:', makeName);
-                        // We do NOT error toast here for Make, as user can just select it.
-                        // But good to log.
                     }
                 }
             } catch (error) {
@@ -127,7 +109,7 @@ export default function EditVehiclePage() {
             }
         };
         fetchBrandsAndPrefill();
-    }, [router.isReady, router.query]); // Depend on router ready
+    }, [router.isReady, router.query, detectPlateFormat]); // Depend on router ready
 
     // 2. Fetch Models when Make changes
     React.useEffect(() => {
@@ -136,10 +118,6 @@ export default function EditVehiclePage() {
                 setModelOptions([]);
                 return;
             }
-
-            // Only fetch if we don't have models or if make changed (handled by dep array)
-            // But we can check if current models belong to this make? API doesn't return make_id in model list easily.
-            // So just fetch.
 
             setIsLoadingModels(true);
             try {
@@ -168,8 +146,6 @@ export default function EditVehiclePage() {
                 m.model_name.toLowerCase().trim() === pendingModelName.toLowerCase().trim()
             );
 
-            // If not found, try finding by ID if pendingModelName happens to be an ID?
-            // Unlikely from current navigation, but good safety.
             if (!matchedModel) {
                 matchedModel = modelOptions.find(m => m.model_id === pendingModelName);
             }
@@ -180,12 +156,10 @@ export default function EditVehiclePage() {
                 setPendingModelName(null); // Clear it so we don't re-set
             } else {
                 console.warn('❌ Could not find match for model:', pendingModelName, 'Available options:', modelOptions.map(m => m.model_name));
-                // Toast to help debug visually
                 toast.error(t('errors.autoSelectModel', { model: pendingModelName }));
-                // setPendingModelName(null); // Optional: stop trying
             }
         }
-    }, [modelOptions, pendingModelName]);
+    }, [modelOptions, pendingModelName, t]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -200,8 +174,6 @@ export default function EditVehiclePage() {
         if (!formData.year) errors.year = t('validation.yearRequired');
         if (!formData.color) errors.color = t('validation.colorRequired');
         if (!formData.plateNumber) errors.plateNumber = t('validation.plateRequired');
-
-        // Image validation removed
 
         setFormErrors(errors);
         if (Object.keys(errors).length > 0) toast.error(t('validation.requiredFields'));
@@ -253,7 +225,6 @@ export default function EditVehiclePage() {
             subtitle={t('subtitle')}
         >
             <div className="max-w-3xl mx-auto pt-8 pb-12">
-                {/* Stepper omitted for Edit mode or kept simple */}
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                     <div className="p-8 border-b border-gray-100">
                         <h2 className="text-lg font-bold text-gray-900 mb-2">{t('sections.vehicleInfo.title')}</h2>
@@ -367,7 +338,6 @@ export default function EditVehiclePage() {
                         <div className="space-y-4">
                             <label className="text-xs font-bold text-gray-700 block">{t('fields.licensePlate')} <span className="text-red-500">*</span></label>
 
-                            {/* Format Selector */}
                             <div className="grid grid-cols-2 gap-4">
                                 <div
                                     onClick={() => setFormData(prev => ({ ...prev, plateFormat: 'new', plateNumber: '' }))}
@@ -380,7 +350,13 @@ export default function EditVehiclePage() {
                                         <span className="text-xs font-bold text-gray-900">{t('plate.newFormat')}</span>
                                     </div>
                                     <div className="bg-gray-100 rounded-lg overflow-hidden h-16 w-full relative">
-                                        <img src="/assets/plates/new-plate.png" alt={t('plate.newFormat')} className="w-full h-full object-contain" />
+                                        <Image
+                                            src="/assets/plates/new-plate.png"
+                                            alt={t('plate.newFormat')}
+                                            className="w-full h-full object-contain"
+                                            width={200}
+                                            height={64}
+                                        />
                                     </div>
                                 </div>
                                 <div
@@ -394,12 +370,17 @@ export default function EditVehiclePage() {
                                         <span className="text-xs font-bold text-gray-900">{t('plate.oldFormat')}</span>
                                     </div>
                                     <div className="bg-gray-100 rounded-lg overflow-hidden h-16 w-full relative">
-                                        <img src="/assets/plates/old-plate.png" alt={t('plate.oldFormat')} className="w-full h-full object-contain" />
+                                        <Image
+                                            src="/assets/plates/old-plate.png"
+                                            alt={t('plate.oldFormat')}
+                                            className="w-full h-full object-contain"
+                                            width={200}
+                                            height={64}
+                                        />
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Inputs (Same logic as add.tsx) */}
                             <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
                                 {formData.plateFormat === 'new' ? (
                                     <div className="flex gap-2 items-center">
@@ -408,18 +389,6 @@ export default function EditVehiclePage() {
                                             maxLength={2}
                                             placeholder="22"
                                             className="w-full px-3 py-2 text-center text-lg font-bold border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FCD34D]"
-                                            onFocus={(e) => {
-                                                // If starting empty, ensure we parse correctly. 
-                                                // Actually for pre-fill, we need to populate this input value from formData.plateNumber.
-                                                // Simplified for edit: We just let user type if they want to change.
-                                                // BUT WAIT: The input values are not bound to state pieces!
-                                                // In add.tsx, they were uncontrolled inputs that updated state.
-                                                // For EDIT, we need them to be controlled or initialized.
-                                                // Let's parse formData.plateNumber to set defaultValues?
-                                                // Or better, bind them to helper state.
-                                            }}
-                                            // Controlled inputs required for Edit! 
-                                            // Extracting parts from state for value prop:
                                             value={formData.plateNumber.split(' ')[0] || ''}
                                             onChange={(e) => {
                                                 const val = e.target.value.replace(/\D/g, '');

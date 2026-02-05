@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import AdminLayout from '../../components/AdminLayout';
 import { FaBuilding, FaPen, FaFileAlt, FaEye, FaPhoneAlt, FaEnvelope, FaUser, FaInfoCircle, FaCheckCircle, FaFileUpload, FaSave, FaMapMarkerAlt, FaDownload, FaTimes } from 'react-icons/fa';
 import { authAPI } from '../../services/api/auth.api';
@@ -86,11 +86,7 @@ export default function AccountPage() {
         }
     };
 
-    useEffect(() => {
-        fetchInitialData();
-    }, []);
-
-    const fetchInitialData = async () => {
+    const fetchInitialData = useCallback(async () => {
         setIsLoading(true);
         try {
             const [companyRes, contactRes] = await Promise.all([
@@ -134,7 +130,11 @@ export default function AccountPage() {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [t]);
+
+    useEffect(() => {
+        fetchInitialData();
+    }, [fetchInitialData]);
 
     const handleSave = async () => {
         if (!companyId) return;
@@ -278,17 +278,6 @@ export default function AccountPage() {
                             {!isEditing && (
                                 <div className="flex justify-between items-center mb-2">
                                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{t('company.tradeDocument.title')}</p>
-                                    {/* {formData.tradeLicenseSignedUrl && (
-                                        <a
-                                            href={formData.tradeLicenseSignedUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            download
-                                            className="text-[10px] font-bold text-[#FCD34D] flex items-center gap-1 hover:text-[#FBBF24]"
-                                        >
-                                            <FaDownload /> Download
-                                        </a>
-                                    )} */}
                                 </div>
                             )}
 

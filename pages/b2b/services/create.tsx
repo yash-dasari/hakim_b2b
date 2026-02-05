@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import AdminLayout from '../../../components/AdminLayout';
 import { useRouter } from 'next/router';
 import { FaCog, FaSearch, FaCheck, FaTimesCircle } from 'react-icons/fa';
@@ -33,14 +33,7 @@ export default function CreateServiceRequestPage() {
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
     const [isLoadingVehicles, setIsLoadingVehicles] = useState(false);
 
-    // Initial Vehicle Fetch
-    useEffect(() => {
-        if (company?.id) {
-            fetchVehicles();
-        }
-    }, [company?.id]);
-
-    const fetchVehicles = async () => {
+    const fetchVehicles = useCallback(async () => {
         setIsLoadingVehicles(true);
         try {
             if (!company?.id) return;
@@ -63,7 +56,14 @@ export default function CreateServiceRequestPage() {
         } finally {
             setIsLoadingVehicles(false);
         }
-    };
+    }, [company?.id, t]);
+
+    // Initial Vehicle Fetch
+    useEffect(() => {
+        if (company?.id) {
+            fetchVehicles();
+        }
+    }, [company?.id, fetchVehicles]);
 
     // Service State
     const [categories, setCategories] = useState<ServiceCategory[]>([]);
@@ -99,17 +99,165 @@ export default function CreateServiceRequestPage() {
     const [dropOffAddress, setDropOffAddress] = useState('');
     const [dropOffCoords, setDropOffCoords] = useState<{ latitude: number; longitude: number } | null>(null);
     const [isLoadingNearby, setIsLoadingNearby] = useState(false);
+    const [permissionDenied, setPermissionDenied] = useState(false);
 
     // Payment Modal State
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    // Price Estimation State
+    const [estimatedPrice, setEstimatedPrice] = useState<{
+        subtotal?: string;
+        total?: string;
+        currency?: string;
+        fee_details?: Array<{ fee_breakdown: Array<{ type: string; price: string; currency?: string }> }>;
+        fee_breakdown?: Array<{ name: string; amount: string; description?: string }>;
+    } | null>(null);
+
     // Derived State
     const selectedService = services.find(s => s.service_catalog_id === selectedServiceId);
 
+    const fetchCategories = useCallback(async () => {
+        setIsLoadingCategories(true);
+        try {
+            const response = await servicesAPI.getServiceCategories();
+            if (response.success) {
+                setCategories(response.data);
+            } else {
+                toast.error(t('errors.categoriesFailed'));
+            }
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+            toast.error(t('errors.categoriesFailed'));
+        } finally {
+            setIsLoadingCategories(false);
+        }
+    }, [t]);
+
+    const getBookingPayload = useCallback((): BatchBookingPayload | null => {
+        if (!company?.id || !selectedServiceId || !selectedProviderId || selectedVehicleIds.size === 0) return null;
+
+        // Calculate schedule
+        let scheduledAt = new Date().toISOString();
+        if (selectedSchedule === 'Scheduled' && scheduledDate) {
+            let hours = parseInt(scheduledHour);
+            if (scheduledAmPm === 'PM' && hours < 12) hours += 12;
+            if (scheduledAmPm === 'AM' && hours === 12) hours = 0;
+            const timeString = `${hours.toString().padStart(2, '0')}:${scheduledMinute}:00`;
+            const date = new Date(`${scheduledDate}T${timeString}`);
+            scheduledAt = date.toISOString();
+        }
+
+        return {
+            company_id: company.id,
+            bookings: Array.from(selectedVehicleIds).map(vehicleId => {
+                let serviceCenterId: string | undefined = (isVanService || isTowService) ? undefined : selectedLocation;
+                let dropoffAddress = '';
+                let dropoffCoordinates: { latitude: number; longitude: number } | undefined = undefined;
+
+                if (isTowService) {
+                    dropoffAddress = dropOffAddress;
+                    if (dropOffCoords) {
+                        dropoffCoordinates = {
+                            latitude: dropOffCoords.latitude,
+                            longitude: dropOffCoords.longitude
+                        };
+                    }
+                } else if (!isVanService) {
+                    const center = serviceCenters.find(c => (c.id || c.service_center_id || c.uuid) === selectedLocation || c.name === selectedLocation);
+                    if (center) {
+                        serviceCenterId = center.id || center.service_center_id || center.uuid || undefined;
+                        dropoffAddress = center.address || center.location || center.name || '';
+                        if (center.latitude && center.longitude) {
+                            const lat = typeof center.latitude === 'string' ? parseFloat(center.latitude) : center.latitude;
+                            const lng = typeof center.longitude === 'string' ? parseFloat(center.longitude) : center.longitude;
+                            dropoffCoordinates = !isNaN(lat) && !isNaN(lng) ? { latitude: lat, longitude: lng } : undefined;
+                        }
+                    }
+                }
+
+                const item: any = {
+                    vehicle_id: vehicleId,
+                    service_catalog_id: selectedServiceId,
+                    service_provider_id: selectedProviderId,
+                    booking_type: selectedSchedule ? selectedSchedule.toLowerCase() : 'scheduled',
+                    scheduled_at: scheduledAt,
+                    notes: notes[vehicleId] || '',
+                    service_center_id: serviceCenterId || undefined,
+                    addon_ids: []
+                };
+
+                if (selectedSchedule !== 'Express') {
+                    item.scheduled_type = selectedSchedule ? selectedSchedule.toLowerCase() : 'scheduled';
+                }
+
+                if (dropoffAddress) item.dropoff_address = dropoffAddress;
+                if (dropoffCoordinates) item.dropoff_coordinates = dropoffCoordinates;
+
+                if (isMobileProvider && pickupAddress) {
+                    item.pickup_address = pickupAddress;
+                    item.pickup_coordinates = selectedCoords ?
+                        { latitude: selectedCoords.latitude, longitude: selectedCoords.longitude } :
+                        { latitude: 0, longitude: 0 };
+                }
+
+                return item;
+            })
+        };
+    }, [company?.id, selectedServiceId, selectedProviderId, selectedVehicleIds, selectedSchedule, scheduledDate, scheduledHour, scheduledMinute, scheduledAmPm, isVanService, isTowService, selectedLocation, dropOffAddress, dropOffCoords, serviceCenters, isMobileProvider, pickupAddress, selectedCoords, notes]);
+
+    // Fetch Estimation Effect
+    useEffect(() => {
+        const fetchEstimation = async () => {
+            // Only fetch if Price Mode is Show Price
+            if (services.find(s => s.service_catalog_id === selectedServiceId)?.price_mode !== 'Show Price') {
+                return;
+            }
+
+            const payload = getBookingPayload();
+            if (payload) {
+                try {
+                    // console.log("Fetching price estimation...", payload);
+                    // API Temporarily disabled due to 422 error
+                    // const response = await servicesAPI.getBookingEstimation(payload);
+                    // if (response.success || response.total) { 
+                    //     setEstimatedPrice(response.data || response); 
+                    // }
+                } catch (error) {
+                    console.error("Failed to fetch price estimation", error);
+                }
+            } else {
+                setEstimatedPrice(null);
+            }
+        };
+
+        const timer = setTimeout(() => {
+            // fetchEstimation(); 
+        }, 500); // Debounce
+
+        return () => clearTimeout(timer);
+    }, [getBookingPayload, selectedServiceId, services]);
+
+    const fetchServices = useCallback(async (categoryId: string) => {
+        setIsLoadingServices(true);
+        try {
+            const response = await servicesAPI.getServices(categoryId);
+            if (response.success) {
+                setServices(response.data);
+            } else {
+                toast.error(t('errors.servicesFailed'));
+            }
+        } catch (error) {
+            console.error('Error fetching services:', error);
+            toast.error(t('errors.servicesFailed'));
+        } finally {
+            setIsLoadingServices(false);
+        }
+    }, [t]);
+
     useEffect(() => {
         fetchCategories();
-    }, []);
+    }, [fetchCategories]);
 
     useEffect(() => {
         if (selectedCategoryId) {
@@ -118,106 +266,63 @@ export default function CreateServiceRequestPage() {
             setServices([]);
             setSelectedServiceId('');
         }
-    }, [selectedCategoryId]);
+    }, [selectedCategoryId, fetchServices]);
 
-    // Update dependent dropdowns when service changes
-    useEffect(() => {
-        if (selectedServiceId && services.length > 0) {
-            const service = services.find(s => s.service_catalog_id === selectedServiceId);
-            if (service) {
-                setAvailableProviders(service.service_providers_info || []);
+    const fetchNearbyCenters = useCallback(async (lat: number, lng: number, categoryId: string) => {
+        setIsLoadingNearby(true);
+        try {
+            const payload: NearbyServiceCenterPayload = {
+                latitude: lat,
+                longitude: lng,
+                category_id: categoryId // Optional filter
+            };
 
-                // Handle Schedule Options
-                if (service.schedule && Array.isArray(service.schedule)) {
-                    setScheduleOptions(service.schedule);
-                    if (service.schedule.length === 1) {
-                        setSelectedSchedule(service.schedule[0]);
-                    } else {
-                        setSelectedSchedule('');
+            const response = await servicesAPI.getNearbyServiceCenters(payload);
+
+            if (response.success && Array.isArray(response.data)) {
+                // Store full objects for payload construction
+                const centers = response.data as Service[];
+                setServiceCenters(centers as Array<Service & { [key: string]: unknown }>);
+
+                // Fallback: If data is just strings, use it. If objects, map .name
+                const newLocations = centers.map((item: { name?: string; location?: string }) => item.name || item.location || t('location.nearbyCenter'));
+                setAvailableLocations(newLocations);
+
+                // Auto-select the first one if available to be helpful
+                if (centers.length > 0) {
+                    const firstCenter = (centers[0] as unknown) as { id?: string; service_center_id?: string; uuid?: string; name?: string;[key: string]: unknown };
+                    const firstId = firstCenter.id || firstCenter.service_center_id || firstCenter.uuid || firstCenter.name || '';
+                    if (firstId) {
+                        setSelectedLocation(firstId);
                     }
-                } else {
-                    setScheduleOptions([]);
-                    setSelectedSchedule('');
                 }
 
-                // If we have coordinates, re-fetch nearby centers for this service
-                // This ensures we get valid Center UUIDs instead of static strings like "On-Site"
-                if (selectedCoords) {
-                    handleLocationSelect({
-                        lat: selectedCoords.latitude,
-                        lng: selectedCoords.longitude,
-                        address: pickupAddress, // Preserve address if we have it
-                        fullAddress: pickupAddress
-                    });
-                } else {
-                    // If no coords yet, wait for auto-detect or user pin
-                    setAvailableLocations([]);
-                }
+            } else {
+                toast.error(t('errors.noServiceCenters'));
+                setAvailableLocations([]);
+                setServiceCenters([]);
             }
-        } else {
-            setAvailableProviders([]);
-            setAvailableLocations([]);
-            setScheduleOptions([]);
-            setSelectedSchedule('');
+        } catch (error) {
+            console.error('Error fetching nearby centers:', error);
+            toast.error(t('errors.nearbyCentersFailed'));
+        } finally {
+            setIsLoadingNearby(false);
         }
-        // Reset selections
-        setSelectedProviderId('');
-        setSelectedLocation('');
-        setShowMap(false);
-    }, [selectedServiceId, services]);
+    }, [t]);
 
-    // Check if provider needs map selection
-    useEffect(() => {
-        if (selectedProviderId && availableProviders.length > 0) {
-            const provider = availableProviders.find(p => p.provider_id === selectedProviderId);
-            if (provider) {
-                // Logic to determine if map is needed based on provider name/description
-                // User examples: "Hakim van", "PickUp Valet", "Mini Van", "Towing", "Tow Partner"
-                const isMobile = /valet|van|mobile|tow|recovery/i.test(provider.name || '') || /pick up|pickup|tow|recovery/i.test(provider.description || '');
-                // Van Service if name has Van but NOT Valet/Towing (to stay safe)
-                const isVan = /van/i.test(provider.name || '') && !/valet|tow|recovery/i.test(provider.name || '');
-                // Tow Service detection
-                const isTow = /tow|recovery/i.test(provider.name || '') || /tow|recovery/i.test(provider.description || '');
+    const handleLocationSelect = useCallback(async (location: { lat: number; lng: number; address?: string; fullAddress?: string }) => {
+        // Always update location state (auto-detected or manually picked)
+        // This ensures that if the user selects a mobile provider LATER, the auto-detected location is already there.
+        const address = location.fullAddress || location.address || `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}`;
+        setPickupAddress(address);
+        setSelectedCoords({ latitude: location.lat, longitude: location.lng });
 
-                setIsMobileProvider(isMobile);
-                setIsVanService(isVan);
-                setIsTowService(isTow);
+        // Search for nearby centers (For both Mobile as Destination, and Standard as Service Center)
+        // For Mobile, we use the picked up location as the reference point to find nearest centers
+        await fetchNearbyCenters(location.lat, location.lng, selectedCategoryId);
+    }, [selectedCategoryId, fetchNearbyCenters]);
 
-                // Show Map for ALL providers (Mobile needs it for pickup, Service Center needs it for auto-detected location)
-                setShowMap(true);
-
-                // Trigger location fetch (get nearby centers) if we have coordinates
-                // This is needed for:
-                // 1. Service Center: To populate the list of nearby centers
-                // 2. Valet: To populate the list of destination centers
-                // 3. Van/Tow: Harmless (dropdown hidden by UI anyway) but good for consistency
-                if (selectedCoords) {
-                    handleLocationSelect({
-                        lat: selectedCoords.latitude,
-                        lng: selectedCoords.longitude,
-                        address: pickupAddress,
-                        fullAddress: pickupAddress
-                    });
-                }
-            }
-        } else {
-            setShowMap(false);
-            setIsMobileProvider(false);
-            setIsVanService(false);
-            setIsTowService(false);
-            setServiceCenters([]); // Clear when no provider
-            setAvailableLocations([]);
-        }
-    }, [selectedProviderId, availableProviders, services, selectedServiceId]);
-
-    const [permissionDenied, setPermissionDenied] = useState(false);
-
-    // Auto-detect location on mount
-    useEffect(() => {
-        detectLocation();
-    }, []);
-
-    const detectLocation = () => {
+    const detectLocation = useCallback(() => {
         if (!navigator.geolocation) {
             console.log('Geolocation not supported');
             setPermissionDenied(true);
@@ -274,93 +379,98 @@ export default function CreateServiceRequestPage() {
                 setPermissionDenied(true);
             }
         );
-    };
+    }, [t]);
 
-    const handleLocationSelect = async (location: { lat: number; lng: number; address?: string; fullAddress?: string }) => {
-        // Always update location state (auto-detected or manually picked)
-        // This ensures that if the user selects a mobile provider LATER, the auto-detected location is already there.
-        const address = location.fullAddress || location.address || `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}`;
-        setPickupAddress(address);
-        setSelectedCoords({ latitude: location.lat, longitude: location.lng });
+    // Auto-detect location on mount
+    useEffect(() => {
+        detectLocation();
+    }, [detectLocation]);
 
-        // Search for nearby centers (For both Mobile as Destination, and Standard as Service Center)
-        // For Mobile, we use the picked up location as the reference point to find nearest centers
-        setIsLoadingNearby(true);
+    // Update dependent dropdowns when service changes
+    useEffect(() => {
+        if (selectedServiceId && services.length > 0) {
+            const service = services.find(s => s.service_catalog_id === selectedServiceId);
+            if (service) {
+                setAvailableProviders(service.service_providers_info || []);
 
-        try {
-            const payload: NearbyServiceCenterPayload = {
-                latitude: location.lat,
-                longitude: location.lng,
-                category_id: selectedCategoryId // Optional filter
-            };
-
-            const response = await servicesAPI.getNearbyServiceCenters(payload);
-
-            if (response.success && Array.isArray(response.data)) {
-                // Store full objects for payload construction
-                const centers = response.data as Service[];
-                setServiceCenters(centers as Array<Service & { [key: string]: unknown }>);
-
-                // Fallback: If data is just strings, use it. If objects, map .name
-                const newLocations = centers.map((item: { name?: string; location?: string }) => item.name || item.location || t('location.nearbyCenter'));
-                setAvailableLocations(newLocations);
-
-                // Auto-select the first one if available to be helpful
-                if (centers.length > 0) {
-                    const firstCenter = (centers[0] as unknown) as { id?: string; service_center_id?: string; uuid?: string; name?: string;[key: string]: unknown };
-                    const firstId = firstCenter.id || firstCenter.service_center_id || firstCenter.uuid || firstCenter.name || '';
-                    if (firstId) {
-                        setSelectedLocation(firstId);
+                // Handle Schedule Options
+                if (service.schedule && Array.isArray(service.schedule)) {
+                    setScheduleOptions(service.schedule);
+                    if (service.schedule.length === 1) {
+                        setSelectedSchedule(service.schedule[0]);
+                    } else {
+                        setSelectedSchedule('');
                     }
+                } else {
+                    setScheduleOptions([]);
+                    setSelectedSchedule('');
                 }
 
-
-            } else {
-                toast.error(t('errors.noServiceCenters'));
-                setAvailableLocations([]);
-                setServiceCenters([]);
+                // If we have coordinates, re-fetch nearby centers for this service
+                // This ensures we get valid Center UUIDs instead of static strings like "On-Site"
+                if (selectedCoords) {
+                    fetchNearbyCenters(selectedCoords.latitude, selectedCoords.longitude, selectedCategoryId);
+                } else {
+                    // If no coords yet, wait for auto-detect or user pin
+                    setAvailableLocations([]);
+                }
             }
-        } catch (error) {
-            console.error('Error fetching nearby centers:', error);
-            toast.error(t('errors.nearbyCentersFailed'));
-        } finally {
-            setIsLoadingNearby(false);
+        } else {
+            setAvailableProviders([]);
+            setAvailableLocations([]);
+            setScheduleOptions([]);
+            setSelectedSchedule('');
         }
-    };
+        // Reset selections
+        setSelectedProviderId('');
+        setSelectedLocation('');
+        setShowMap(false);
+    }, [selectedServiceId, services]);
 
-    const fetchCategories = async () => {
-        setIsLoadingCategories(true);
-        try {
-            const response = await servicesAPI.getServiceCategories();
-            if (response.success) {
-                setCategories(response.data);
-            } else {
-                toast.error(t('errors.categoriesFailed'));
-            }
-        } catch (error) {
-            console.error('Error fetching categories:', error);
-            toast.error(t('errors.categoriesFailed'));
-        } finally {
-            setIsLoadingCategories(false);
-        }
-    };
+    // Check if provider needs map selection
+    useEffect(() => {
+        if (selectedProviderId && availableProviders.length > 0) {
+            const provider = availableProviders.find(p => p.provider_id === selectedProviderId);
+            if (provider) {
+                // Logic to determine if map is needed based on provider name/description
+                // User examples: "Hakim van", "PickUp Valet", "Mini Van", "Towing", "Tow Partner"
+                const isMobile = /valet|van|mobile|tow|recovery/i.test(provider.name || '') || /pick up|pickup|tow|recovery/i.test(provider.description || '');
+                // Van Service if name has Van but NOT Valet/Towing (to stay safe)
+                const isVan = /van/i.test(provider.name || '') && !/valet|tow|recovery/i.test(provider.name || '');
+                // Tow Service detection
+                const isTow = /tow|recovery/i.test(provider.name || '') || /tow|recovery/i.test(provider.description || '');
 
-    const fetchServices = async (categoryId: string) => {
-        setIsLoadingServices(true);
-        try {
-            const response = await servicesAPI.getServices(categoryId);
-            if (response.success) {
-                setServices(response.data);
-            } else {
-                toast.error(t('errors.servicesFailed'));
+                setIsMobileProvider(isMobile);
+                setIsVanService(isVan);
+                setIsTowService(isTow);
+
+                // Show Map for ALL providers (Mobile needs it for pickup, Service Center needs it for auto-detected location)
+                setShowMap(true);
+
+                // Trigger location fetch (get nearby centers) if we have coordinates
+                // This is needed for:
+                // 1. Service Center: To populate the list of nearby centers
+                // 2. Valet: To populate the list of destination centers
+                // 3. Van/Tow: Harmless (dropdown hidden by UI anyway) but good for consistency
+                if (selectedCoords) {
+                    fetchNearbyCenters(selectedCoords.latitude, selectedCoords.longitude, selectedCategoryId);
+                }
             }
-        } catch (error) {
-            console.error('Error fetching services:', error);
-            toast.error(t('errors.servicesFailed'));
-        } finally {
-            setIsLoadingServices(false);
+        } else {
+            setShowMap(false);
+            setIsMobileProvider(false);
+            setIsVanService(false);
+            setIsTowService(false);
+            setServiceCenters([]); // Clear when no provider
+            setAvailableLocations([]);
         }
-    };
+    }, [selectedProviderId, availableProviders, selectedCategoryId, fetchNearbyCenters]);
+
+
+
+
+
+
 
     const handleNoteChange = (vehicleId: string, note: string) => {
         setNotes(prev => ({ ...prev, [vehicleId]: note }));
@@ -410,16 +520,12 @@ export default function CreateServiceRequestPage() {
             return;
         }
 
-        // Check for 'Show Price' mode
-        if (selectedService?.price_mode === 'Show Price') {
-            setIsPaymentModalOpen(true);
-            return;
-        }
+
 
         await processBookingSubmission();
     };
 
-    const handlePaymentConfirm = async (method: string) => {
+    const handlePaymentConfirm = async () => {
         setIsPaymentModalOpen(false);
         // In a real app, you might pass the payment method to the API
         // For now, we just proceed with the booking creation
@@ -490,8 +596,6 @@ export default function CreateServiceRequestPage() {
             const bookingsPayload: BatchBookingPayload = {
                 company_id: company.id,
                 bookings: Array.from(selectedVehicleIds).map(vehicleId => {
-                    const provider = availableProviders.find(p => p.provider_id === selectedProviderId);
-
                     // For Van and Tow, we might not have a service center ID (destination).
                     let serviceCenterId: string | undefined = (isVanService || isTowService) ? undefined : selectedLocation;
                     let dropoffAddress = '';
@@ -562,9 +666,9 @@ export default function CreateServiceRequestPage() {
             await servicesAPI.createBatchBooking(bookingsPayload);
             toast.success(t('submission.success'), { id: toastId });
             router.push('/b2b/services/requests');
-        } catch (error) {
+        } catch (error: any) {
             console.error('Booking submission failed', error);
-            toast.error(t('submission.failed'), { id: toastId });
+            toast.error(error.message || t('submission.failed'), { id: toastId });
         } finally {
             setIsSubmitting(false); // Always re-enable button
         }
@@ -956,7 +1060,32 @@ export default function CreateServiceRequestPage() {
                                         <input
                                             type="text"
                                             readOnly
-                                            value="0"
+                                            value={(() => {
+                                                if (!estimatedPrice) return '0 IQD';
+
+                                                // Handle batch response structure
+                                                let subtotal = 0;
+                                                let currency = 'IQD';
+
+                                                if (Array.isArray(estimatedPrice.fee_details)) {
+                                                    estimatedPrice.fee_details.forEach(detail => {
+                                                        if (Array.isArray(detail.fee_breakdown)) {
+                                                            detail.fee_breakdown.forEach((fee: any) => {
+                                                                if (fee.type === 'service') {
+                                                                    subtotal += parseFloat(fee.price || 0);
+                                                                }
+                                                                if (fee.currency) currency = fee.currency;
+                                                            });
+                                                        }
+                                                    });
+                                                } else if (estimatedPrice.subtotal) {
+                                                    // Fallback for single object structure if API differs
+                                                    subtotal = parseFloat(estimatedPrice.subtotal);
+                                                    currency = estimatedPrice.currency || 'IQD';
+                                                }
+
+                                                return `${subtotal.toLocaleString()} ${currency}`;
+                                            })()}
                                             className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none"
                                         />
                                     </div>
@@ -986,13 +1115,13 @@ export default function CreateServiceRequestPage() {
                                         <input
                                             type="text"
                                             readOnly
-                                            value="0 Months"
+                                            value={selectedService?.warranty_info || '0 Months'}
                                             className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none"
                                         />
                                     </div>
                                 </div>
 
-                                {/* Transportation Fees */}
+                                {/* Transportation Fees / Other Fees */}
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-bold text-gray-700 block">
                                         {t('serviceInfo.transportationFees', { defaultValue: 'Transportation Fees' })}
@@ -1001,7 +1130,32 @@ export default function CreateServiceRequestPage() {
                                         <input
                                             type="text"
                                             readOnly
-                                            value="0 IQD"
+                                            value={(() => {
+                                                if (!estimatedPrice) return '0 IQD';
+
+                                                // Handle batch response
+                                                let otherFees = 0;
+                                                let currency = 'IQD';
+
+                                                if (Array.isArray(estimatedPrice.fee_details)) {
+                                                    estimatedPrice.fee_details.forEach(detail => {
+                                                        if (Array.isArray(detail.fee_breakdown)) {
+                                                            detail.fee_breakdown.forEach((fee: any) => {
+                                                                if (fee.type !== 'service') {
+                                                                    otherFees += parseFloat(fee.price || 0);
+                                                                }
+                                                                if (fee.currency) currency = fee.currency;
+                                                            });
+                                                        }
+                                                    });
+                                                } else if (estimatedPrice.total && estimatedPrice.subtotal) {
+                                                    // Fallback
+                                                    otherFees = parseFloat(estimatedPrice.total) - parseFloat(estimatedPrice.subtotal);
+                                                    currency = estimatedPrice.currency || 'IQD';
+                                                }
+
+                                                return `${otherFees.toLocaleString()} ${currency}`;
+                                            })()}
                                             className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none"
                                         />
                                     </div>
@@ -1047,7 +1201,12 @@ export default function CreateServiceRequestPage() {
                     isOpen={isPaymentModalOpen}
                     onClose={() => setIsPaymentModalOpen(false)}
                     onConfirm={handlePaymentConfirm}
-                    amount="0 IQD" // Placeholder for now
+                    request={{
+                        service: { type: selectedService?.name },
+                        customer: { name: company?.company_name || 'B2B Company' },
+                        booking_id: '', // Not available until after submission, but required for modal
+                        service_cost: selectedService?.price_mode === 'Show Price' ? 0 : 0
+                    }}
                 />
 
             </div>

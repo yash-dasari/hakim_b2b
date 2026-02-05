@@ -1,5 +1,3 @@
-import axios from 'axios';
-import Cookies from 'js-cookie';
 import { mockDataHelpers, mockVehicles, MockVehicle } from '../data/mockData';
 import { VehicleType } from '../types/vehicle';
 

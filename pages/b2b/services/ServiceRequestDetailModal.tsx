@@ -34,8 +34,8 @@ export default function ServiceRequestDetailModal({
     const t = useTranslations('modals.serviceRequestDetail');
 
     // Toast states
-    const [cancelMessage, setCancelMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-    const [quoteStatusMessage, setQuoteStatusMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+    const [cancelMessage, _setCancelMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+    const [quoteStatusMessage, _setQuoteStatusMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
     // Fetch booking details when modal opens
     useEffect(() => {
@@ -131,10 +131,10 @@ export default function ServiceRequestDetailModal({
                             </h2>
                             <div className="flex items-center gap-2 mt-0.5 text-xs font-medium text-gray-800">
                                 <span className="bg-yellow-200 px-1.5 py-0.5 rounded text-[10px] uppercase tracking-wide">
-                                    {((displayData as unknown) as { service_type_title?: string; service_name?: string; service_type?: string; [key: string]: unknown }).service_type_title || ((displayData as unknown) as { service_type_title?: string; service_name?: string; service_type?: string; [key: string]: unknown }).service_name || ((displayData as unknown) as { service_type_title?: string; service_name?: string; service_type?: string; [key: string]: unknown }).service_type || t('serviceFallback')}
+                                    {((displayData as unknown) as { service_type_title?: string; service_name?: string; service_type?: string;[key: string]: unknown }).service_type_title || ((displayData as unknown) as { service_type_title?: string; service_name?: string; service_type?: string;[key: string]: unknown }).service_name || ((displayData as unknown) as { service_type_title?: string; service_name?: string; service_type?: string;[key: string]: unknown }).service_type || t('serviceFallback')}
                                 </span>
                                 <span className="opacity-75">
-                                    {t('createdLabel')} {new Date((((displayData as unknown) as { created_at?: string; scheduled_at?: string; [key: string]: unknown }).created_at || ((displayData as unknown) as { created_at?: string; scheduled_at?: string; [key: string]: unknown }).scheduled_at || Date.now())).toLocaleString()}
+                                    {t('createdLabel')} {new Date((((displayData as unknown) as { created_at?: string; scheduled_at?: string;[key: string]: unknown }).created_at || ((displayData as unknown) as { created_at?: string; scheduled_at?: string;[key: string]: unknown }).scheduled_at || Date.now())).toLocaleString()}
                                 </span>
                             </div>
                         </div>
@@ -237,9 +237,9 @@ export default function ServiceRequestDetailModal({
                                         <label className="block text-[10px] text-gray-400 uppercase tracking-wider mb-0.5">{t('vehicle.makeModel')}</label>
                                         <p className="font-bold text-gray-900 text-xs">
                                             {(() => {
-                                                const data = (displayData as unknown) as { vehicle?: { make?: string; model?: string; year?: number; [key: string]: unknown } | string; [key: string]: unknown };
+                                                const data = (displayData as unknown) as { vehicle?: { make?: string; model?: string; year?: number;[key: string]: unknown } | string;[key: string]: unknown };
                                                 if (typeof data.vehicle === 'object' && data.vehicle) {
-                                                    const vehicle = data.vehicle as { make?: string; model?: string; year?: number; [key: string]: unknown };
+                                                    const vehicle = data.vehicle as { make?: string; model?: string; year?: number;[key: string]: unknown };
                                                     return `${vehicle.make || '--'} ${vehicle.model || '--'} ${vehicle.year || ''}`;
                                                 } else if (typeof data.vehicle === 'string') {
                                                     return data.vehicle;
@@ -252,9 +252,9 @@ export default function ServiceRequestDetailModal({
                                         <label className="block text-[10px] text-gray-400 uppercase tracking-wider mb-0.5">{t('vehicle.vin')}</label>
                                         <p className="font-bold text-gray-900 text-xs">
                                             {(() => {
-                                                const data = (displayData as unknown) as { vehicle?: { vin?: string; [key: string]: unknown } | string; [key: string]: unknown };
+                                                const data = (displayData as unknown) as { vehicle?: { vin?: string;[key: string]: unknown } | string;[key: string]: unknown };
                                                 if (typeof data.vehicle === 'object' && data.vehicle) {
-                                                    const vehicle = data.vehicle as { vin?: string; [key: string]: unknown };
+                                                    const vehicle = data.vehicle as { vin?: string;[key: string]: unknown };
                                                     return vehicle.vin || '--';
                                                 }
                                                 return '--';
@@ -263,15 +263,15 @@ export default function ServiceRequestDetailModal({
                                     </div>
                                     <div>
                                         <label className="block text-[10px] text-gray-400 uppercase tracking-wider mb-0.5">{t('vehicle.plate')}</label>
-                                        <p className="font-bold text-gray-900 text-xs">{((displayData as unknown) as { plate_number?: string; [key: string]: unknown }).plate_number || '--'}</p>
+                                        <p className="font-bold text-gray-900 text-xs">{((displayData as unknown) as { plate_number?: string;[key: string]: unknown }).plate_number || '--'}</p>
                                     </div>
                                     <div>
                                         <label className="block text-[10px] text-gray-400 uppercase tracking-wider mb-0.5">{t('vehicle.mileage')}</label>
                                         <p className="font-bold text-gray-900 text-xs">
                                             {(() => {
-                                                const data = (displayData as unknown) as { vehicle?: { mileage?: number; [key: string]: unknown } | string; [key: string]: unknown };
+                                                const data = (displayData as unknown) as { vehicle?: { mileage?: number;[key: string]: unknown } | string;[key: string]: unknown };
                                                 if (typeof data.vehicle === 'object' && data.vehicle) {
-                                                    const vehicle = data.vehicle as { mileage?: number; [key: string]: unknown };
+                                                    const vehicle = data.vehicle as { mileage?: number;[key: string]: unknown };
                                                     if (vehicle.mileage) {
                                                         return t('vehicle.mileageValue', { value: vehicle.mileage });
                                                     }
@@ -284,9 +284,9 @@ export default function ServiceRequestDetailModal({
                                         <label className="block text-[10px] text-gray-400 uppercase tracking-wider mb-0.5">{t('vehicle.color')}</label>
                                         <p className="font-bold text-gray-900 text-xs">
                                             {(() => {
-                                                const data = (displayData as unknown) as { vehicle?: { color?: string; [key: string]: unknown } | string; [key: string]: unknown };
+                                                const data = (displayData as unknown) as { vehicle?: { color?: string;[key: string]: unknown } | string;[key: string]: unknown };
                                                 if (typeof data.vehicle === 'object' && data.vehicle) {
-                                                    const vehicle = data.vehicle as { color?: string; [key: string]: unknown };
+                                                    const vehicle = data.vehicle as { color?: string;[key: string]: unknown };
                                                     return vehicle.color || '--';
                                                 }
                                                 return '--';
@@ -297,9 +297,9 @@ export default function ServiceRequestDetailModal({
                                         <label className="block text-[10px] text-gray-400 uppercase tracking-wider mb-0.5">{t('vehicle.engine')}</label>
                                         <p className="font-bold text-gray-900 text-xs">
                                             {(() => {
-                                                const data = (displayData as unknown) as { vehicle?: { engine?: string; [key: string]: unknown } | string; [key: string]: unknown };
+                                                const data = (displayData as unknown) as { vehicle?: { engine?: string;[key: string]: unknown } | string;[key: string]: unknown };
                                                 if (typeof data.vehicle === 'object' && data.vehicle) {
-                                                    const vehicle = data.vehicle as { engine?: string; [key: string]: unknown };
+                                                    const vehicle = data.vehicle as { engine?: string;[key: string]: unknown };
                                                     return vehicle.engine || '--';
                                                 }
                                                 return '--';
@@ -317,7 +317,7 @@ export default function ServiceRequestDetailModal({
                                         <label className="block text-[10px] text-gray-400 uppercase tracking-wider mb-0.5">{t('service.type')}</label>
                                         <p className="font-bold text-gray-900 text-xs">
                                             {(() => {
-                                                const data = (displayData as unknown) as { service?: { type?: string; [key: string]: unknown }; service_type_title?: string; service_type?: string; [key: string]: unknown };
+                                                const data = (displayData as unknown) as { service?: { type?: string;[key: string]: unknown }; service_type_title?: string; service_type?: string;[key: string]: unknown };
                                                 return data.service?.type || data.service_type_title || data.service_type || '--';
                                             })()}
                                         </p>
@@ -326,7 +326,7 @@ export default function ServiceRequestDetailModal({
                                         <label className="block text-[10px] text-gray-400 uppercase tracking-wider mb-0.5">{t('service.destination')}</label>
                                         <p className="font-bold text-gray-900 text-xs">
                                             {(() => {
-                                                const data = (displayData as unknown) as { dropoff_location?: { name?: string; [key: string]: unknown }; dropoff_address?: string; [key: string]: unknown };
+                                                const data = (displayData as unknown) as { dropoff_location?: { name?: string;[key: string]: unknown }; dropoff_address?: string;[key: string]: unknown };
                                                 return data.dropoff_location?.name || data.dropoff_address || t('service.autoServiceCenter');
                                             })()}
                                         </p>
@@ -335,7 +335,7 @@ export default function ServiceRequestDetailModal({
                                         <label className="block text-[10px] text-gray-400 uppercase tracking-wider mb-0.5">{t('service.requestedDate')}</label>
                                         <p className="font-bold text-gray-900 text-xs">
                                             {(() => {
-                                                const data = (displayData as unknown) as { created_at?: string; scheduled_at?: string; [key: string]: unknown };
+                                                const data = (displayData as unknown) as { created_at?: string; scheduled_at?: string;[key: string]: unknown };
                                                 const created_at = data.created_at || data.scheduled_at || new Date().toISOString();
                                                 const date = new Date(created_at);
                                                 return `${date.toLocaleDateString()}, ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;

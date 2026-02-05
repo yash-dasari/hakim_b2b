@@ -4,8 +4,7 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Link from 'next/link';
 import Cookies from 'js-cookie';
-import { useSelector } from 'react-redux';
-import { RootState } from '../store/store';
+import Image from 'next/image';
 import { performLogout, isLogoutInProgress } from '../lib/logout-utils';
 import { useTranslations } from 'next-intl';
 import {
@@ -47,9 +46,8 @@ export default function AdminLayout({ children, title, subtitle, headerActions, 
 
 
   // WebSocket Integration (Global)
-  const { lastMessage, isConnected } = useWebSocket();
+  const { lastMessage } = useWebSocket();
   // We don't need company/accessToken here anymore for WS connection as it's handled in provider
-  const { company } = useSelector((state: RootState) => state.auth); // kept for other potential usages if any, or just useAuth
 
   const [notificationCount, setNotificationCount] = useState(0);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
@@ -74,7 +72,7 @@ export default function AdminLayout({ children, title, subtitle, headerActions, 
     }
 
     // Search for message and reference_id in potential locations
-    let targetData: any = null;
+    let targetData: Record<string, unknown> | null = null;
 
     if (rootData.data && rootData.data.data && (rootData.data.data.message || rootData.data.data.reference_id)) {
       targetData = rootData.data.data;
@@ -85,10 +83,10 @@ export default function AdminLayout({ children, title, subtitle, headerActions, 
     }
 
     if (targetData) {
-      if (targetData.message) messageText = targetData.message;
-      if (targetData.reference_id) referenceId = targetData.reference_id;
+      if (targetData.message) messageText = String(targetData.message);
+      if (targetData.reference_id) referenceId = String(targetData.reference_id);
       // Also map type if present
-      if (targetData.type) msgType = targetData.type;
+      if (targetData.type) msgType = targetData.type as 'error' | 'info' | 'success' | 'warning';
     }
 
     // Fallback for type at root if not found in target
@@ -130,7 +128,7 @@ export default function AdminLayout({ children, title, subtitle, headerActions, 
       setNotificationCount(prev => prev + 1);
     }
 
-  }, [lastMessage]); // Removed isNotificationsOpen dependency to avoid stale closure issues if not careful, but setNotificationCount uses func update so it's fine.
+  }, [lastMessage, isNotificationsOpen]); // Removed isNotificationsOpen dependency to avoid stale closure issues if not careful, but setNotificationCount uses func update so it's fine.
 
 
   const handleNotificationClick = () => {
@@ -376,7 +374,7 @@ export default function AdminLayout({ children, title, subtitle, headerActions, 
                     : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
                   }
                 `}
-                onClick={(_e) => {
+                onClick={() => {
                   // Only close sidebar on mobile
                   if (typeof window !== 'undefined' && window.innerWidth < 1024) {
                     setIsSidebarOpen(false);
@@ -451,10 +449,12 @@ export default function AdminLayout({ children, title, subtitle, headerActions, 
                     </button>
                     <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-white font-semibold cursor-pointer hover:opacity-90 transition-opacity">
                       {admin.profilePicture && typeof admin.profilePicture === 'string' ? (
-                        <img
+                        <Image
                           src={admin.profilePicture}
                           alt={typeof admin.firstName === 'string' ? admin.firstName : (typeof admin.name === 'string' ? admin.name : t('adminLabel'))}
                           className="w-full h-full object-cover"
+                          width={40}
+                          height={40}
                         />
                       ) : (
                         <FaUserCircle className="h-6 w-6" />

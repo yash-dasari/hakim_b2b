@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FaFileInvoiceDollar, FaTruck, FaWrench, FaShieldAlt, FaTimes, FaCheckCircle, FaCalculator, FaClock, FaCamera, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaFileInvoiceDollar, FaTruck, FaWrench, FaShieldAlt, FaTimes, FaCheckCircle, FaCalculator, FaClock } from 'react-icons/fa';
 import { useTranslations } from 'next-intl';
 
 interface QuotationModalProps {
@@ -158,7 +158,7 @@ export default function QuotationModal({ isOpen, onClose, quotationData, onAccep
                                                                         {svc.service_name || svc.name || t('fees.serviceItem', { index: services.length > 1 ? idx + 1 : '' })}
                                                                     </p>
                                                                     <p className="text-xs text-gray-500">
-                                                                        {t('fees.quantity', { count: svc.quantity })} {Number(svc.discount_amount) > 0 && <span className="text-green-600 ms-2">{t('fees.discount', { currency: currencySymbol, amount: svc.discount_amount })}</span>}
+                                                                        {t('fees.quantity', { count: svc.quantity ?? 0 })} {Number(svc.discount_amount) > 0 && <span className="text-green-600 ms-2">{t('fees.discount', { currency: currencySymbol, amount: svc.discount_amount ?? 0 })}</span>}
                                                                     </p>
                                                                 </div>
                                                             </div>
@@ -199,7 +199,7 @@ export default function QuotationModal({ isOpen, onClose, quotationData, onAccep
                                                                     {part.name || t('fees.replacementPart')}
                                                                 </p>
                                                                 <p className="text-xs text-gray-500">
-                                                                    {t('fees.qty', { count: part.quantity })}
+                                                                    {t('fees.qty', { count: part.quantity ?? 0 })}
                                                                 </p>
                                                             </div>
                                                         </div>
@@ -246,8 +246,8 @@ export default function QuotationModal({ isOpen, onClose, quotationData, onAccep
                                                             <FaTruck className="text-sm" />
                                                         </div>
                                                         <div>
-                                                        <p className="text-sm font-bold text-gray-900">{t('fees.transportation')}</p>
-                                                        <p className="text-xs text-gray-500">{t('fees.transportationFees')}</p>
+                                                            <p className="text-sm font-bold text-gray-900">{t('fees.transportation')}</p>
+                                                            <p className="text-xs text-gray-500">{t('fees.transportationFees')}</p>
                                                         </div>
                                                     </div>
                                                     <span className="font-bold text-gray-900">

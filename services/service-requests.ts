@@ -1,5 +1,3 @@
-import axios from 'axios';
-import { getSession } from 'next-auth/react';
 import { mockDataHelpers, mockServiceRequests, MockServiceRequest } from '../data/mockData';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
