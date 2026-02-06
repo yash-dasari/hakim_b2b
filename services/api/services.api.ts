@@ -246,9 +246,13 @@ export const servicesAPI = {
      * Initiate payment (FIB or other providers)
      * @param payload { booking_id, amount, currency, provider }
      */
-    initiatePayment: async (payload: { booking_id: string; amount: number; currency: string; provider: string }): Promise<any> => {
+    initiatePayment: async (payload: PaymentPayload): Promise<any> => {
         // Using the endpoint from workflow or assuming finance/v1
-        const response = await apiClient.post('/finance/v1/payments', payload);
+        const response = await apiClient.post('/finance/v1/payments', payload, {
+            validateStatus: function (status) {
+                return status < 500; // Resolve only if the status code is less than 500
+            }
+        });
         return response.data;
     },
 
@@ -301,6 +305,23 @@ export const servicesAPI = {
     },
 
 };
+
+export interface PaymentPayload {
+    booking_id: string;
+    quotation_id?: string;
+    amount: number;
+    currency: string;
+    provider: string;
+    customer_name?: string;
+    customer_email?: string;
+    customer_phone?: string;
+    description?: string;
+    category?: string;
+    success_url?: string;
+    fail_url?: string;
+    cancel_url?: string;
+    redirect_uri?: string;
+}
 
 export interface BookingRequestItem {
     vehicle_id: string;

@@ -697,45 +697,45 @@ export default function B2BDashboard() {
     if (!status) return null;
     const s = status.toLowerCase();
 
-    const config = { bg: 'bg-gray-100 text-gray-600', icon: <FaClock className="me-1.5" />, label: status };
+    const config = { bg: 'bg-gray-100 text-gray-600', icon: <FaClock className="w-3 h-3 me-2" />, label: status };
 
     // Determine colors based on status keywords
-    if (s.includes('quotation price') || s.includes('pending price')) {
+    if (s.includes('quotation price') || s.includes('pending price') || s.includes('awaiting price')) {
       config.bg = 'bg-yellow-50 text-yellow-700 border border-yellow-100';
-      config.icon = <FaClock className="me-1.5" />;
+      config.icon = <FaClock className="w-3 h-3 me-2" />;
     } else if (s.includes('approve quotation')) {
       config.bg = 'bg-blue-50 text-blue-700 border border-blue-100';
-      config.icon = <FaFileInvoiceDollar className="me-1.5" />;
+      config.icon = <FaFileInvoiceDollar className="w-3 h-3 me-2" />;
     } else if (s.includes('technician assignment') || s.includes('pending technician')) {
       config.bg = 'bg-purple-50 text-purple-700 border border-purple-100';
-      config.icon = <FaUserCircle className="me-1.5" />;
+      config.icon = <FaUserCircle className="w-3 h-3 me-2" />;
     } else if (s.includes('technician assigned')) {
       config.bg = 'bg-blue-50 text-blue-700 border border-blue-100';
-      config.icon = <FaCheck className="me-1.5" />;
+      config.icon = <FaCheck className="w-3 h-3 me-2" />;
     } else if (s.includes('driver will start') || s.includes('driver is on')) {
       config.bg = 'bg-cyan-50 text-cyan-700 border border-cyan-100';
-      config.icon = <FaTruck className="me-1.5" />;
+      config.icon = <FaTruck className="w-3 h-3 me-2" />;
     } else if (s.includes('driver arrived') || s.includes('body checking')) {
       config.bg = 'bg-purple-50 text-purple-700 border border-purple-100';
-      config.icon = <FaCamera className="me-1.5" />;
-    } else if (s.includes('approve body check')) {
+      config.icon = <FaCamera className="w-3 h-3 me-2" />;
+    } else if (s.includes('approve body check') || s.includes('confirm body check')) {
       config.bg = 'bg-orange-50 text-orange-700 border border-orange-100';
-      config.icon = <FaClipboardList className="me-1.5" />;
+      config.icon = <FaClipboardList className="w-3 h-3 me-2" />;
     } else if (s.includes('body check report approved')) {
       config.bg = 'bg-green-50 text-green-700 border border-green-100';
-      config.icon = <FaCheckDouble className="me-1.5" />;
+      config.icon = <FaCheckDouble className="w-3 h-3 me-2" />;
     } else if (s.includes('serviced') || s.includes('fixing') || s.includes('start-service')) {
       config.bg = 'bg-indigo-50 text-indigo-700 border border-indigo-100';
-      config.icon = <FaWrench className="me-1.5" />;
+      config.icon = <FaWrench className="w-3 h-3 me-2" />;
     } else if (s.includes('complete payment') || s.includes('payment')) {
       config.bg = 'bg-pink-50 text-pink-700 border border-pink-100';
-      config.icon = <FaCreditCard className="me-1.5" />;
+      config.icon = <FaCreditCard className="w-3 h-3 me-2" />;
     } else if (s.includes('car receiving') || s.includes('receiving')) {
       config.bg = 'bg-teal-50 text-teal-700 border border-teal-100';
-      config.icon = <FaCar className="me-1.5" />;
-    } else if (s.includes('car delivered') || s.includes('completed')) {
+      config.icon = <FaCar className="w-3 h-3 me-2" />;
+    } else if (s.includes('car delivered') || s.includes('completed') || s.includes('car received')) {
       config.bg = 'bg-green-100 text-green-800 border border-green-200';
-      config.icon = <FaCheckCircle className="me-1.5" />;
+      config.icon = <FaCheckCircle className="w-3 h-3 me-2" />;
     }
 
     return (
@@ -795,7 +795,7 @@ export default function B2BDashboard() {
       );
     }
 
-    if (request.status === 'Approve Estimated Price' || request.status?.toLowerCase() === 'approve service pricing') {
+    if (request.status === 'Approve Estimated Price' || request.status?.toLowerCase() === 'approve service pricing' || request.status === 'Awaiting Price Approval') {
       return (
         <div className="flex items-center gap-2">
           <button
@@ -816,7 +816,7 @@ export default function B2BDashboard() {
       );
     }
 
-    if (request.status === 'Awaiting Body Check Response' || request.status === 'Approve Body Check' || request.status === 'Approve Body Check Report') {
+    if (request.status === 'Awaiting Body Check Response' || request.status === 'Approve Body Check' || request.status === 'Approve Body Check Report' || request.status === 'Confirm Body Check Report') {
       return (
         <div className="flex items-center gap-2">
           <button
@@ -851,7 +851,31 @@ export default function B2BDashboard() {
             className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-sm font-bold rounded-lg shadow-sm transition-colors flex items-center gap-2"
           >
             <FaKey />
-            Confirm pickup
+            {t('actions.confirmCarReceived') || 'Confirm Car Receive'}
+          </button>
+          <button
+            onClick={() => handleViewQuotation(request)}
+            className="p-1.5 text-gray-500 hover:text-gray-700 transition-colors"
+            title={t('actions.viewQuotation')}
+          >
+            <FaFileInvoiceDollar className="w-4 h-4" />
+          </button>
+        </div>
+      );
+    }
+
+    if (request.status === 'Car Receiving' || request.status === 'Receiving') {
+      return (
+        <div className="flex items-center gap-2">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleConfirmCarReceived(request.booking_id);
+            }}
+            className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-bold rounded-lg shadow-sm transition-colors flex items-center gap-2"
+          >
+            <FaCheckCircle className="w-4 h-4" />
+            {t('actions.confirmCarReceived') || 'Confirm Car Receive'}
           </button>
           <button
             onClick={() => handleViewQuotation(request)}
