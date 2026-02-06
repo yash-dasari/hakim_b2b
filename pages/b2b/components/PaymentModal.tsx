@@ -34,6 +34,8 @@ export default function PaymentModal({
     const [personalAppLink, setPersonalAppLink] = useState<string | null>(null);
     const [transactionDetails, setTransactionDetails] = useState<{ amount: string, currency: string } | null>(null);
 
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
     const pollInterval = useRef<NodeJS.Timeout | null>(null);
 
     const t = useTranslations('modals.collectPayment');
@@ -47,6 +49,7 @@ export default function PaymentModal({
             setRedirectUrl(null);
             setPaymentStatus(null);
             setTransactionDetails(null);
+            setErrorMessage(null); // Clear error on open
             setIsLoading(false);
         } else {
             // Cleanup on close
@@ -73,7 +76,10 @@ export default function PaymentModal({
         try {
             setIsLoading(true);
             setQrCode(null);
+            setIsLoading(true);
+            setQrCode(null);
             setRedirectUrl(null);
+            setErrorMessage(null); // Clear previous errors
 
             // Clean the cost string: remove currency symbols, commas, spaces
             // Keep digits and decimal point
@@ -91,14 +97,41 @@ export default function PaymentModal({
             }
 
             // Initiate Payment
-            const response = await servicesAPI.initiatePayment({
-                booking_id: request.booking_id,
-                amount: amount,
-                currency: 'IQD',
-                provider: provider
-            });
+            // Initiate Payment using provider-specific payload
+            const origin = typeof window !== 'undefined' ? window.location.origin : '';
+            let payload: any = {};
 
-            if (response && response.data) {
+            if (provider === 'fib') {
+                payload = {
+                    booking_id: request.booking_id!,
+                    quotation_id: (request.quotation_id || request.booking_id!) as string,
+                    amount: amount,
+                    currency: 'IQD',
+                    provider: provider
+                };
+            } else {
+                // FastPay and others
+                payload = {
+                    booking_id: request.booking_id!,
+                    quotation_id: (request.quotation_id || request.booking_id!) as string,
+                    amount: amount,
+                    currency: 'IQD',
+                    provider: provider,
+                    customer_name: request.customer?.name || 'Unknown',
+                    customer_email: (request.customer as any)?.email || 'unknown@example.com',
+                    customer_phone: (request.customer as any)?.phone || '0000000000',
+                    // description: `Payment for booking ${request.booking_id}`, // Removed due to length restriction
+                    category: (request.category as string) || 'General',
+                    success_url: `${origin}/payment/success`,
+                    fail_url: `${origin}/payment/fail`,
+                    cancel_url: `${origin}/payment/cancel`,
+                    redirect_uri: `${origin}/payment/callback`,
+                };
+            }
+
+            const response = await servicesAPI.initiatePayment(payload);
+
+            if (response?.success && response.data) {
                 setTransactionDetails({
                     amount: response.data.amount,
                     currency: response.data.currency
@@ -109,23 +142,32 @@ export default function PaymentModal({
                     setPersonalAppLink(response.data.personal_app_link);
                 }
 
-                if (response.data.redirect_url) {
-                    setRedirectUrl(response.data.redirect_url);
+                if (provider === 'fastpay' && !response.data.redirect_url && !response.data.payment_url) {
+                    setErrorMessage('FastPay is not supported to user. As there would be or might be possible for few value of transactions');
+                    return;
+                }
+
+                if (response.data.redirect_url || response.data.payment_url) {
+                    setRedirectUrl(response.data.redirect_url || response.data.payment_url);
                 }
 
                 setPaymentStatus('pending');
                 startPolling(request.booking_id);
+            } else if (response?.success === false) {
+                const apiErrorMessage = response.error?.message || `Failed to initiate ${provider === 'fib' ? 'FIB' : 'FastPay'} payment. Please try again.`;
+                setErrorMessage(apiErrorMessage);
+                setPaymentStatus('failed');
             } else {
                 console.error('Invalid Response:', response);
                 throw new Error('Failed to initiate payment');
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error(`${provider} Payment Error:`, error);
-            Swal.fire({
-                title: 'Error',
-                text: `Failed to initiate ${provider === 'fib' ? 'FIB' : 'FastPay'} payment. Please try again.`,
-                icon: 'error'
-            });
+            // Fallback for network errors or unexpected exceptions
+            const apiErrorMessage = error.response?.data?.error?.message || error.response?.data?.message || error.message;
+            const displayMessage = apiErrorMessage || `Failed to initiate ${provider === 'fib' ? 'FIB' : 'FastPay'} payment. Please try again.`;
+
+            setErrorMessage(displayMessage);
             setPaymentStatus('failed');
         } finally {
             setIsLoading(false);
@@ -307,6 +349,13 @@ export default function PaymentModal({
                     ) : (
                         // Digital Payment View (FIB or FastPay)
                         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300 text-center">
+                            {errorMessage && (
+                                <div className="bg-red-50 border border-red-100 rounded-lg p-4 flex gap-3 text-red-600 animate-in fade-in slide-in-from-top-2 mx-auto max-w-sm text-left">
+                                    <FaInfoCircle className="mt-0.5 flex-shrink-0" />
+                                    <p className="text-sm font-medium leading-relaxed">{errorMessage}</p>
+                                </div>
+                            )}
+
                             {isLoading ? (
                                 <div className="py-12 flex flex-col items-center justify-center text-gray-500">
                                     <div className={`w-10 h-10 border-4 border-t-transparent rounded-full animate-spin mb-3 ${paymentMethod === 'fastpay' ? 'border-purple-500' : 'border-blue-500'}`}></div>
@@ -384,18 +433,20 @@ export default function PaymentModal({
                                         </div>
                                     )}
 
-                                    {(qrCode || redirectUrl) && (
+                                    {(qrCode || redirectUrl || errorMessage) && (
                                         <div className="space-y-4">
-                                            <div className={`text-xs p-3 rounded-lg flex items-center gap-2 justify-center ${paymentMethod === 'fastpay' ? 'bg-purple-50 text-purple-700' : 'bg-blue-50 text-blue-700'}`}>
-                                                <div className={`w-2 h-2 rounded-full animate-pulse ${paymentMethod === 'fastpay' ? 'bg-purple-500' : 'bg-blue-500'}`}></div>
-                                                Waiting for payment confirmation...
-                                            </div>
+                                            {(qrCode || redirectUrl) && (
+                                                <div className={`text-xs p-3 rounded-lg flex items-center gap-2 justify-center ${paymentMethod === 'fastpay' ? 'bg-purple-50 text-purple-700' : 'bg-blue-50 text-blue-700'}`}>
+                                                    <div className={`w-2 h-2 rounded-full animate-pulse ${paymentMethod === 'fastpay' ? 'bg-purple-500' : 'bg-blue-500'}`}></div>
+                                                    Waiting for payment confirmation...
+                                                </div>
+                                            )}
 
                                             <button
                                                 onClick={() => setPaymentMethod(null)}
                                                 className="text-gray-400 text-sm hover:text-gray-600 underline"
                                             >
-                                                Cancel / Change Method
+                                                {errorMessage ? 'Back to Payment Methods' : 'Cancel / Change Method'}
                                             </button>
                                         </div>
                                     )}
